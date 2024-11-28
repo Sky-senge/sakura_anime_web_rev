@@ -32,8 +32,9 @@
 
     <!-- 每周更新 -->
     <section class="weekly-update">
-      <h2>每周更新</h2>
-      <div class="tabs">
+      <!-- <h2>每周更新</h2> -->
+      <!-- 每周更新的日期按钮 -->
+      <!-- <div class="tabs">
         <el-button
           v-for="day in days"
           :key="day"
@@ -44,7 +45,7 @@
         >
           {{ day }}
         </el-button>
-      </div>
+      </div> -->
       <div class="video-list">
         <div v-for="n in 6" :key="n" class="video-card">
           <div class="video-thumbnail">视频封面</div>
@@ -55,7 +56,7 @@
 
     <!-- 最新国漫和日漫 -->
     <section class="latest-section">
-      <h2>最新国漫</h2>
+      <!-- <h2>最新国漫</h2> -->
       <div class="video-list">
         <div v-for="n in 6" :key="n" class="video-card">
           <div class="video-thumbnail">视频封面</div>
@@ -63,7 +64,8 @@
         </div>
       </div>
 
-      <h2>最新日漫</h2>
+      <!-- <h2>最新日漫</h2> -->
+      <section class="latest-section"></section>
       <div class="video-list">
         <div v-for="n in 6" :key="n" class="video-card">
           <div class="video-thumbnail">视频封面</div>
