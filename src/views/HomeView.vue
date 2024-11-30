@@ -2,12 +2,10 @@
   <div class="container">
     <!-- 导航栏 -->
     <Navbar />
-
     <!-- 推荐大图区域 -->
-    <section class="banner">
+    <div class="banner">
       <Carousel />
-    </section>
-
+    </div>
     <!-- 视频分类展示 -->
     <section class="video-section">
       <div class="section-header">
@@ -43,6 +41,7 @@ export default defineComponent({
 }
 
 .banner {
+  padding-top: 85px;
   margin-bottom: 20px;
   position: relative;
 }
