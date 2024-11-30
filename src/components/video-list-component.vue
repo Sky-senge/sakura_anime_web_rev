@@ -45,11 +45,12 @@ export default defineComponent({
           status: boolean;
           data: Anime[];
           message: string;
-        }>('/anime/getAnimeList?page=1&size=18');
+        }>('/anime/getAnimeList?page=1&size=12');
 
         if (response.data.status) {
           // 成功获取数据，赋值给 animeList
           animeList.value = response.data.data;
+          console.log(animeList.value)
         } else {
           // 接口返回失败信息，打印日志
           console.error('Failed to fetch anime list:', response.data.message);
@@ -84,30 +85,34 @@ export default defineComponent({
 <style scoped>
 .video-list {
   display: flex;
-  flex-wrap: wrap; /* 允许换行 */
-  gap: 10px; /* 卡片间距 */
-  justify-content: center; /* 居中对齐 */
-  max-width: 1200px; /* 最大宽度，防止太宽 */
-  margin: 0 auto; /* 水平居中 */
+  flex-wrap: wrap;
+  background-color: #333;
+  gap: 10px;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .video-card {
-  background: #333;
-  width: calc(16.6% - 10px); /* 16.6% 确保一行最多放 6 个，减去 gap 的宽度 */
-  max-width: 180px; /* 设置最大宽度，防止拉伸 */
-  padding: 10px;
-  text-align: center;
+  width: calc(25% - 10px);
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  flex-grow: 1; /* 允许在行内均匀分布 */
-  box-sizing: border-box; /* 包括 padding */
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.video-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .video-thumbnail {
-  background: #666;
-  height: 130px;
-  margin-bottom: 10px;
+  width: 100%;
+  height: 150px;
   overflow: hidden;
-  border-radius: 4px;
+  border-bottom: 1px solid #ddd;
 }
 
 .video-thumbnail img {
@@ -116,19 +121,12 @@ export default defineComponent({
   object-fit: cover;
 }
 
-.no-cover {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  background-color: #333;
-  color: #fff;
-  font-size: 12px;
-}
-
 .video-name {
-  font-size: 14px;
-  color: #fff;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

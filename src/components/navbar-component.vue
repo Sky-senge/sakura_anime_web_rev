@@ -2,15 +2,18 @@
   <header class="navbar">
     <div class="logo">LOGO</div>
     <nav class="nav-links">
+      <!-- 导航链接按钮 -->
       <el-button type="primary" size="small" class="nav-button">首页</el-button>
       <el-button size="small" class="nav-button">分类</el-button>
+      <!-- 搜索框 -->
       <el-input placeholder="搜索" class="search-bar" />
       <el-button size="small" class="nav-button">排行</el-button>
+      <!-- 登录按钮 -->
       <el-button size="small" class="nav-button" @click="dialogVisible = true">登录</el-button>
       <el-button size="small" class="nav-button">观看记录</el-button>
     </nav>
-
-    <!-- 登录模态框 -->
+    
+    <!-- 登录框模态框 -->
     <el-dialog
       v-model="dialogVisible"
       title="登录"
@@ -40,7 +43,7 @@ import { ref, reactive } from 'vue'
 import { useUserStore } from '@/stores/user'
 import request from '@/utils/request'
 
-// 控制模态框的显示
+// 控制登录框的显示状态
 const dialogVisible = ref(false)
 
 // 登录表单数据
@@ -49,7 +52,7 @@ const loginForm = reactive({
   password: '',
 })
 
-// 表单校验规则
+// 表单验证规则
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
@@ -75,7 +78,6 @@ const submitLogin = async () => {
           const { token, userId } = response.data.data
           const userStore = useUserStore()
           userStore.setUser({ token, userId })
-
           dialogVisible.value = false
           resetForm()
           console.log('登录成功', response.data.message)
@@ -94,36 +96,48 @@ const submitLogin = async () => {
 
 <style scoped>
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #1e1e1e;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
   padding: 10px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .logo {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
-  color: white;
+  color: #007bff;
 }
 
 .nav-links {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 15px;
 }
 
 .nav-button {
+  color: #007bff;
   font-size: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  text-decoration: underline;
 }
 
 .search-bar {
-  width: 200px;
+  width: 250px;
+  border-radius: 4px;
 }
 
 .dialog-footer {
   text-align: right;
 }
 </style>
+
