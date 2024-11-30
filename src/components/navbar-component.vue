@@ -98,7 +98,7 @@ const submitLogin = async () => {
 .navbar {
   position: fixed;
   top: 0;
-  width: 100%;
+  width: 98%;
   background-color: #ffffff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -116,7 +116,9 @@ const submitLogin = async () => {
 
 .nav-links {
   display: flex;
-  gap: 15px;
+  /* gap: 15px;*/
+  column-gap: 15px;
+  
 }
 
 .nav-button {
@@ -133,6 +135,7 @@ const submitLogin = async () => {
 
 .search-bar {
   width: 250px;
+  height: 24px;
   border-radius: 4px;
 }
 
