@@ -1,6 +1,6 @@
 <template>
   <section class="carousel">
-    <a-carousel :style="{ width: '100%', height: '300px' }" :default-current="1" @change="handleChange">
+    <a-carousel :style="{ width: '100%', height: '300px' }" :default-current="1" indicator-type="line" @change="handleChange">
       <a-carousel-item v-for="(image, index) in images" :key="index">
         <img :src="image" alt="轮播图" :style="{ width: '100%', height: '100%', objectFit: 'cover' }" />
       </a-carousel-item>
