@@ -48,6 +48,7 @@ export default defineComponent({
 
 .video-section {
   max-width: 1200px;
+  height: 100vh;
   margin: 0 auto;
   padding: 20px 10px;
   background-color: #333;

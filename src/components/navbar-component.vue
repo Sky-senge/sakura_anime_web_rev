@@ -9,12 +9,12 @@
       <el-input placeholder="搜索" class="search-bar" />
       <el-button size="small" class="nav-button">排行</el-button>
       <!-- 登录按钮 -->
-      <el-button size="small" class="nav-button" @click="dialogVisible = true">登录</el-button>
+      <el-button size="small" class="nav-button" @click="jumpToLogin()">登录</el-button>
       <el-button size="small" class="nav-button">观看记录</el-button>
     </nav>
     
     <!-- 登录框模态框 -->
-    <el-dialog
+    <!-- <el-dialog
       v-model="dialogVisible"
       title="登录"
       width="500"
@@ -34,17 +34,20 @@
           <el-button type="primary" @click="submitLogin">登录</el-button>
         </div>
       </template>
-    </el-dialog>
+    </el-dialog> -->
   </header>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router';
 import request from '@/utils/request'
 
 // 控制登录框的显示状态
 const dialogVisible = ref(false)
+const router = useRouter();
+
 
 // 登录表单数据
 const loginForm = reactive({
@@ -66,6 +69,9 @@ const resetForm = (done?: () => void) => {
   loginForm.username = ''
   loginForm.password = ''
   if (done) done()
+}
+const jumpToLogin = () => {
+  router.push('/login')
 }
 
 // 提交登录
@@ -98,7 +104,7 @@ const submitLogin = async () => {
 .navbar {
   position: fixed;
   top: 0;
-  width: 98%;
+  width: 99%;
   background-color: #ffffff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
