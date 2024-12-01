@@ -45,59 +45,59 @@ import { useRouter } from 'vue-router';
 import request from '@/utils/request'
 
 // 控制登录框的显示状态
-const dialogVisible = ref(false)
+//const dialogVisible = ref(false)
 const router = useRouter();
 
 
 // 登录表单数据
-const loginForm = reactive({
-  username: '',
-  password: '',
-})
+// const loginForm = reactive({
+//   username: '',
+//   password: '',
+// })
 
 // 表单验证规则
-const rules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-}
+// const rules = {
+//   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+//   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+// }
 
 // 表单引用
 const loginFormRef = ref()
 
 // 重置表单
-const resetForm = (done?: () => void) => {
-  loginForm.username = ''
-  loginForm.password = ''
-  if (done) done()
-}
+// const resetForm = (done?: () => void) => {
+//   loginForm.username = ''
+//   loginForm.password = ''
+//   if (done) done()
+// }
 const jumpToLogin = () => {
   router.push('/login')
 }
 
 // 提交登录
-const submitLogin = async () => {
-  loginFormRef.value?.validate(async (valid: boolean) => {
-    if (valid) {
-      try {
-        const response = await request.post('/user/login', loginForm)
-        if (response.data.status) {
-          const { token, userId } = response.data.data
-          const userStore = useUserStore()
-          userStore.setUser({ token, userId })
-          dialogVisible.value = false
-          resetForm()
-          console.log('登录成功', response.data.message)
-        } else {
-          console.error('登录失败:', response.data.message)
-        }
-      } catch (error) {
-        console.error('网络错误:', error)
-      }
-    } else {
-      console.log('表单验证失败')
-    }
-  })
-}
+// const submitLogin = async () => {
+//   loginFormRef.value?.validate(async (valid: boolean) => {
+//     if (valid) {
+//       try {
+//         const response = await request.post('/user/login', loginForm)
+//         if (response.data.status) {
+//           const { token, userId } = response.data.data
+//           const userStore = useUserStore()
+//           userStore.setUser({ token, userId })
+//           dialogVisible.value = false
+//           resetForm()
+//           console.log('登录成功', response.data.message)
+//         } else {
+//           console.error('登录失败:', response.data.message)
+//         }
+//       } catch (error) {
+//         console.error('网络错误:', error)
+//       }
+//     } else {
+//       console.log('表单验证失败')
+//     }
+//   })
+// }
 </script>
 
 <style scoped>
