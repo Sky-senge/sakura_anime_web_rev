@@ -88,7 +88,7 @@ export default defineComponent({
   flex-wrap: wrap;
   background-color: #333;
   gap: 10px;
-  justify-content: space-between;
+  justify-content: flex-start;
   max-width: 1200px;
   margin: 0 auto;
 }
