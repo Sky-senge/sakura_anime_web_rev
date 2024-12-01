@@ -36,8 +36,8 @@
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
-import { loginQuery } from '@/utils/query';
-import { useUserStore } from '@/stores/counter';
+import { useUserStore } from '@/stores/user';
+import  request  from '@/utils/request';
 
 const userStore=useUserStore();
 const dialogVisible=ref(false);
@@ -51,11 +51,10 @@ const router = useRouter();
 
 const signIn = async () => {
   console.log('Sign In:', loginData.value);
-  var response=await loginQuery(loginData.value)
-  if(response){
-    userStore.setUsername(loginData.value.username);
-    userStore.setToken(response);
-    userStore.setLoginStatus(true)
+  var response=await request.post('/user/login', loginData.value)
+  if(response.data.status){
+    const {token, userId}= response.data.data
+    userStore.setUser({token, userId})
     ElMessage.success("登录成功！")
     router.push('/') //登录成功后返回主页
   }else{

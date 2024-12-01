@@ -7,9 +7,9 @@
       placeholder="Username..."
     />
     <input
-      type="phone"
-      v-model="registerData.phone"
-      placeholder="Phone Number (Musted)..."
+      type="mail"
+      v-model="registerData.email"
+      placeholder="Email (Musted)..."
     />
     <input
       type="password"
@@ -24,13 +24,12 @@
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
-import { signupQuery,loginQuery } from '@/utils/query';
-import { useUserStore } from '@/stores/counter';
+import request from '@/utils/request';
 
-const userStore=useUserStore();
 
 const registerData = ref({
   username: '',
+  email: '',
   password: '',
 });
 
@@ -38,16 +37,12 @@ const router = useRouter();
 
 
 const signUp = async () => {
-  var response=await signupQuery(registerData.value);
-  if(response){
-    var loginResponse=await loginQuery(registerData.value); //注册完成后立即登录
-    userStore.setUsername(registerData.value.username);
-    userStore.setLoginStatus(true);
-    userStore.setToken(loginResponse);
-    ElMessage.success("注册成功！")
-    router.push("/")
+  var response=await request.post('/user/register', registerData.value)
+  if(response.data.status){
+    ElMessage.success("注册成功，请登录！")
+    router.push("/login")
   }else{
-    ElMessage.error("注册失败，用户已重复或手机号不正确")
+    ElMessage.error("注册失败，用户已重复或邮箱不正确！")
   }
 };
 </script>
