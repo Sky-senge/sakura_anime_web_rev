@@ -42,7 +42,11 @@ const signUp = async () => {
     ElMessage.success("注册成功，请登录！")
     router.push("/login")
   }else{
-    ElMessage.error("注册失败，用户已重复或邮箱不正确！")
+    if(response.data.error!=null){
+      ElMessage.error(response.data.error)
+    }else{
+      ElMessage.error("注册失败，用户已重复或邮箱不正确！")
+    }
   }
 };
 </script>
