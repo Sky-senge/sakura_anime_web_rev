@@ -60,6 +60,7 @@ import VideoPanel from './VideoPanel.vue';
 import CommentPanel from './CommentPanel.vue';
 import DanmuPanel from './DanmuPanel.vue';
 
+
 export default {
   name: 'Home',
   components: {
@@ -80,6 +81,7 @@ export default {
     },
     login() {
       // 实际应用中这里需完善与后端交互验证等登录逻辑
+      this.$router.push('/login'); // 使用 this.$router 而不是 useRouter
       console.log('执行登录操作');
       this.isLoggedIn = true; // 登录成功，更新登录状态为已登录
     },

@@ -4,15 +4,15 @@
     <div class="button-group">
       <el-button type="primary" @click="addUser">新增用户</el-button>
       <el-button type="danger" @click="deleteUser">删除用户</el-button>
-      <el-button type="warning" @copy="editUser">修改用户</el-button>
+      <el-button type="warning" @click="editUser">修改用户</el-button>
       <el-button type="info" @click="queryUser">查询用户</el-button>
     </div>
 
     <!-- 用户列表表格 -->
     <el-table :data="userList" style="width: 100%">
-      <el-table-column prop="account" label="用户账户"></el-table-column>
-      <el-table-column prop="password" label="密码"></el-table-column>
-      <el-table-column prop="status" label="账号状态"></el-table-column>
+      <el-table-column prop="username" label="用户名"></el-table-column>
+      <el-table-column prop="email" label="邮箱"></el-table-column>
+      <el-table-column prop="remarks" label="备注"></el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
           <el-button type="warning" size="small" @click="editUser(row)">修改</el-button>
@@ -26,22 +26,19 @@
       background
       layout="prev, pager, next"
       :total="total"
-      @current-change="handleCurrentPageChange"/>
+      @current-change="handleCurrentPageChange" />
 
     <!-- 对话框 -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
       <el-form :model="userForm" :rules="userRules" ref="userFormRef">
-        <el-form-item label="用户账户" prop="account">
-          <el-input v-model="userForm.account"></el-input>
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="userForm.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model="userForm.password"></el-input>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="userForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="账号状态" prop="status">
-          <el-select v-model="userForm.status">
-            <el-option label="正常" value="active"></el-option>
-            <el-option label="冻结" value="frozen"></el-option>
-          </el-select>
+        <el-form-item label="备注" prop="remarks">
+          <el-input v-model="userForm.remarks"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -53,25 +50,23 @@
 </template>
 
 <script>
-import { reactive, ref } from 'vue';
-import axios from 'axios';
+import { reactive, ref, onMounted } from 'vue';
+import request from '@/utils/request';
 import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router';
 
 export default {
   setup() {
-    const router = useRouter();
-
     const dialogVisible = ref(false);
     const dialogTitle = ref('');
     const userForm = reactive({
-      account: '',
-      password: '',
-      status: 'active'
+      id:1,
+      username: '',
+      email: '',
+      remarks: '',
     });
     const userRules = reactive({
-      account: [{ required: true, message: '请输入用户账户', trigger: 'blur' }],
-      password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+      username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+      email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
     });
     const userFormRef = ref(null);
 
@@ -79,68 +74,105 @@ export default {
     const total = ref(0);
     const currentPage = ref(1);
 
+    const fetchUserList = () => {
+  // 获取用户列表
+  request
+    .get(`/user/getUserList?page=${currentPage.value}&size=30`)
+    .then((response) => {
+      if (response.data.status) {
+        userList.value = response.data.data.map((user) => ({
+          id: user.id,
+          account: user.username,
+          status: user.permission === 0 ? '管理员' : '普通用户', // 根据权限解析状态
+          email: user.email,
+          remarks: user.remarks || '无',
+        }));
+      } else {
+        ElMessage.error(response.data.message || '获取用户列表失败');
+      }
+    })
+    .catch(() => {
+      ElMessage.error('网络错误，获取用户列表失败');
+    });
+  // 获取总用户数
+  request
+    .get(`/user/countUserPage?size=30`)
+    .then((response) => {
+      if (response.data.status) {
+        total.value = response.data.data;
+      } else {
+        ElMessage.error(response.data.message || '获取用户总数失败');
+      }
+    })
+    .catch(() => {
+      ElMessage.error('网络错误，获取用户总数失败');
+    });
+};
+
+    // 加载数据
+    const loadData = async () => {
+      // 已经集合到fetchUserList中
+      // await fetchUserTotal();
+      await fetchUserList();
+    };
+
+    // 分页切换
+    const handleCurrentPageChange = async (page) => {
+      currentPage.value = page;
+      await fetchUserList();
+    };
+
     const addUser = () => {
       dialogTitle.value = '新增用户';
-      userForm.account = '';
-      userForm.password = '';
-      userForm.status = 'active';
+      Object.assign(userForm, { username: '', email: '', remarks: '' });
       dialogVisible.value = true;
     };
 
-    const deleteUser = (row) => {
-      axios.post('/api/user/delete', { account: row.account })
-       .then(() => {
-          ElMessage.success('删除成功');
-          fetchUserList();
-        })
-       .catch(() => {
-          ElMessage.error('删除失败');
-        });
-    };
+  const deleteUser = (row) => {
+  console.log('删除用户:', row.id);
+  request
+    .get(`/user/deleteUser/${row.id}`) // 使用 GET 方法，并将 UID 拼接到 URL 中
+    .then((response) => {
+      if (response.data.status) {
+        ElMessage.success('删除成功');
+        fetchUserList(); // 刷新用户列表
+      } else {
+        ElMessage.error(response.data.message || '删除失败');
+      }
+    })
+    .catch(() => {
+      ElMessage.error('网络错误，删除失败');
+    });
+};
 
     const editUser = (row) => {
       dialogTitle.value = '修改用户';
-      Object.assign(userForm, {...row });
+      Object.assign(userForm, row);
       dialogVisible.value = true;
     };
 
     const submitUserForm = () => {
-      userFormRef.value.validate((valid) => {
-        if (valid) {
-          axios.post('/api/user/' + (dialogTitle.value === '新增用户'? 'add' : 'update'), userForm)
-           .then(() => {
-              ElMessage.success(dialogTitle.value === '新增用户'? '添加成功' : '修改成功');
-              dialogVisible.value = false;
-              fetchUserList();
-            })
-           .catch(() => {
-              ElMessage.error('操作失败');
-            });
-        }
-      });
-    };
-
-    const queryUser = () => {
-      // 查询用户逻辑
-    };
-
-    const handleCurrentPageChange = (page) => {
-      currentPage.value = page;
-      fetchUserList();
-    };
-
-    const fetchUserList = () => {
-      axios.get(`/api/user/list?page=${currentPage.value}&size=10`)
-       .then((response) => {
-          userList.value = response.data.data;
-          total.value = response.data.total;
+  userFormRef.value.validate((valid) => {
+    if (valid) {
+      const apiUrl = dialogTitle.value === '新增用户' ? '/user/add' : '/user/update';
+      request
+        .post(apiUrl, userForm)
+        .then((response) => {
+          if (response.data.status) {
+            ElMessage.success(dialogTitle.value === '新增用户' ? '添加成功' : '修改成功');
+            dialogVisible.value = false;
+            fetchUserList(); // 刷新列表
+          } else {
+            ElMessage.error(response.data.message || '操作失败');
+          }
         })
-       .catch(() => {
-          ElMessage.error('获取用户列表失败');
+        .catch(() => {
+          ElMessage.error('网络错误，操作失败');
         });
-    };
-
-    fetchUserList();
+    }
+  });
+};
+    onMounted(loadData);
 
     return {
       dialogVisible,
@@ -155,10 +187,9 @@ export default {
       deleteUser,
       editUser,
       submitUserForm,
-      queryUser,
-      handleCurrentPageChange
+      handleCurrentPageChange,
     };
-  }
+  },
 };
 </script>
 
