@@ -3,9 +3,11 @@
     <el-container class="main-container">
       <el-aside width="220px" class="sidebar">
         <div class="logo">
-          <img src="https://img0.baidu.com/it/u=746753980,1537730619&fm=253&fmt=auto&app=120&f=JPEG?w=500&h=569" alt="Logo" class="logo-img" />
+          <img src="https://img0.baidu.com/it/u=746753980,1537730619&fm=253&fmt=auto&app=120&f=JPEG?w=500&h=569"
+            alt="Logo" class="logo-img" />
         </div>
-        <el-menu default-active="1-1" class="el-menu-vertical-demo" :default-openeds="['1', '2', '3', '4']">
+        <el-menu default-active="1-1" class="el-menu-vertical-demo" :default-openeds="['1', '2', '3', '4']"
+          background-color="#2d3a4b" text-color="#fff" active-text-color="#ffd04b">
           <el-submenu index="1">
             <template #title>
               <i class="el-icon-user"></i>
@@ -37,7 +39,13 @@
         </el-menu>
       </el-aside>
       <el-container>
-        <el-header class="header">Sakura Anime 后台管理</el-header>
+        <el-header class="header">
+          Sakura Anime 后台管理
+          <div class="header-buttons">
+            <el-button type="primary" @click="login" v-if="!isLoggedIn">登录</el-button>
+            <el-button type="info" @click="logout" v-if="isLoggedIn">退出登录</el-button>
+          </div>
+        </el-header>
         <el-main class="main">
           <component :is="currentPanel" />
         </el-main>
@@ -62,12 +70,23 @@ export default {
   },
   data() {
     return {
-      currentPanel: 'UserPanel' // 默认显示用户管理模块
+      currentPanel: 'UserPanel', // 默认显示用户管理模块
+      isLoggedIn: false // 记录用户是否登录的状态，初始为未登录
     };
   },
   methods: {
     switchPanel(panel) {
       this.currentPanel = `${panel}Panel`;
+    },
+    login() {
+      // 实际应用中这里需完善与后端交互验证等登录逻辑
+      console.log('执行登录操作');
+      this.isLoggedIn = true; // 登录成功，更新登录状态为已登录
+    },
+    logout() {
+      // 实际应用中这里需完善与后端交互清除登录状态等退出登录逻辑
+      console.log('执行退出登录操作');
+      this.isLoggedIn = false; // 退出登录成功，更新登录状态为未登录
     }
   }
 };
@@ -109,12 +128,54 @@ export default {
   margin-top: 20px;
 }
 
+.el-submenu__title,
+.el-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #2d3a4b;
+  color: #fff;
+  height: 100px;
+  font-size: 16px; 
+  padding-left: 20px;
+  transition: background-color 0.3s;
+}
+
+.el-submenu__title:hover,
+.el-menu-item:hover {
+  background-color: #1e272e;
+}
+
+.el-submenu__title i,
+.el-menu-item i {
+  margin-right: 10px;
+}
+
+.el-menu-item {
+  justify-content: center;
+  padding-left: 50px;
+}
+
 .header {
-  background-color: #4a90e2;
-  text-align: center;
-  line-height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 16px; 
+  background-color: #2985ed;
   color: #ffffff;
-  border-radius: 0 8px 0 0;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 按钮之间的间距 */
 }
 
 .main {
