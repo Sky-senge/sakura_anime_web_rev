@@ -2,27 +2,27 @@
   <div class="video-panel">
     <!-- 操作按钮区域 -->
     <div class="button-group">
-      <el-button type="primary" @click="openUploadDialog">
+      <!-- 功能按钮（根据需要解注释） -->
+      <el-button type="primary" @click="openCreateDialog">
         <i class="el-icon-upload"></i>
-        <span>上传视频</span>
+        <span>新建视频</span>
       </el-button>
-      <el-button type="danger" @click="confirmUnpublishVideo">
-        <i class="el-icon-delete"></i>
-        <span>下架视频</span>
-      </el-button>
-      <el-button type="warning" @click="editVideoInfo">
-        <i class="el-icon-edit"></i>
-        <span>修改视频</span>
-      </el-button>
+     
     </div>
 
     <!-- 视频列表展示区域 -->
     <el-table :data="videoList" style="width: 100%">
-      <el-table-column prop="title" label="视频标题" align="left"></el-table-column>
+      <el-table-column prop="name" label="视频标题" align="left"></el-table-column>
+      <el-table-column prop="tags" label="标签" align="left"></el-table-column>
       <el-table-column prop="description" label="视频描述" align="left"></el-table-column>
+      <el-table-column prop="rating" label="评分" align="center"></el-table-column>
+      <el-table-column prop="releaseDate" label="发行日期" align="center"></el-table-column>
       <el-table-column prop="status" label="视频状态" align="center"></el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
+          <el-button type="primary" size="small" @click="openUploadVideo(row)">上传视频</el-button>
+          <el-button type="success" size="small" :disabled="row.filePath.length === 0" @click="openUploadCover(row)">上传封面</el-button>
+          <el-button type="info" size="small" :disabled="row.filePath.length === 0" @click="openUploadSubtitle(row)">上传字幕</el-button>
           <el-button type="warning" size="small" @click="editVideoInfo(row)">修改信息</el-button>
           <el-button type="danger" size="small" @click="unpublishVideo(row)">下架视频</el-button>
         </template>
@@ -34,200 +34,501 @@
       background
       layout="prev, pager, next"
       :total="total"
-      :page-size="pageSize"
       @current-change="handleCurrentPageChange"
     />
 
     <!-- 编辑视频信息对话框 -->
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
-      <el-form :model="videoForm" :rules="videoRules" ref="videoFormRef">
-        <el-form-item label="视频标题" prop="title">
-          <el-input v-model="videoForm.title"></el-input>
+    <el-dialog v-model="isEditDialogVisible" title="修改视频信息">
+    <div v-loading="loadingDetail"> 
+    <el-form :model="editForm" label-width="100px">
+      <el-form-item label="视频标题">
+        <el-input v-model="editForm.name" />
+      </el-form-item>
+      <el-form-item label="视频标签">
+        <el-form-item v-model="editForm.tags" multiple placeholder="动漫标签，用逗号分隔">
+          <el-input v-model="editForm.tags" />
         </el-form-item>
-        <el-form-item label="视频描述" prop="description">
-          <el-input v-model="videoForm.description"></el-input>
-        </el-form-item>
-        <el-form-item label="视频时长" prop="duration">
-          <el-input v-model="videoForm.duration"></el-input>
-        </el-form-item>
-        <!-- 可根据实际需求添加更多视频信息编辑字段 -->
-      </el-form>
-      <template #footer>
-        <div class="dialog-button-group">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveVideoChanges">提交</el-button>
+      </el-form-item>
+      <el-form-item label="视频描述">
+        <el-input type="textarea" v-model="editForm.description" rows="3" />
+      </el-form-item>
+      <el-form-item label="评分">
+        <el-input-number v-model="editForm.rating" :min="0" :max="10" step="0.1" />
+      </el-form-item>
+      <el-form-item label="资源管理">
+        <div v-for="(file, index) in editForm.filePath" :key="index" class="file-item">
+          <el-row>
+            <el-col :span="4">
+              <el-input-number v-model="file.episodes" :min="1" label="集数" />
+            </el-col>
+            <el-col :span="12">
+              <div style="padding-left: 80px;padding-right: 20px;">
+                <el-input v-model="file.fileName" placeholder="文件名" />
+              </div>
+              
+            </el-col>
+            <el-col :span="6">
+              <el-button type="danger" size="mini" @click="removeFilePath(index)" >删除一集</el-button>
+            </el-col>
+          </el-row>
         </div>
-      </template>
-    </el-dialog>
+      </el-form-item>
+      <el-form-item>
+        <div style="padding-left: 5px;">
+          <el-button type="primary" plain icon="el-icon-plus" @click="addFilePath">添加一集</el-button>
+        </div>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="isEditDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="editForm.id ? submitEdit() : submitCreate()">
+        {{ editForm.id ? '保存' : '创建' }}
+      </el-button>
+    </div>
+  </div>
+  </el-dialog>
+
+
+   <!-- 上传视频对话框 -->
+   <el-dialog v-model="isUploadDialogVisible" title="上传视频">
+    <el-form :model="uploadForm" label-width="100px">
+      <el-form-item label="集数">
+        <el-input-number v-model="uploadForm.episodes" :min="1" />
+      </el-form-item>
+      <el-form-item label="选择文件">
+        <input
+          type="file"
+          @change="handleFileChange"
+          accept="video/*"
+          class="file-input"
+        />
+        <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="isUploadDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="uploadVideo">上传</el-button>
+    </div>
+  </el-dialog>
+
+  <!-- 上传封面对话框 -->
+  <el-dialog v-model="isUploadCoverDialogVisible" title="上传封面">
+    <el-form :model="uploadForm" label-width="100px">
+      <el-form-item label="选择文件">
+        <input
+          type="file"
+          @change="handleFileChange"
+          accept="image/*"
+          class="file-input"
+        />
+        <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="isUploadCoverDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="uploadCover">上传</el-button>
+    </div>
+  </el-dialog>
+
+  <!-- 上传字幕对话框 -->
+  <el-dialog v-model="isUploadSubtitleDialogVisible" title="上传视频">
+    <el-form :model="uploadForm" label-width="100px">
+      <el-form-item label="集数">
+        <el-input-number v-model="uploadForm.episodes" :min="1" />
+      </el-form-item>
+      <el-form-item label="选择文件">
+        <input
+          type="file"
+          @change="handleFileChange"
+          accept="*"
+          class="file-input"
+        />
+        <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="isUploadSubtitleDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="uploadSubtitle">上传</el-button>
+    </div>
+  </el-dialog>
+
   </div>
 </template>
 
-<script>
-import { reactive, ref } from 'vue';
-import axios from 'axios';
-import { ElMessage, ElMessageBox } from 'element-plus';
+<script setup>
+import { ref, onMounted, reactive } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { request,fileRequest } from '@/utils/request'; // 引入自定义 request
 
-export default {
-  name: 'VideoPanel',
-  setup() {
-    const videoList = ref([]);
-    const dialogVisible = ref(false);
-    const dialogTitle = ref('');
-    const videoForm = reactive({
-      id: '',
-      title: '',
-      description: '',
-      duration: '',
-      // 可根据实际需求添加更多视频相关属性
+const videoList = ref([]);
+const total = ref(0);
+const pageSize = ref(15);
+const currentPage = ref(1);
+const isEditDialogVisible = ref(false);
+const loadingDetail = ref(false);
+const editForm = reactive({
+  id: null,
+  name: '',
+  tags: [],
+  description: '',
+  rating: '',
+  releaseDate: '',
+  filePath: [],
+});
+
+// 当前操作的视频行
+const currentRow = ref(null);
+//上传视频
+const isUploadDialogVisible = ref(false);
+//上传封面
+const isUploadCoverDialogVisible = ref(false);
+//上传字幕
+const isUploadSubtitleDialogVisible = ref(false);
+//视频文件上传表单
+const uploadForm = reactive({
+  animeId: null,
+  episodes: 1,
+});
+const selectedFile = ref(null);
+
+// 加载视频列表
+const loadVideoList = async () => {
+  try {
+    // 获取视频列表数据
+    const videoResponse = await request.get('/anime/getAnimeList', {
+      params: {
+        page: currentPage.value,
+        size: pageSize.value,
+      },
     });
-    const videoRules = reactive({
-      title: [{ required: true, message: '请输入视频标题', trigger: 'blur' }],
-      description: [{ required: true, message: '请输入视频描述', trigger: 'blur' }],
-      duration: [{ required: true, message: '请输入视频时长', trigger: 'blur' }],
+    if (videoResponse.data.status) {
+      // 格式化数据，用于显示
+      videoList.value = videoResponse.data.data.map((video) => ({
+        id: video.id,
+        name: video.name,
+        tags: video.tags.join(', '), // 将标签数组转换为字符串
+        description: video.description,
+        rating: parseFloat(video.rating).toFixed(1), //确保无论如何都显示一位小数
+        releaseDate: video.releaseDate,
+        filePath: video.filePath,
+        status: video.filePath.length === 0 ? '未上传' : '已上传资源',
+      }));
+    }
+    // 获取总页数数据
+    const pageResponse = await request.get('/anime/countAnimePage', {
+      params: { size: pageSize.value },
     });
-    const videoFormRef = ref(null);
-
-    // 总记录数
-    const total = ref(0);
-    // 当前页码
-    const currentPage = ref(1);
-    // 每页显示记录数
-    const pageSize = ref(10);
-
-    // 获取视频列表数据的函数，结合分页参数
-    const fetchVideoList = () => {
-      axios.get(`/api/video/list?page=${currentPage.value}&size=${pageSize.value}`)
-    .then((response) => {
-          videoList.value = response.data.data;
-          total.value = response.data.total;
-        })
-    .catch(() => {
-          ElMessage.error('获取视频列表失败');
-        });
-    };
-
-    // 页面加载时获取视频列表
-    fetchVideoList();
-
-    // 打开上传视频文件选择对话框的函数
-    const openUploadDialog = () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'video/*';
-      input.onchange = () => {
-        const file = input.files[0];
-        if (file) {
-          const formData = new FormData();
-          formData.append('video', file);
-          axios.post('/api/video/upload', formData)
-        .then(() => {
-              ElMessage.success('视频上传成功');
-              fetchVideoList();
-            })
-        .catch(() => {
-              ElMessage.error('视频上传失败');
-            });
-        }
-      };
-      input.click();
-    };
-
-    // 下架视频函数（在列表中点击下架按钮时调用）
-    const unpublishVideo = (row) => {
-      ElMessageBox.confirm('确认要下架此视频吗？', '视频下架确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-    .then(() => {
-          axios.post('/api/video/unpublish', { videoId: row.id })
-        .then(() => {
-              ElMessage.success('视频下架成功');
-              fetchVideoList();
-            })
-        .catch(() => {
-              ElMessage.error('视频下架失败');
-            });
-        })
-    .catch(() => {
-          // 用户取消操作，不做任何处理
-        });
-    };
-
-    // 确认下架视频函数（主下架按钮点击时调用，先弹出确认框）
-    const confirmUnpublishVideo = () => {
-      ElMessageBox.confirm('确认要下架所有选中的视频吗？', '视频下架确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-    .then(() => {
-          // 这里可以添加遍历选中视频列表并逐个下架的逻辑，假设只有一个视频被选中，先简单下架当前视频
-          const currentVideo = videoList.value[0];
-          if (currentVideo) {
-            unpublishVideo(currentVideo);
-          }
-        })
-    .catch(() => {
-          // 用户取消操作，不做任何处理
-        });
-    };
-
-    // 编辑视频信息函数
-    const editVideoInfo = (row) => {
-      dialogTitle.value = '编辑视频信息';
-      Object.assign(videoForm, {...row });
-      dialogVisible.value = true;
-    };
-
-    // 保存视频更改函数
-    const saveVideoChanges = () => {
-      videoFormRef.value.validate((valid) => {
-        if (valid) {
-          axios.post('/api/video/update', videoForm)
-        .then(() => {
-              ElMessage.success('视频信息修改成功');
-              dialogVisible.value = false;
-              fetchVideoList();
-            })
-        .else(() => {
-              ElMessage.error('视频信息修改失败');
-            });
-        }
-      });
-    };
-
-    // 取消编辑视频信息函数
-    const cancelEdit = () => {
-      dialogVisible.value = false;
-    };
-
-    // 分页器页码改变时的处理函数
-    const handleCurrentPageChange = (page) => {
-      currentPage.value = page;
-      fetchVideoList();
-    };
-
-    return {
-      videoList,
-      dialogVisible,
-      dialogTitle,
-      videoForm,
-      videoRules,
-      videoFormRef,
-      total,
-      currentPage,
-      pageSize,
-      openUploadDialog,
-      confirmUnpublishVideo,
-      unpublishVideo,
-      editVideoInfo,
-      saveVideoChanges,
-      cancelEdit,
-      handleCurrentPageChange
-    };
+    if (pageResponse.data.status) {
+      total.value = pageResponse.data.data*10; // ElementPlus为什么要页数乘以10，而不能直接赋值？我也不知道，反正官方是这样操作的
+    }
+  } catch (error) {
+    console.error('加载视频列表失败', error);
   }
 };
+
+// 打开新建视频对话框
+const openCreateDialog = () => {
+  // 清空表单数据，准备新增视频
+  editForm.id = null;  // 新建视频无需 id
+  editForm.name = '';
+  editForm.tags = [];
+  editForm.description = '';
+  editForm.rating = '';
+  editForm.releaseDate = '';
+  editForm.filePath = [];
+  // 显示对话框
+  isEditDialogVisible.value = true;
+};
+
+// 打开编辑对话框
+const editVideoInfo = async (row) => {
+  loadingDetail.value = true;
+  try {
+    currentRow.value = row;
+    Object.assign(editForm, { ...row,
+      rating: parseFloat(row.rating),
+     });
+     console.log(editForm);
+    const response = await request.get(`/anime/getDetail/${row.id}`);
+    if (response.data.status) {
+      editForm.filePath = response.data.data.filePath || [];
+    } else {
+      ElMessage.error('获取视频详情失败，请稍后重试！');
+      editForm.filePath = [];
+    }
+
+    isEditDialogVisible.value = true;
+  } catch (error) {
+    console.error('获取视频详情失败', error);
+    ElMessage.error('获取视频详情失败，请稍后重试！');
+  } finally {
+    loadingDetail.value = false;
+  }
+};
+
+// 提交修改
+const submitEdit = async () => {
+  try {
+    try{
+      if(editForm.tags){
+        // 替换中文逗号为英文逗号
+      editForm.tags = editForm.tags.replace(/，/g, ',');
+      const invalidCharRegex = /[@\$%\^&\*\(\)\_+\-={}\[\]:";'<>\?\/`]/;
+      if (invalidCharRegex.test(editForm.tags)) {
+        ElMessage.error('标签中包含非法字符！');
+        throw new Error('标签中包含非法字符！');
+      }
+        editForm.tags=editForm.tags.split(',').map(tag => tag.trim());
+      }
+    }catch(error){
+      ElMessage.error('Tags类型转换失败，请联络管理员！');
+      throw new Error('Tags类型转换失败，请联络管理员！');
+    }
+    const payload = { ...editForm }; // 准备发送的数据
+    const response = await request.post(`/anime/updateAnime`, payload);
+    if(response.data.status) {
+      ElMessage.success('视频信息更新成功！');
+    }else{
+      ElMessage({
+          type: 'error',
+          message: `下架失败: ${response.data.error || '未知错误'}`,
+        });
+    }
+    isEditDialogVisible.value = false;
+    loadVideoList(); // 刷新列表
+  } catch (error) {
+    console.error('修改视频失败', error);
+    ElMessage.error('更新视频信息失败，请稍后重试！');
+  }
+};
+
+// 提交新建视频
+const submitCreate = async () => {
+  try {
+    // 处理标签
+    if (editForm.tags) {
+      editForm.tags = editForm.tags.replace(/，/g, ','); // 替换中文逗号为英文逗号
+      const invalidCharRegex = /[@\$%\^&\*\(\)\_+\-={}\[\]:";'<>\?\/`]/;
+      if (invalidCharRegex.test(editForm.tags)) {
+        ElMessage.error('标签中包含非法字符！');
+        throw new Error('标签中包含非法字符！');
+      }
+      editForm.tags = editForm.tags.split(',').map(tag => tag.trim());
+    }
+
+    // 准备请求体，移除 id 字段
+    const payload = { ...editForm }; // 包含所有表单字段
+
+    // 发送请求，创建新的视频
+    const response = await request.post(`/anime/createAnime`, payload);
+    
+    // 判断返回结果
+    if (response.data.status) {
+      ElMessage.success('视频信息创建成功！');
+    } else {
+      ElMessage({
+        type: 'error',
+        message: `创建失败: ${response.data.error || '未知错误'}`,
+      });
+    }
+    isEditDialogVisible.value = false; // 关闭对话框
+    loadVideoList(); // 刷新视频列表
+  } catch (error) {
+    console.error('新建视频失败', error);
+    ElMessage.error('新建视频信息失败，请稍后重试！');
+  }
+};
+
+// 删除某集
+const removeFilePath = (index) => {
+  editForm.filePath.splice(index, 1);
+};
+
+// 添加新集
+const addFilePath = () => {
+  editForm.filePath.push({ episodes: editForm.filePath.length + 1, fileName: '' });
+};
+
+// 下架视频方法
+const unpublishVideo = (row) => {
+  ElMessageBox.confirm(
+    `下架该视频将会联动删除该动漫以及动漫下的所有评论。是否继续？`,
+    '警告',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      try {
+        // 调用 API 执行下架操作
+        const response = await request.get(`/anime/deleteAnime/${row.id}`);
+        if (response.data.status) {
+          ElMessage({
+            type: 'success',
+            message: '视频下架成功！',
+          });
+          // 重新加载视频列表
+          loadVideoList();
+        } else {
+          throw new Error(response.data.message || '下架失败');
+        }
+      } catch (error) {
+        ElMessage({
+          type: 'error',
+          message: `下架失败: ${error.message || '未知错误'}`,
+        });
+      }
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '已取消下架操作',
+      });
+    });
+};
+
+// 打开上传视频对话框
+const openUploadVideo = (row) => {
+  uploadForm.animeId = row.id; // 绑定当前视频的 ID
+  isUploadDialogVisible.value = true;
+};
+
+// 打开上传封面对话框
+const openUploadCover = (row) => {
+  uploadForm.animeId = row.id; // 绑定当前视频的 ID
+  isUploadCoverDialogVisible.value = true;
+};
+
+// 打开上传字幕对话框
+const openUploadSubtitle = (row) => {
+  uploadForm.animeId = row.id; // 绑定当前视频的 ID
+  isUploadSubtitleDialogVisible.value = true;
+};
+
+// 处理文件选择
+const handleFileChange = (event) => {
+  const input = event.target;
+  const files = input.files;
+  if (files && files.length > 0) {
+    selectedFile.value = files[0];
+  }
+};
+
+// 上传视频
+const uploadVideo = async () => {
+  if (!selectedFile.value) {
+    ElMessage.error('请先选择文件！');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('animeId', uploadForm.animeId);
+  formData.append('episodes', String(uploadForm.episodes));
+  formData.append('file', selectedFile.value);
+
+  try {
+    const loadingMessage = ElMessage({
+      message: '正在上传，请稍后...',
+      type: 'info',
+      duration: 0,
+    });
+    const response = await fileRequest.post('/uploadAnime', formData);
+    loadingMessage.close();
+    if (response.data.status) {
+      ElMessage.success('视频上传完成！');
+      isUploadDialogVisible.value = false;
+      selectedFile.value = null; // 清空选择的文件
+      loadVideoList(); // 刷新视频列表
+    } else {
+      ElMessage.error('上传失败，请稍后重试！');
+    }
+  } catch (error) {
+    ElMessage.error('上传失败，请检查网络或重试！');
+    console.error(error);
+  }
+};
+
+// 上传封面
+const uploadCover = async () => {
+  if (!selectedFile.value) {
+    ElMessage.error('请先选择文件！');
+    return;
+  }
+  uploadForm.episodes=1; //封面只会存在于第一集，先重置变量
+  const formData = new FormData();
+  formData.append('animeId', uploadForm.animeId);
+  formData.append('episodes', String(uploadForm.episodes));
+  formData.append('file', selectedFile.value);
+
+  try {
+    const loadingMessage = ElMessage({
+      message: '正在上传，请稍后...',
+      type: 'info',
+      duration: 0,
+    });
+    const response = await fileRequest.post('/uploadCover', formData);
+    loadingMessage.close();
+    if (response.data.status) {
+      ElMessage.success('封面上传完成！');
+      isUploadDialogVisible.value = false;
+      selectedFile.value = null; // 清空选择的文件
+      loadVideoList(); // 刷新视频列表
+    } else {
+      ElMessage.error('上传失败，请稍后重试！');
+    }
+  } catch (error) {
+    ElMessage.error('上传失败，请检查网络或重试！');
+    console.error(error);
+  }
+};
+
+// 上传字幕
+const uploadSubtitle = async () => {
+  if (!selectedFile.value) {
+    ElMessage.error('请先选择文件！');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('animeId', uploadForm.animeId);
+  formData.append('episodes', String(uploadForm.episodes));
+  formData.append('file', selectedFile.value);
+
+  try {
+    const loadingMessage = ElMessage({
+      message: '正在上传，请稍后...',
+      type: 'info',
+      duration: 0,
+    });
+    const response = await fileRequest.post('/uploadSubtitle', formData);
+    loadingMessage.close();
+    if (response.data.status) {
+      ElMessage.success('字幕上传完成！');
+      isUploadDialogVisible.value = false;
+      selectedFile.value = null; // 清空选择的文件
+      loadVideoList(); // 刷新视频列表
+    } else {
+      ElMessage.error('上传失败，请稍后重试！');
+    }
+  } catch (error) {
+    ElMessage.error('上传失败，请检查网络或重试！');
+    console.error(error);
+  }
+};
+
+
+// 分页处理
+const handleCurrentPageChange = (page) => {
+  currentPage.value = page;
+  loadVideoList();
+};
+
+// 初始化
+onMounted(() => {
+  loadVideoList();
+});
 </script>
 
 <style scoped>
@@ -251,6 +552,11 @@ export default {
   border-radius: 4px;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
+
+.el-table .el-button {
+  margin: 0; /* 表格中的按钮不需要额外的外边距 */
+}
+
 
 .el-button:hover {
   background-color: #f0f0f0;
@@ -342,5 +648,10 @@ export default {
   display: flex;
   justify-content: center;
   gap: 20px;
+}
+
+
+.file-item{
+  padding: 6px;
 }
 </style>
