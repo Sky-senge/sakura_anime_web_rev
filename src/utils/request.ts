@@ -25,7 +25,7 @@ request.interceptors.request.use(
 //文件请求
 const fileRequest = axios.create({
   baseURL: 'http://127.0.0.1:8080/files', // 文件路径的根路径
-  timeout: 5000,
+  timeout: 0, //因为暂时没写流响应，只能停用超时的方式进行上传
 });
 //添加 Token 到文件路径
 fileRequest.interceptors.request.use(
@@ -33,8 +33,7 @@ fileRequest.interceptors.request.use(
     const userStore = useUserStore();
     const token = userStore.token || localStorage.getItem('token');
     if (token) {
-      // 在文件路径中添加 token 参数
-      config.url = `${config.url}?token=${token}`;
+      config.headers.Authorization = `Bearer ${token}`; // 设置 Token 到 Authorization 头
     }
     return config;
   },
