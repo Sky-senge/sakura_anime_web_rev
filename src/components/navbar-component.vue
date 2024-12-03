@@ -42,7 +42,7 @@
 import { ref, reactive } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router';
-import request from '@/utils/request'
+// import request from '@/utils/request'
 
 // 控制登录框的显示状态
 //const dialogVisible = ref(false)
