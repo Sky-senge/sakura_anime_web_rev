@@ -44,3 +44,4 @@ fileRequest.interceptors.request.use(
 );
 
 export { request, fileRequest };
+export default request;
