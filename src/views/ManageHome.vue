@@ -22,7 +22,7 @@
             </template>
             <el-menu-item index="2-1" @click="switchPanel('Video')">视频管理</el-menu-item>
           </el-submenu>
-          <el-submenu index="3">
+          <!-- <el-submenu index="3">
             <template #title>
               <i class="el-icon-chat-line-square"></i>
               <span>评论管理</span>
@@ -35,7 +35,7 @@
               <span>弹幕管理</span>
             </template>
             <el-menu-item index="4-1" @click="switchPanel('Danmu')">弹幕管理</el-menu-item>
-          </el-submenu>
+          </el-submenu> -->
         </el-menu>
       </el-aside>
       <el-container>
@@ -55,10 +55,10 @@
 </template>
 
 <script>
-import UserPanel from './UserPanel.vue';
-import VideoPanel from './VideoPanel.vue';
-import CommentPanel from './CommentPanel.vue';
-import DanmuPanel from './DanmuPanel.vue';
+import UserPanel from '@/components/UserPanel.vue';
+import VideoPanel from '@/components/VideoPanel.vue';
+import CommentPanel from '@/components/CommentPanel.vue';
+import DanmuPanel from '@/components/DanmuPanel.vue';
 
 
 export default {
