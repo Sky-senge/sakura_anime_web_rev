@@ -291,7 +291,7 @@ const submitEdit = async () => {
     }else{
       ElMessage({
           type: 'error',
-          message: `下架失败: ${response.data.error || '未知错误'}`,
+          message: `修改失败: ${response.data.error || '未知错误'}`,
         });
     }
     isEditDialogVisible.value = false;
