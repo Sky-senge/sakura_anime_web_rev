@@ -54,43 +54,48 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
 import UserPanel from '@/components/UserPanel.vue';
 import VideoPanel from '@/components/VideoPanel.vue';
 import CommentPanel from '@/components/CommentPanel.vue';
 import DanmuPanel from '@/components/DanmuPanel.vue';
 
+// 路由实例
+const router = useRouter();
 
-export default {
-  name: 'Home',
-  components: {
-    UserPanel,
-    VideoPanel,
-    CommentPanel,
-    DanmuPanel
-  },
-  data() {
-    return {
-      currentPanel: 'UserPanel', // 默认显示用户管理模块
-      isLoggedIn: false // 记录用户是否登录的状态，初始为未登录
-    };
-  },
-  methods: {
-    switchPanel(panel) {
-      this.currentPanel = `${panel}Panel`;
-    },
-    login() {
-      // 实际应用中这里需完善与后端交互验证等登录逻辑
-      this.$router.push('/login'); // 使用 this.$router 而不是 useRouter
-      console.log('执行登录操作');
-      this.isLoggedIn = true; // 登录成功，更新登录状态为已登录
-    },
-    logout() {
-      // 实际应用中这里需完善与后端交互清除登录状态等退出登录逻辑
-      console.log('执行退出登录操作');
-      this.isLoggedIn = false; // 退出登录成功，更新登录状态为未登录
-    }
+// 响应式变量
+const currentPanel = ref('UserPanel'); // 默认显示用户管理模块
+const isLoggedIn = ref(false); // 记录用户是否登录的状态，初始为未登录
+
+// 切换面板
+const switchPanel = (panel) => {
+  if (panel === 'User') {
+    currentPanel.value = UserPanel;
+  } else if (panel === 'Video') {
+    currentPanel.value = VideoPanel;
   }
+  else if (panel === 'Comment') {
+    currentPanel.value = CommentPanel;
+  }
+  else if (panel === 'Danmu') {
+    currentPanel.value = DanmuPanel;
+  }
+};
+
+const login = () => {
+  // 实际应用中这里需完善与后端交互验证等登录逻辑
+  router.push('/login'); // 使用 `useRouter` 进行路由跳转
+  console.log('执行登录操作');
+  isLoggedIn.value = true; // 登录成功，更新登录状态为已登录
+};
+
+const logout = () => {
+  // 实际应用中这里需完善与后端交互清除登录状态等退出登录逻辑
+  console.log('执行退出登录操作');
+  isLoggedIn.value = false; // 退出登录成功，更新登录状态为未登录
 };
 </script>
 
