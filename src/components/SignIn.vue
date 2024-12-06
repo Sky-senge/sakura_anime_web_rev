@@ -58,7 +58,9 @@ const signIn = async () => {
     ElMessage.success("登录成功！")
     router.push('/') //登录成功后返回主页
   }else{
-    ElMessage.error("登录失败！请检查用户名和密码。")
+    if(response.data.status!==null){
+      ElMessage.error("登录失败！"+response.data.error)
+    }
   }
 };
 const handleClose = ()=>{
