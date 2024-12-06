@@ -58,11 +58,14 @@
 import { ref,onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user'; 
+import { ElMessageBox } from 'element-plus';
+import request from '@/utils/request';
+
 import UserPanel from '@/components/UserPanel.vue';
 import VideoPanel from '@/components/VideoPanel.vue';
 import CommentPanel from '@/components/CommentPanel.vue';
 import DanmuPanel from '@/components/DanmuPanel.vue';
-import { ElMessageBox } from 'element-plus';
+
 
 // 路由实例
 const router = useRouter();
@@ -110,12 +113,34 @@ const logout = () => {
   })
 };
 
+const checkUserPermissionLv = async () => { // 检查用户权限是否满足
+  try {
+    const response = await request.get('/user/getDetail');
+    if (response.data.status && response.data.data) {
+      if (response.data.data.permission === 0) {
+        return null;  // 如果权限为0（管理员），正确，继续下一步
+      } else {
+        router.push('/');  // 如果权限不为0，跳转到首页
+      }
+    } else {
+      router.push('/');  // 如果状态为false或者data不存在，跳转到首页
+    }
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    router.push('/');  // 如果请求失败，也跳转到首页
+  }
+};
+
+
 // 加载数据
 const loadData = () =>{
 currentPanel.value = UserPanel;
 userStore.loadUser()
 if(userStore.token.length!=0){
+  checkUserPermissionLv()
   isLoggedIn.value=true
+}else{
+  router.push('/'); //没登陆的话也给你送回去首页
 }
 
 }
