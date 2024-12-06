@@ -55,16 +55,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { useUserStore } from '@/stores/user'; 
 import UserPanel from '@/components/UserPanel.vue';
 import VideoPanel from '@/components/VideoPanel.vue';
 import CommentPanel from '@/components/CommentPanel.vue';
 import DanmuPanel from '@/components/DanmuPanel.vue';
+import { ElMessageBox } from 'element-plus';
 
 // 路由实例
 const router = useRouter();
+// userStore实例化
+const userStore = useUserStore();
 
 // 响应式变量
 const currentPanel = ref('UserPanel'); // 默认显示用户管理模块
@@ -86,17 +89,38 @@ const switchPanel = (panel) => {
 };
 
 const login = () => {
-  // 实际应用中这里需完善与后端交互验证等登录逻辑
   router.push('/login'); // 使用 `useRouter` 进行路由跳转
   console.log('执行登录操作');
   isLoggedIn.value = true; // 登录成功，更新登录状态为已登录
 };
 
 const logout = () => {
-  // 实际应用中这里需完善与后端交互清除登录状态等退出登录逻辑
-  console.log('执行退出登录操作');
-  isLoggedIn.value = false; // 退出登录成功，更新登录状态为未登录
+  ElMessageBox.confirm(
+    "确定要登出吗？",
+    '警告',
+    {
+      confirmButtonText:'确定',
+      cancelButtonText:'取消',
+      type:'warning',
+    }
+  ).then(()=>{
+    userStore.clearUser();
+    isLoggedIn.value = false; // 退出登录成功，更新登录状态为未登录
+    router.push('/')
+  })
 };
+
+// 加载数据
+const loadData = () =>{
+currentPanel.value = UserPanel;
+userStore.loadUser()
+if(userStore.token.length!=0){
+  isLoggedIn.value=true
+}
+
+}
+// 初始化检查登入状态
+onMounted(loadData);
 </script>
 
 <style scoped>
