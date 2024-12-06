@@ -11,6 +11,7 @@ const request = axios.create({
 request.interceptors.request.use(
   (config) => {
     const userStore = useUserStore(); // 获取 Pinia 的 user store
+    userStore.loadUser(); //命令userStore加载用户
     const token = userStore.token || localStorage.getItem('token'); // 获取 token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; // 设置 Token 到 Authorization 头
@@ -31,6 +32,7 @@ const fileRequest = axios.create({
 fileRequest.interceptors.request.use(
   (config) => {
     const userStore = useUserStore();
+    userStore.loadUser(); //命令userStore加载用户
     const token = userStore.token || localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; // 设置 Token 到 Authorization 头
