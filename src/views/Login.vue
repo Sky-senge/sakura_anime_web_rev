@@ -1,22 +1,26 @@
 <template>
   <div id="login">
     <div class="container" :class="{ active: isSignUp }">
-      <component :is="currentComponent" class="form-container"></component>
-      <div class="overlay_container">
-        <div class="overlay">
-          <div class="overlay_panel overlay_left_container">
-            <h2>欢迎注册!</h2>
-            <p>欢迎您注册本站</p>
-            <el-button round color="#ffffff" @click="switchToSignIn" id="sign-in">登录</el-button>
-          </div>
-          <div class="overlay_panel overlay_right_container">
-            <h2>欢迎回来~</h2>
-            <p>尊敬的用户，请登录</p>
-            <el-button round color="#ffffff" @click="switchToSignUp" id="sign-up">注册</el-button>
-          </div>
-        </div>
+      <!-- 包裹在 transition 组件中，以便控制过渡动画 -->
+      <transition name="fade" @before-enter="beforeEnter" @enter="enter" @leave="leave">
+        <component :is="currentComponent" class="form-container"></component>
+      </transition>
+
+      <!-- 切换按钮，分别控制注册与登录 -->
+      <button v-if="isSignUp" class="d-btn" @click="switchToSignIn" id="sign-in">已有账号?点击登陆</button>
+      <button v-if="!isSignUp" class="d-btn" @click="switchToSignUp" id="sign-up">没有账号?立即注册</button>
+    </div>
+
+    <div class="mask">
+      <div class="text" :class="{ 'text-signup': isSignUp, 'text-signin': !isSignUp }">
+        <h2>{{ isSignUp ? '欢迎注册' : '欢迎回来' }}😃</h2>
+        <h1>{{ isSignUp ? '加入我们，开启新旅程！' : '欢迎回来，继续未完的冒险！' }}</h1>
       </div>
     </div>
+
+    <video class="bgVideo" autoplay loop muted>
+      <source src="https://wallpaper-static.cheetahfun.com/wallpaper/sites/dynamics/vm8.mp4" type="video/mp4">
+    </video>
   </div>
 </template>
 
@@ -25,115 +29,119 @@ import { ref } from 'vue';
 import SignIn from '@/components/SignIn.vue';
 import SignUp from '@/components/SignUp.vue';
 
+const isSignUp = ref(false); // 控制是否为注册状态
+const currentComponent = ref(SignIn); // 默认显示登录组件
 
-const isSignUp = ref(false);
-const currentComponent = ref(SignIn);
-
+// 切换到注册界面
 const switchToSignUp = () => {
   isSignUp.value = true;
-  currentComponent.value = SignUp;
+  currentComponent.value = SignUp; // 切换组件为注册界面
 };
 
+// 切换到登录界面
 const switchToSignIn = () => {
   isSignUp.value = false;
-  currentComponent.value = SignIn;
+  currentComponent.value = SignIn; // 切换组件为登录界面
+};
+
+// 过渡动画生命周期钩子
+const beforeEnter = (el: HTMLElement) => {
+  el.style.opacity = 0;
+  el.style.transform = "scale(0.5)";
+};
+
+const enter = (el: HTMLElement, done: Function) => {
+  el.offsetHeight; // trigger reflow to ensure transition starts
+  el.style.transition = "transform 0.5s ease, opacity 0.5s ease";
+  el.style.opacity = 1;
+  el.style.transform = "scale(1)";
+  done(); // 动画结束后调用
+};
+
+const leave = (el: HTMLElement, done: Function) => {
+  el.style.transition = "transform 0.5s ease, opacity 0.5s ease";
+  el.style.opacity = 0;
+  el.style.transform = "scale(0.5)";
+  done(); // 动画结束后调用
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 #login {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  overflow: hidden;
   background-color: #f6f5f7;
 }
 
-h2 {
-  margin-bottom: 10px;
-  font-size: 32px;
-  text-transform: capitalize;
+.text {
+  position: fixed;
+  bottom: 30px;
+  left: 20px;
+}
+
+.text h2 {
+  font-size: 1.8rem;
+}
+
+.text h1 {
+  letter-spacing: 6px;
+  font-size: 2.4rem;
+}
+
+.d-btn {
+  cursor: pointer;
+  color: #fff;
+  background: none;
+  border: none;
+  position: fixed;
+  z-index: 88;
+  bottom: 20%;
+}
+
+.mask {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 8;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.bgVideo {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  z-index: -1;
+  transition: transform 1.85s ease;
+}
+
+.bgVideo source {
+  object-fit: fill;
 }
 
 .container {
-  position: relative;
-  width: 768px;
-  height: 480px;
-  background-color: white;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.form-container {
-  position: absolute;
-  top: 0;
-  width: 50%;
+  width: 40%;
   height: 100%;
-  background-color: white;
-  transition: all 0.6s ease-in-out;
-}
-
-.form-container.active {
-  transform: translateX(100%);
-}
-
-.overlay_container {
-  position: absolute;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  z-index: 100;
-  right: 0;
-  overflow: hidden;
-  transition: all 0.6s ease-in-out;
-}
-
-.overlay {
-  position: absolute;
-  width: 200%;
-  height: 100%;
-  left: -100%;
-  background-color: #ff4b2b;
-  transition: transform 0.6s ease-in-out;
-}
-
-.overlay_panel {
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
   position: absolute;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  width: 50%;
-  height: 100%;
-  color: white;
-  text-align: center;
-}
-
-.overlay_panel button {
-  background-color: transparent;
-  border: 1px solid white;
-  background-color: white;
-}
-
-.overlay_panel p {
-  font-size: 12px;
-  margin: 10px 0 15px 0;
-}
-
-.overlay_right_container {
+  justify-content: center;
+  z-index: 10;
   right: 0;
 }
 
-.container.active .overlay_container {
-  transform: translateX(-100%);
+/* 过渡动画样式 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
 }
 
-.container.active .overlay {
-  transform: translateX(50%);
-}
-
-.container.active .form-container {
-  transform: translateX(100%);
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
 }
 </style>

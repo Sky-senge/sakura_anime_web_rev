@@ -1,34 +1,23 @@
 <template>
   <div class="form">
     <h2>登录</h2>
-    <input
-      type="text"
-      v-model="loginData.username"
-      placeholder="username..."
-    />
-    <input
-      type="password"
-      v-model="loginData.password"
-      placeholder="Password..."
-    />
-    <a href="#" class="forget-password" @click="dialogVisible=true">忘记密码</a>
+    <label>用户名</label>
+    <input type="text" v-model="loginData.username" placeholder="username..." />
+    <label>密码</label>
+    <input type="password" v-model="loginData.password" placeholder="Password..." />
+    <a href="#" class="forget-password" @click="dialogVisible = true">忘记密码</a>
     <button @click="signIn">登录</button>
     <!-- 忘记密码的对话框 -->
-    <el-dialog
-    v-model="dialogVisible"
-    title="Tips"
-    width="500"
-    :before-close="handleClose"
-  >
-    <span>请联络站点管理员。</span>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">
-          Confirm
-        </el-button>
-      </div>
-    </template>
-  </el-dialog>
+    <el-dialog v-model="dialogVisible" title="Tips" width="500" :before-close="handleClose">
+      <span>请联络站点管理员。</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="dialogVisible = false">
+            Confirm
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -37,10 +26,15 @@ import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import  request  from '@/utils/request';
+import request from '@/utils/request';
 
-const userStore=useUserStore();
-const dialogVisible=ref(false);
+const userStore = useUserStore();
+const dialogVisible = ref(false);
+
+const switchToSignUp = () => {
+  isSignUp.value = true;
+  currentComponent.value = SignUp;
+};
 
 const loginData = ref({
   username: '',
@@ -51,31 +45,35 @@ const router = useRouter();
 
 const signIn = async () => {
   console.log('Sign In:', loginData.value);
-  var response=await request.post('/user/login', loginData.value)
-  if(response.data.status){
-    const {token, userId}= response.data.data
-    userStore.setUser({token, userId})
+  var response = await request.post('/user/login', loginData.value)
+  if (response.data.status) {
+    const { token, userId } = response.data.data
+    userStore.setUser({ token, userId })
     ElMessage.success("登录成功！")
     router.push('/') //登录成功后返回主页
-  }else{
-    if(response.data.status!==null){
-      ElMessage.error("登录失败！"+response.data.error)
+  } else {
+    if (response.data.status !== null) {
+      ElMessage.error("登录失败！" + response.data.error)
     }
   }
 };
-const handleClose = ()=>{
+const handleClose = () => {
   return null;
 }
 </script>
 
 <style scoped>
 .form {
+  border-radius: 10px;
+  padding: 25px;
+  background-color: #fff;
+  width: 75%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
+}
+
+h2{
+  margin-bottom: 35px;
 }
 
 input {
@@ -84,36 +82,42 @@ input {
   padding: 12px;
   background-color: #eee;
   border: none;
+  border-bottom: 1px solid #333;
   outline: none;
 }
 
 .forget-password {
-  display: inline-block;
-  height: 20px;
   text-decoration: none;
-  color: #bbb;
-  text-transform: capitalize;
-  font-size: 12px;
+  color: #787878;
+  font-size: 0.8rem;
+  margin: 20px 0;
 }
 
 .forget-password:hover {
-  color: lightslategray;
-  border-bottom: 2px solid #ff4b2b;
+  color: rgb(255, 47, 47);
 }
 
 button {
-  background: #ff4b2b;
-  padding: 10px 50px;
-  border: 1px solid transparent;
-  border-radius: 20px;
-  text-transform: uppercase;
+  cursor: pointer;
+  background: #ff3b3b;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 25px;
   color: white;
-  margin-top: 10px;
+  margin-top: 12px;
   outline: none;
-  transition: transform 80ms;
+  font-weight: 800;
+  letter-spacing: 4px;
+  transition: all .3s;
+}
+
+button:hover{
+  background-color: #d33418;
+  transform: scale(1.01);
 }
 
 button:active {
-  transform: scale(0.95);
+  background-color: #e12200;
+  transform: scale(0.98);
 }
 </style>

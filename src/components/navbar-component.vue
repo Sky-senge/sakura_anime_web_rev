@@ -1,40 +1,21 @@
 <template>
   <header class="navbar">
-    <div class="logo">LOGO</div>
-    <nav class="nav-links">
-      <!-- 导航链接按钮 -->
-      <el-button type="primary" size="small" class="nav-button">首页</el-button>
-      <el-button size="small" class="nav-button">分类</el-button>
-      <!-- 搜索框 -->
-      <el-input placeholder="搜索" class="search-bar" />
-      <el-button size="small" class="nav-button">排行</el-button>
-      <!-- 登录按钮 -->
-      <el-button size="small" class="nav-button" @click="jumpToLogin()">登录</el-button>
-      <el-button size="small" class="nav-button">观看记录</el-button>
+    <div class="left-nav">
+      <div class="logo">o</div>
+      <nav class="nav-links">
+        <el-button type="primary" size="small" class="nav-button-l">首页</el-button>
+        <el-button size="small" class="nav-button-l">分类</el-button>
+        <el-button size="small" class="nav-button-l">排行</el-button>
+      </nav>
+    </div>
+    <nav class="right-nav">
+      <div class="search-concent">
+        <i class="bi bi-search"></i>
+        <input placeholder="搜索" class="search-bar" />
+      </div>
+      <button size="small" class="nav-button" @click="jumpToLogin()">登录</button>
+      <button size="small" class="nav-button"><i class="bi bi-clock-history"></i></button>
     </nav>
-    
-    <!-- 登录框模态框 -->
-    <!-- <el-dialog
-      v-model="dialogVisible"
-      title="登录"
-      width="500"
-      :before-close="resetForm"
-    >
-      <el-form :model="loginForm" :rules="rules" ref="loginFormRef" label-width="80px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="loginForm.username" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="loginForm.password" type="password" autocomplete="off" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitLogin">登录</el-button>
-        </div>
-      </template>
-    </el-dialog> -->
   </header>
 </template>
 
@@ -102,51 +83,89 @@ const jumpToLogin = () => {
 
 <style scoped>
 .navbar {
-  position: fixed;
+  user-select: none;
+  position: sticky;
   top: 0;
-  width: 99%;
-  background-color: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #368dff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   padding: 10px 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+}
+
+.left-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .logo {
-  font-size: 20px;
-  font-weight: bold;
-  color: #007bff;
+  background-color: #fff;
+  font-size: 1.3em;
+  font-weight: 800;
+  height: 1.5rem;
+  width: 1.5rem;
+  padding: 3px;
+  margin: 0.3rem;
+  border-radius: 25px;
+  text-align: center;
+  justify-content: center;
+  color: #7f2fff;
 }
 
+.right-nav,
 .nav-links {
   display: flex;
-  /* gap: 15px;*/
-  column-gap: 15px;
-  
+  align-items: center;
+  gap: 0px;
 }
 
+.right-nav {
+  gap: 10px;
+}
+
+.bi {
+  font-weight: 800;
+}
+
+.nav-button-l,
 .nav-button {
-  color: #007bff;
-  font-size: 14px;
+  color: #d2d2d2;
+  font-size: 0.85rem;
+  font-weight: 700;
   background: none;
   border: none;
   cursor: pointer;
 }
 
+.nav-button-l:hover {
+  background: none;
+  color: #fff;
+}
+
 .nav-button:hover {
-  text-decoration: underline;
+  background: none;
+  color: #fff;
+  text-decoration: none;
+}
+
+.search-concent {
+  background-color: #fff;
+  padding: 4px;
+  border-radius: 25px;
+}
+
+.search-concent i {
+  font-size: 0.7rem;
+  padding: 8px 4px;
 }
 
 .search-bar {
-  width: 250px;
-  height: 24px;
-  border-radius: 4px;
-}
-
-.dialog-footer {
-  text-align: right;
+  font-size: 0.8rem;
+  border: none;
+  background: none;
+  outline: none;
 }
 </style>
-

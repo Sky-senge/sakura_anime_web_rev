@@ -38,16 +38,12 @@ export default defineComponent({
 <style scoped>
 .carousel {
   margin: 0 auto; /* 水平居中，与 .video-list 保持一致 */
-  margin-top: 10px !important;; /* 顶部间距保持不变 */
-  margin-bottom: 20px; /* 添加底部间距，与 .video-list 区分 */
   max-width: 1200px; /* 限制最大宽度，与 .video-list 一致 */
-  border-radius: 16px; /* 圆角保持原样 */
   padding: 0; /* 内边距保持不变 */
 }
 
 
 .carousel img {
-  border-radius: 16px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 </style>
