@@ -86,7 +86,7 @@ export default defineComponent({
 .video-list {
   display: flex;
   flex-wrap: wrap;
-  background-color: #333;
+  background-color: #f2f4f8;
   gap: 10px;
   justify-content: flex-start;
   max-width: 1200px;
