@@ -4,6 +4,7 @@ import ManageHome from '@/views/ManageHome.vue'
 import Login from '@/views/Login.vue'
 import Ranking from '@/views/Ranking.vue'
 import Sort from '@/views/Sort.vue'
+import VideoPlayback from '@/views/VideoPlayback.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/manage',
       name: 'homeManage',
       component: ManageHome,
+    },
+    {
+      path: '/Videoplayback',
+      name: 'Videoplayback',
+      component: VideoPlayback,
     },
     {
       path: '/login',
