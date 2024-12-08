@@ -3,9 +3,9 @@
     <div class="left-nav">
       <div class="logo">o</div>
       <nav class="nav-links">
-        <el-button type="primary" size="small" class="nav-button-l">首页</el-button>
-        <el-button size="small" class="nav-button-l">分类</el-button>
-        <el-button size="small" class="nav-button-l">排行</el-button>
+        <el-button type="primary" size="small" class="nav-button-l" @click="home">首页</el-button>
+        <el-button size="small" class="nav-button-l" @click="sort()">分类</el-button>
+        <el-button size="small" class="nav-button-l" @click="ranking()">排行</el-button>
       </nav>
     </div>
     <nav class="right-nav">
@@ -53,6 +53,15 @@ const loginFormRef = ref()
 // }
 const jumpToLogin = () => {
   router.push('/login')
+}
+const sort = () => {
+  router.push('/sort')
+}
+const ranking = () => {
+  router.push('/ranking')
+}
+const home =() => {
+  router.push('/')
 }
 
 // 提交登录
