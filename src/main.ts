@@ -11,6 +11,7 @@ import ElementPlus from 'element-plus'
 import ArcoVue from '@arco-design/web-vue';
 import 'element-plus/dist/index.css'
 import '@arco-design/web-vue/dist/arco.css';
+import './assets/global.css' 
 
 
 const app = createApp(App)
