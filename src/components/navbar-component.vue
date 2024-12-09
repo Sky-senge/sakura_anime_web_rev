@@ -124,9 +124,16 @@ const home = () => {
   background-color: #fff;
   padding: 12px 15px;
   border-radius: 5px;
-  transition: all .3s;
+  transition: all .3s ease;
 }
 
+
+@media (min-width: 2100px) {
+  .nav {
+    transform: translateX(-120px);
+    width: 1600px;
+  }
+}
 
 @media (max-width: 1620px) {
   .nav {
@@ -163,8 +170,18 @@ const home = () => {
     width: 100%;
   }
 
+  .search-concent {
+    width: 200px;
+  }
+
   .logo {
     display: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .search-concent {
+    width: 100px;
   }
 }
 
