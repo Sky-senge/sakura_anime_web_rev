@@ -34,6 +34,8 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRoute,useRouter } from 'vue-router';
 import Artplayer from '/src/components/Artplayer.vue';
 import Hls from 'hls.js';
+import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitles';
+import artplayerPluginLibass from 'artplayer-plugin-libass';
 import { request } from '@/utils/request';
 
 // 获取路由参数
@@ -63,6 +65,9 @@ const option = reactive({
       }
     },
   },
+  subtitle: {
+        url: '/assets/sample/style-test.ass',
+    },
 });
 const style = reactive({
   width: "1600px",
@@ -98,11 +103,13 @@ async function fetchEpisodeList(animeId: string) {
         return {
           episode: `第${file.episodes}集`,
           videoUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.m3u8`,
+          subtitleUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.ass`
         };
       });
       // 如果 episodes 存在，默认设置为第一个视频
       if (episodes.value.length > 0) {
         option.url = episodes.value[0].videoUrl;
+        option.subtitle.url = episodes.value[0].subtitleUrl;
         EpisodeBuilder(Number(episode)-1);
       }
     } else {
@@ -118,7 +125,7 @@ function selectEpisode(index: number) {
   const selectedEpisode = episodes.value[index];
   if (selectedEpisode) {
     option.url = selectedEpisode.videoUrl;
-    console.log(`选中视频: ${selectedEpisode.episode}, URL: ${option.url}`);
+    console.log(`选中视频: ${selectedEpisode.episode}, URL: ${option.url}, 字幕URL: ${option.subtitle.url}`);
     // 更新播放器，手动重新加载视频
     if (artPlayerInstance.value) {
       artPlayerInstance.value.url=option.url; // 直接调用Artplayer的load方法更新视频
