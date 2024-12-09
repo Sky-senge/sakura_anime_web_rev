@@ -43,7 +43,7 @@ const episode = route.params.episode as string;
 
 // 定义响应式数据
 const option = reactive({
-  url: `http://localhost:8080/files/getVideo/anime_1732528204793/playlist.m3u8`,
+  url: ``,
   fullscreen: true,
   type: 'm3u8',
   customType: {
@@ -102,7 +102,7 @@ async function fetchEpisodeList(animeId: string) {
       // 如果 episodes 存在，默认设置为第一个视频
       if (episodes.value.length > 0) {
         option.url = episodes.value[0].videoUrl;
-        console.log("视频连接："+option.url)
+        selectEpisode(Number(episode)-1);
       }
     } else {
       console.error('Failed to fetch video detail:', response.data.message);

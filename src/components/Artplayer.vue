@@ -1,9 +1,9 @@
 <template>
-  <div ref="artRef" class="artplayer-container"></div>
+  <div ref="artRef"></div>
 </template>
 
 <script>
-import Artplayer from "artplayer"; // 引入Artplayer
+import Artplayer from "artplayer";
 
 export default {
   data() {
@@ -24,23 +24,13 @@ export default {
     });
 
     this.$nextTick(() => {
-      this.$emit("get-instance", this.instance); // 将实例传递给父组件
+      this.$emit("get-instance", this.instance);
     });
   },
   beforeDestroy() {
     if (this.instance && this.instance.destroy) {
       this.instance.destroy(false);
     }
-  },
-  watch: {
-    option: {
-      handler(newOption) {
-        if (this.instance) {
-          this.instance.update(newOption); // 使用Artplayer的update方法更新配置
-        }
-      },
-      deep: true,
-    },
   },
 };
 </script>
