@@ -2,22 +2,7 @@
   <div class="container">
     <!-- 导航栏 -->
     <Navbar />
-    <!-- 推荐大图区域 -->
-    <div class="banner">
-      <Carousel />
-    </div>
-    <!-- 视频分类展示 -->
-    <section class="video-section">
-      <div class="section-header">
-        <div class="title">
-          <div class="dot"></div>
-          <div class="title-name">热门推荐</div>
-        </div>
-        <a href="/sort" class="view-more">更多</a>
-      </div>
-      <VideoList />
-    </section>
-    <Login />
+    <router-view></router-view>
   </div>
 </template>
 

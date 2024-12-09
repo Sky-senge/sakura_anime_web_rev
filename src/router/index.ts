@@ -5,6 +5,7 @@ import Login from '@/views/Login.vue'
 import Ranking from '@/views/Ranking.vue'
 import Sort from '@/views/Sort.vue'
 import VideoPlayback from '@/views/VideoPlayback.vue'
+import HomeSubView from '@/views/HomeSubView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,26 +14,33 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-    },
-    {
-      path: '/ranking',
-      name: 'ranking',
-      component: Ranking,
-    },
-    {
-      path: '/sort',
-      name: 'sort',
-      component: Sort,
+      children: [
+        {
+          path:'/',
+          name:'HomeSubView',
+          component: HomeSubView
+        },
+        {
+          path: '/Videoplayback/:animeId/:episode',
+          name: 'Videoplayback',
+          component: VideoPlayback,
+        },
+        {
+          path: '/ranking',
+          name: 'ranking',
+          component: Ranking,
+        },
+        {
+          path: '/sort',
+          name: 'sort',
+          component: Sort,
+        },
+      ]
     },
     {
       path: '/manage',
       name: 'homeManage',
       component: ManageHome,
-    },
-    {
-      path: '/Videoplayback/:animeId/:episode',
-      name: 'Videoplayback',
-      component: VideoPlayback,
     },
     {
       path: '/login',
@@ -46,12 +54,6 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
-    },
-    {
-      path: '/Login',
-      name: 'Login',
-      component: () => import('../views/Login.vue'),
-      meta: { requiresAuth: false }
     },
   ],
 })
