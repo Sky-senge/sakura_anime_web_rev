@@ -127,11 +127,22 @@ const home = () => {
   transition: all .3s ease;
 }
 
-
-@media (min-width: 2100px) {
+@media (min-width: 1800px) {
   .nav {
-    transform: translateX(-120px);
+    transform: translateX(-100px);
     width: 1600px;
+  }
+
+}
+
+@media (max-width: 1800px) {
+  .nav {
+    transform: translateX(-80px);
+    width: 1300px;
+  }
+
+  .search-concent {
+    width: 600px;
   }
 }
 
