@@ -22,62 +22,73 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import Navbar from '/src/components/navbar-component.vue';
-import Artplayer from "/src/components/Artplayer.vue";
+import Artplayer from '/src/components/Artplayer.vue';
 
 export default defineComponent({
-    name: 'HomePage',
-    data() {
-        return {
-            option: {
-                url: "path/to/video.mp4",
-                fullscreen: true,
-            },
-            style: {
-                width: "1600px",
-                height: "800px",
-                margin: "60px auto 0",
-            },
-            // 模拟的选集数据，实际中可以从接口获取
-            episodes: [
-                { title: "第1集", videoUrl: "path/to/episode1.mp4" },
-                { title: "第2集", videoUrl: "path/to/episode2.mp4" },
-                { title: "第3集", videoUrl: "path/to/episode3.mp4" }
-            ],
-            // 模拟的评论数据，实际中可以从接口获取并更新
-            comments: [],
-            newComment: "",
-            username: "匿名用户" // 这里可以改为登录后的真实用户名，比如从登录状态获取
-        };
+  name: 'HomePage',
+  props: {
+    animeId: {
+      type: String,
+      required: true,
     },
-    components: {
-        Artplayer,
-        Navbar,
+    episode: {
+      type: String,
+      required: true,
     },
-    methods: {
-        getInstance(art) {
-            console.info(art);
-        },
-        // 选集切换方法
-        selectEpisode(index) {
-            const selectedEpisode = this.episodes[index];
-            this.option.url = selectedEpisode.videoUrl;
-            // 这里可以根据ArtPlayer.js的API重新加载视频等操作，示例中暂未详细体现
-        },
-        // 添加评论的方法
-        addComment() {
-            if (this.newComment.trim()!== "") {
-                this.comments.push({
-                    username: this.username,
-                    text: this.newComment
-                });
-                this.newComment = "";
-            }
-        }
-    }
+  },
+  data() {
+    return {
+      option: {
+        url: `path/to/${this.animeId}/episode${this.episode}.mp4`, // 使用传入的路由参数生成视频 URL
+        fullscreen: true,
+      },
+      style: {
+        width: "1600px",
+        height: "800px",
+        margin: "60px auto 0",
+      },
+      // 模拟的选集数据，实际中可以从接口获取
+      episodes: [
+        { title: "第1集", videoUrl: `path/to/${this.animeId}/episode1.mp4` },
+        { title: "第2集", videoUrl: `path/to/${this.animeId}/episode2.mp4` },
+        { title: "第3集", videoUrl: `path/to/${this.animeId}/episode3.mp4` },
+      ],
+      // 模拟的评论数据，实际中可以从接口获取并更新
+      comments: [],
+      newComment: "",
+      username: "匿名用户", // 这里可以改为登录后的真实用户名，比如从登录状态获取
+    };
+  },
+  components: {
+    Artplayer,
+    Navbar,
+  },
+  methods: {
+    getInstance(art: any) {
+      console.info(art);
+    },
+    // 选集切换方法
+    selectEpisode(index: number) {
+      const selectedEpisode = this.episodes[index];
+      this.option.url = selectedEpisode.videoUrl;
+      // 这里可以根据 ArtPlayer.js 的 API 重新加载视频等操作，示例中暂未详细体现
+    },
+    // 添加评论的方法
+    addComment() {
+      if (this.newComment.trim() !== "") {
+        this.comments.push({
+          username: this.username,
+          text: this.newComment,
+        });
+        this.newComment = "";
+      }
+    },
+  },
 });
 </script>
+
 
 <style scoped>
 .video-wrapper {
