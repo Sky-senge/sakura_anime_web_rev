@@ -1,7 +1,7 @@
 <template>
   <div class="video-wrapper">
     <!-- 视频播放器 -->
-    <Artplayer @get-instance="getInstance" :option="option" :style="style" />
+    <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" :style="style" />
     <!-- 选集区域 -->
     <div class="episode-selector">
       <h3>选集：</h3>
@@ -29,7 +29,7 @@
 </template>
 
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { useRoute,useRouter } from 'vue-router';
 import Artplayer from '/src/components/Artplayer.vue';
@@ -44,11 +44,22 @@ const route = useRoute();
 const animeId = route.params.animeId as string;
 const episode = route.params.episode as string;
 
+// 创建对VideoPlayer子组件的引用
+const videoPlayerRef = ref(null);
+
 // 定义响应式数据
 const option = reactive({
   url: ``,
   fullscreen: true,
   type: 'm3u8',
+  plugins: [
+        artplayerPluginLibass({
+            // debug: true,
+            workerUrl: 'https://unpkg.com/libass-wasm@4.1.0/dist/js/subtitles-octopus-worker.js',
+            // wasmUrl: 'https://unpkg.com/libass-wasm@4.1.0/dist/js/subtitles-octopus-worker.wasm',
+            fallbackFont: 'https://github.com/magiclen/source-han-sans-cn-woff2/raw/refs/heads/master/SourceHanSansCN-Bold.woff2'
+        }),
+    ],
   customType: {
     m3u8: function playM3u8(video: any, url: any, art: any) {
       if (Hls.isSupported()) {
@@ -66,7 +77,7 @@ const option = reactive({
     },
   },
   subtitle: {
-        url: '/assets/sample/style-test.ass',
+        url: '',
     },
 });
 const style = reactive({
@@ -110,7 +121,10 @@ async function fetchEpisodeList(animeId: string) {
       if (episodes.value.length > 0) {
         option.url = episodes.value[0].videoUrl;
         option.subtitle.url = episodes.value[0].subtitleUrl;
+        console.log("episodes.value")
+        console.log(episodes.value)
         EpisodeBuilder(Number(episode)-1);
+        
       }
     } else {
       console.error('Failed to fetch video detail:', response.data.message);
@@ -124,11 +138,16 @@ async function fetchEpisodeList(animeId: string) {
 function selectEpisode(index: number) {
   const selectedEpisode = episodes.value[index];
   if (selectedEpisode) {
+    console.log("selectedEpisode")
+    console.log(selectedEpisode)
     option.url = selectedEpisode.videoUrl;
+    option.subtitle.url = selectedEpisode.subtitleUrl;
     console.log(`选中视频: ${selectedEpisode.episode}, URL: ${option.url}, 字幕URL: ${option.subtitle.url}`);
     // 更新播放器，手动重新加载视频
     if (artPlayerInstance.value) {
-      artPlayerInstance.value.url=option.url; // 直接调用Artplayer的load方法更新视频
+      // artPlayerInstance.value.url=option.url;
+      videoPlayerRef.value.switchVideo(option.url) //调用切换方法
+      videoPlayerRef.value.switchSubtitle(option.subtitle.url);
       router.push(`/Videoplayback/${animeId}/${index+1}`)
     }
   }
@@ -139,10 +158,13 @@ function EpisodeBuilder(index: number) {
   const selectedEpisode = episodes.value[index];
   if (selectedEpisode) {
     option.url = selectedEpisode.videoUrl;
-    console.log(`选中视频: ${selectedEpisode.episode}, URL: ${option.url}`);
+    option.subtitle.url = selectedEpisode.subtitleUrl;
+    console.log(`选中视频: ${selectedEpisode.episode}, URL: ${option.url}, 字幕URL: ${option.subtitle.url}`);
     // 更新播放器，手动重新加载视频
     if (artPlayerInstance.value) {
-      artPlayerInstance.value.url=option.url; // 直接调用Artplayer的load方法更新视频
+      videoPlayerRef.value.switchVideo(option.url) //调用切换方法
+      videoPlayerRef.value.switchSubtitle(option.subtitle.url);
+      console.log(videoPlayerRef.value)
     }
   }
 }
