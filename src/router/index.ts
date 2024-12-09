@@ -30,7 +30,7 @@ const router = createRouter({
       component: ManageHome,
     },
     {
-      path: '/Videoplayback',
+      path: '/Videoplayback/:animeId/:episode',
       name: 'Videoplayback',
       component: VideoPlayback,
     },
