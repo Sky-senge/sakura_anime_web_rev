@@ -1,5 +1,4 @@
 <template>
-    <Navbar />
     <div class="video-wrapper">
         <Artplayer @get-instance="getInstance" :option="option" :style="style" />
         <!-- 选集区域 -->

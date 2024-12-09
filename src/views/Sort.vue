@@ -1,5 +1,4 @@
 <template>
-  <Navbar />
   <div class="filter-container">
     <div class="tab">
       <button
