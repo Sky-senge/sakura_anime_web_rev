@@ -37,13 +37,21 @@ export default defineComponent({
 
 <style scoped>
 .carousel {
+  max-height: 300px;
   margin: 0 auto; /* 水平居中，与 .video-list 保持一致 */
-  max-width: 1200px; /* 限制最大宽度，与 .video-list 一致 */
+  max-width: 1150px; /* 限制最大宽度，与 .video-list 一致 */
   padding: 0; /* 内边距保持不变 */
+  transition: all .3s;
 }
 
 
 .carousel img {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .carousel {
+    max-height: 0px;
+}
 }
 </style>

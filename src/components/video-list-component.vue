@@ -91,6 +91,7 @@ export default defineComponent({
   background-color: #f2f4f8;
   margin: 0 auto;
   user-select: none;
+  transition: all .3s;
 }
 
 .video-card {

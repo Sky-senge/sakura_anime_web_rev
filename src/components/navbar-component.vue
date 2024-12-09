@@ -1,20 +1,21 @@
 <template>
   <header class="navbar">
-    <div class="left-nav">
-      <nav class="nav-links">
-        <el-button type="primary" size="small" class="nav-button-l" @click="home">首页</el-button>
-        <el-button size="small" class="nav-button-l" @click="sort()">全部</el-button>
-        <el-button size="small" class="nav-button-l" @click="ranking()">排行榜</el-button>
+    <div class="nav">
+      <span class="logo"> sakura </span>
+      <nav class="left-nav">
+        <button type="primary" size="small" class="nav-button-l" @click="home">首页</button>
+        <button size="small" class="nav-button-l" @click="sort()">全部</button>
+        <button size="small" class="nav-button-l" @click="ranking()">排行榜</button>
       </nav>
-    </div>
-    <nav class="right-nav">
       <div class="search-concent">
         <i class="bi bi-search"></i>
         <input type="text" placeholder="搜索" class="search-bar" />
       </div>
-      <button size="small" class="nav-button" @click="jumpToLogin()">登录</button>
-      <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
-    </nav>
+      <nav class="right-nav">
+        <button size="small" class="nav-button" @click="jumpToLogin()">登录</button>
+        <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
+      </nav>
+    </div>
   </header>
 </template>
 
@@ -59,7 +60,7 @@ const sort = () => {
 const ranking = () => {
   router.push('/ranking')
 }
-const home =() => {
+const home = () => {
   router.push('/')
 }
 
@@ -91,33 +92,87 @@ const home =() => {
 
 <style scoped>
 .navbar {
-  user-select: none;
+  display: flex;
+  justify-content: center;
   position: sticky;
   top: 0;
   background-color: #ff8d00;
   box-shadow: 0 2px 10px #ff8c001c;
   z-index: 1000;
   padding: 10px 35px;
+
+}
+
+.logo {
+  font-size: 1.3rem;
+  color: #fff;
+  font-weight: 800;
+}
+
+.nav {
+  transform: translateX(-150px);
+  user-select: none;
+  width: 1280px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: all .3s;
 }
 
-.left-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.search-concent {
+  width: 500px;
+  background-color: #fff;
+  padding: 12px 15px;
+  border-radius: 5px;
+  transition: all .3s;
 }
 
-.right-nav,
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 0px;
+
+@media (max-width: 1620px) {
+  .nav {
+    transform: translateX(-60px);
+    width: 1200px;
+  }
 }
 
+@media (max-width: 1350px) {
+  .nav {
+    transform: translateX(-30px);
+    width: 980px;
+  }
+
+  .search-concent {
+    width: 400px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .nav {
+    transform: translateX(-10px);
+    width: 768px;
+  }
+
+  .search-concent {
+    width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav {
+    transform: translateX(0px);
+    width: 100%;
+  }
+
+  .logo {
+    display: none;
+  }
+}
+
+.left-nav,
 .right-nav {
-  gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .bi {
@@ -145,12 +200,6 @@ const home =() => {
   text-decoration: none;
 }
 
-.search-concent {
-  background-color: #fff;
-  padding: 6px 10px;
-  border-radius: 25px;
-}
-
 .search-concent i {
   font-size: 0.7rem;
   padding: 8px 4px;
@@ -163,5 +212,4 @@ const home =() => {
   background: none;
   outline: none;
 }
-
 </style>
