@@ -42,8 +42,8 @@
         <el-header class="header">
           Sakura Anime 后台管理
           <div class="header-buttons">
-            <el-button type="primary" @click="login" v-if="!isLoggedIn">登录</el-button>
-            <el-button type="info" @click="logout" v-if="isLoggedIn">退出登录</el-button>
+            <button type="primary" @click="login" v-if="!isLoggedIn">登录</button>
+            <button type="info" @click="logout" v-if="isLoggedIn">退出登录</button>
           </div>
         </el-header>
         <el-main class="main">
@@ -178,11 +178,10 @@ onMounted(loadData);
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
 }
 
 .el-menu-vertical-demo {
-  width: 100%;
+  width: 110%;
 }
 
 .el-submenu__title,
@@ -194,7 +193,7 @@ onMounted(loadData);
   color: #fff;
   font-size: 1rem; 
  height: 80px;
-  transition: background-color 0.3s;
+  transition: background-color .3s;
 }
 
 .el-submenu__title:hover,
@@ -218,7 +217,7 @@ onMounted(loadData);
   align-items: center;
   padding: 0 20px;
   font-size: 16px; 
-  background-color: #2985ed;
+  background-color: #ff8000;
   color: #ffffff;
 }
 
@@ -232,6 +231,15 @@ onMounted(loadData);
   display: flex;
   align-items: center;
   gap: 10px; /* 按钮之间的间距 */
+}
+
+.header-buttons button{
+  border: none;
+  font-size: 0.8rem;
+  padding: 12px 24px;
+  color: #fff;
+background-color: #5a5a5a;
+border-radius: 25px;
 }
 
 .main {
