@@ -6,6 +6,7 @@ import Ranking from '@/views/Ranking.vue'
 import Sort from '@/views/Sort.vue'
 import VideoPlayback from '@/views/VideoPlayback.vue'
 import HomeSubView from '@/views/HomeSubView.vue'
+import VideoDetails from '@/views/VideoDetails.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +35,11 @@ const router = createRouter({
           path: '/sort',
           name: 'sort',
           component: Sort,
+        },
+        {
+          path: '/videodetails',
+          name: 'VideoDetails',
+          component: VideoDetails,
         },
       ]
     },
