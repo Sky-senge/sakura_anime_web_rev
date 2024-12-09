@@ -1,6 +1,6 @@
 <template>
     <div ref="artRef"></div>
-  </template>
+</template>
   
   <script>
   import Artplayer from "artplayer";
