@@ -1,0 +1,14 @@
+/* 针对Chrome、Safari和Opera等基于WebKit的浏览器 */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* 针对Firefox浏览器 */
+html {
+    scrollbar-width: none;
+}
+
+/* 针对IE和Edge浏览器（虽然IE已逐渐淘汰，但为兼容性考虑可保留） */
+html {
+    -ms-overflow-style: none;
+}
