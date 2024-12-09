@@ -13,7 +13,7 @@
           <div class="dot"></div>
           <div class="title-name">热门推荐</div>
         </div>
-        <a href="/all" class="view-more">更多</a>
+        <a href="/sort" class="view-more">更多</a>
       </div>
       <VideoList />
     </section>

@@ -1,13 +1,13 @@
 <template>
   <div class="home">
     <el-container class="main-container">
-      <el-aside width="220px" class="sidebar">
+      <el-aside width="20%" class="sidebar">
         <div class="logo">
           <img src="https://img0.baidu.com/it/u=746753980,1537730619&fm=253&fmt=auto&app=120&f=JPEG?w=500&h=569"
             alt="Logo" class="logo-img" />
         </div>
         <el-menu default-active="1-1" class="el-menu-vertical-demo" :default-openeds="['1', '2', '3', '4']"
-          background-color="#2d3a4b" text-color="#fff" active-text-color="#ffd04b">
+         text-color="#fff" active-text-color="#ff8d00">
           <el-submenu index="1">
             <template #title>
               <i class="el-icon-user"></i>
@@ -161,15 +161,17 @@ onMounted(loadData);
 .sidebar {
   background-color: #2d3a4b;
   color: #ffffff;
-  position: relative;
-  padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  gap: 10px;
+  align-items: center;
 }
 
 .logo {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
+  text-align: center;
+  width: 100%;
+  height: 70px;
 }
 
 .logo-img {
@@ -181,7 +183,6 @@ onMounted(loadData);
 
 .el-menu-vertical-demo {
   width: 100%;
-  margin-top: 20px;
 }
 
 .el-submenu__title,
@@ -191,9 +192,8 @@ onMounted(loadData);
   justify-content: flex-start;
   background-color: #2d3a4b;
   color: #fff;
-  height: 100px;
-  font-size: 16px; 
-  padding-left: 20px;
+  font-size: 1rem; 
+ height: 80px;
   transition: background-color 0.3s;
 }
 

@@ -142,8 +142,7 @@ export default defineComponent({
 <style scoped>
 /* 整体容器样式 */
 .filter-container {
-  background-color: #181818;
-  color: white;
+  color: rgb(37, 37, 37);
   padding: 20px;
   width: 100%;
   height: 300px;
@@ -153,8 +152,7 @@ export default defineComponent({
 /* 选项卡样式 */
 .tab {
   overflow: hidden;
-  border-bottom: 1px solid #444;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .tab button {
@@ -162,13 +160,15 @@ export default defineComponent({
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-  color: white;
+  padding: 8px 10px;
+  transition: all .3s;
+  color: rgb(95, 95, 95);
 }
 
 .tab button.active {
-  border-bottom: 2px solid orange;
+  font-weight: 800;
+  color: #ff8d00;
+  border-bottom: 3px solid #ff8d00;;
 }
 
 .tabcontent {
@@ -182,7 +182,7 @@ export default defineComponent({
 
 /* 新增筛选容器样式 */
 .filter-wrapper {
-  border: 1px solid #444;
+  user-select: none;
   border-radius: 5px;
   padding: 10px;
   margin-top: 10px;
@@ -190,29 +190,59 @@ export default defineComponent({
 
 /* 筛选区域样式 */
 .filter-section {
-  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 20px;
 }
 
 .filter-label {
-  margin-right: 10px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+  margin-right: 8px;
 }
 
 .filter-option {
   cursor: pointer;
-  margin-right: 10px;
+  padding: 5px;
+  font-size: 0.85em;
+  transition: all .3s;
+  border-radius: 25px;
+}
+
+.filter-option:hover{
+  padding: 5px 12px;
+  color: #ff5a5a;
 }
 
 .filter-option.active {
-  color: orange;
+  color: rgb(255, 255, 255);
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 5px 16px;
+  background: #ff8d00;
 }
 
 /* 重新筛选按钮样式 */
 .reset-button {
-  background-color: orange;
+  background-color: #ff8d00;
   color: white;
   border: none;
-  padding: 10px 20px;
+  border-radius: 4px;
+  padding: 8px 20px;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 12px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.reset-button:hover{
+  background-color: #ff9a1f;
+}
+
+.reset-button:active{
+  background-color: #ffa231;
 }
 </style>

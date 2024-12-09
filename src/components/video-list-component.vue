@@ -84,19 +84,18 @@ export default defineComponent({
 
 <style scoped>
 .video-list {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 15px;
+  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   background-color: #f2f4f8;
-  gap: 10px;
-  justify-content: flex-start;
-  max-width: 1200px;
   margin: 0 auto;
+  user-select: none;
 }
 
 .video-card {
-  width: calc(25% - 10px);
-  background: #fff;
-  border: 1px solid #ddd;
+  cursor: pointer;
+  background: #ececec;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -104,7 +103,7 @@ export default defineComponent({
 }
 
 .video-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -112,7 +111,6 @@ export default defineComponent({
   width: 100%;
   height: 150px;
   overflow: hidden;
-  border-bottom: 1px solid #ddd;
 }
 
 .video-thumbnail img {
@@ -122,9 +120,10 @@ export default defineComponent({
 }
 
 .video-name {
-  padding: 10px;
-  font-size: 16px;
+  padding: 20px 5px;
+  font-size: 1em;
   color: #333;
+  background: #fff;
   font-weight: bold;
   text-align: center;
   white-space: nowrap;

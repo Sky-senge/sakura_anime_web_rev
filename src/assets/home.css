@@ -16,7 +16,6 @@
     height: 100vh;
     margin: 0 auto;
     padding: 20px 10px;
-    border-radius: 12px;
 }
 
 .section-header {
@@ -28,9 +27,11 @@
 }
 
 .title {
+    user-select: none;
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    margin-bottom: 10px;
 }
 
 .dot {
@@ -47,7 +48,7 @@
 }
 
 .section-header .view-more {
-    font-size: 14px;
+    font-size: 0.9em;
     color: #007bff;
     text-decoration: none;
 }

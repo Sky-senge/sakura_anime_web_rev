@@ -1,20 +1,19 @@
 <template>
   <header class="navbar">
     <div class="left-nav">
-      <div class="logo">o</div>
       <nav class="nav-links">
         <el-button type="primary" size="small" class="nav-button-l" @click="home">首页</el-button>
-        <el-button size="small" class="nav-button-l" @click="sort()">分类</el-button>
-        <el-button size="small" class="nav-button-l" @click="ranking()">排行</el-button>
+        <el-button size="small" class="nav-button-l" @click="sort()">全部</el-button>
+        <el-button size="small" class="nav-button-l" @click="ranking()">排行榜</el-button>
       </nav>
     </div>
     <nav class="right-nav">
       <div class="search-concent">
         <i class="bi bi-search"></i>
-        <input placeholder="搜索" class="search-bar" />
+        <input type="text" placeholder="搜索" class="search-bar" />
       </div>
       <button size="small" class="nav-button" @click="jumpToLogin()">登录</button>
-      <button size="small" class="nav-button"><i class="bi bi-clock-history"></i></button>
+      <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
     </nav>
   </header>
 </template>
@@ -95,10 +94,10 @@ const home =() => {
   user-select: none;
   position: sticky;
   top: 0;
-  background-color: #368dff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #ff8d00;
+  box-shadow: 0 2px 10px #ff8c001c;
   z-index: 1000;
-  padding: 10px 20px;
+  padding: 10px 35px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -110,20 +109,6 @@ const home =() => {
   gap: 10px;
 }
 
-.logo {
-  background-color: #fff;
-  font-size: 1.3em;
-  font-weight: 800;
-  height: 1.5rem;
-  width: 1.5rem;
-  padding: 3px;
-  margin: 0.3rem;
-  border-radius: 25px;
-  text-align: center;
-  justify-content: center;
-  color: #7f2fff;
-}
-
 .right-nav,
 .nav-links {
   display: flex;
@@ -132,7 +117,7 @@ const home =() => {
 }
 
 .right-nav {
-  gap: 10px;
+  gap: 12px;
 }
 
 .bi {
@@ -141,8 +126,8 @@ const home =() => {
 
 .nav-button-l,
 .nav-button {
-  color: #d2d2d2;
-  font-size: 0.85rem;
+  color: #e5e5e5;
+  font-size: 0.88rem;
   font-weight: 700;
   background: none;
   border: none;
@@ -162,7 +147,7 @@ const home =() => {
 
 .search-concent {
   background-color: #fff;
-  padding: 4px;
+  padding: 6px 10px;
   border-radius: 25px;
 }
 
@@ -172,9 +157,11 @@ const home =() => {
 }
 
 .search-bar {
+  font-weight: 600;
   font-size: 0.8rem;
   border: none;
   background: none;
   outline: none;
 }
+
 </style>
