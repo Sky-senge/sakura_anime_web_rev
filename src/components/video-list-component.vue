@@ -1,7 +1,7 @@
 <template>
   <div class="video-list">
     <!-- 循环展示 animeList 中的每个视频 -->
-    <div v-for="anime in animeList" :key="anime.id" class="video-card">
+    <div v-for="anime in animeList" :key="anime.id" class="video-card" @click="jumpToDetail(anime.id)">
       <div class="video-thumbnail">
         <!-- 如果 filePath 存在且有内容，展示封面图片 -->
         <img v-if="anime.filePath?.length > 0" :src="getCoverUrl(anime.filePath[0].fileName)" :alt="anime.name">
@@ -18,6 +18,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import request from '@/utils/request'; // 引入封装好的 request 模块
+import router from '@/router';
 
 // 定义 Anime 接口类型
 interface Anime {
@@ -70,12 +71,20 @@ export default defineComponent({
       return `http://localhost:8080/files/getCover/${fileName}`;
     };
 
+    /**
+     * 根据动漫ID跳转到详情页
+     * @param animeId - 动漫ID 
+     */
+     const jumpToDetail = (animeId: number) =>{
+      router.push(`/Videoplayback/${animeId}/1`)
+    };
     // 在组件挂载时调用 fetchAnimeList
     onMounted(fetchAnimeList);
 
     return {
       animeList,
       getCoverUrl,
+      jumpToDetail
     };
   },
 });

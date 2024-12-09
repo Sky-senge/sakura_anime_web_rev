@@ -46,21 +46,24 @@ const switchToSignIn = () => {
 
 // 过渡动画生命周期钩子
 const beforeEnter = (el: HTMLElement) => {
-  el.style.opacity = 0;
+  el.style.opacity = '0';
+
   el.style.transform = "scale(0.5)";
 };
 
 const enter = (el: HTMLElement, done: Function) => {
   el.offsetHeight; // trigger reflow to ensure transition starts
   el.style.transition = "transform 0.5s ease, opacity 0.5s ease";
-  el.style.opacity = 1;
+  el.style.opacity = '1';
+
   el.style.transform = "scale(1)";
   done(); // 动画结束后调用
 };
 
 const leave = (el: HTMLElement, done: Function) => {
   el.style.transition = "transform 0.5s ease, opacity 0.5s ease";
-  el.style.opacity = 0;
+  el.style.opacity = '0';
+
   el.style.transform = "scale(0.5)";
   done(); // 动画结束后调用
 };
