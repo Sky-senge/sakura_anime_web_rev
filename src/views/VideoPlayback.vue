@@ -31,12 +31,13 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import Artplayer from '/src/components/Artplayer.vue';
 import Hls from 'hls.js';
 import { request } from '@/utils/request';
 
 // 获取路由参数
+const router = useRouter();
 const route = useRoute();
 const animeId = route.params.animeId as string;
 const episode = route.params.episode as string;
@@ -102,7 +103,7 @@ async function fetchEpisodeList(animeId: string) {
       // 如果 episodes 存在，默认设置为第一个视频
       if (episodes.value.length > 0) {
         option.url = episodes.value[0].videoUrl;
-        selectEpisode(Number(episode)-1);
+        EpisodeBuilder(Number(episode)-1);
       }
     } else {
       console.error('Failed to fetch video detail:', response.data.message);
@@ -118,7 +119,20 @@ function selectEpisode(index: number) {
   if (selectedEpisode) {
     option.url = selectedEpisode.videoUrl;
     console.log(`选中视频: ${selectedEpisode.episode}, URL: ${option.url}`);
+    // 更新播放器，手动重新加载视频
+    if (artPlayerInstance.value) {
+      artPlayerInstance.value.url=option.url; // 直接调用Artplayer的load方法更新视频
+      router.push(`/Videoplayback/${animeId}/${index+1}`)
+    }
+  }
+}
 
+// 初始化加载
+function EpisodeBuilder(index: number) {
+  const selectedEpisode = episodes.value[index];
+  if (selectedEpisode) {
+    option.url = selectedEpisode.videoUrl;
+    console.log(`选中视频: ${selectedEpisode.episode}, URL: ${option.url}`);
     // 更新播放器，手动重新加载视频
     if (artPlayerInstance.value) {
       artPlayerInstance.value.url=option.url; // 直接调用Artplayer的load方法更新视频
