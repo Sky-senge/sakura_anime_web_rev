@@ -53,12 +53,15 @@ const loginFormRef = ref()
 // }
 const jumpToLogin = () => {
   router.push('/login')
+  window.location.href="/login"
 }
 const sort = () => {
   router.push('/sort')
+  window.location.href="/sort"
 }
 const ranking = () => {
   router.push('/ranking')
+  window.location.href="/ranking"
 }
 const home = () => {
   router.push('/')
