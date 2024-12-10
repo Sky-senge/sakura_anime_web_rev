@@ -1,29 +1,36 @@
 <template>
   <div class="video-wrapper">
-    <!-- 视频播放器 -->
-    <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" :style="style" />
-    <!-- 选集区域 -->
-    <div class="episode-selector">
-      <h3>选集：</h3>
-      <button
-        v-for="(episode, index) in episodes"
-        :key="index"
-        @click="selectEpisode(index)"
-        class="episode-btn"
-      >
-        {{ episode.episode }}
-      </button>
-    </div>
-    <!-- 评论区 -->
-    <div class="comment-section">
-      <h3>评论区</h3>
-      <textarea v-model="newComment" placeholder="发表你的评论"></textarea>
-      <button @click="addComment">发表评论</button>
-      <ul>
-        <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
-          <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
-        </li>
-      </ul>
+    <div class="middle">
+      <div class="wrapper">
+        <!-- 视频播放器 -->
+        <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
+        <div class="right">
+          <div class="episode">
+            <div class="episode-title">选集播放</div>
+            <div class="episode-selector">
+              <button v-for="(episode, index) in episodes" :key="index" @click="selectEpisode(index)"
+                class="episode-btn">
+                {{ episode.episode }}
+              </button>
+            </div>
+          </div>
+          <!-- 视频推荐 -->
+          <div class="lll">
+
+          </div>
+        </div>
+      </div>
+      <!-- 评论区 -->
+      <div class="comment-section">
+        <h3>评论区</h3>
+        <textarea v-model="newComment" placeholder="发表你的评论"></textarea>
+        <button @click="addComment">发表评论</button>
+        <ul>
+          <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
+            <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -31,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { useRoute,useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import Artplayer from '/src/components/Artplayer.vue';
 import Hls from 'hls.js';
 import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitles';
@@ -53,13 +60,13 @@ const option = reactive({
   fullscreen: true,
   type: 'm3u8',
   plugins: [
-        artplayerPluginLibass({
-            // debug: true,
-            workerUrl: 'https://unpkg.com/libass-wasm@4.1.0/dist/js/subtitles-octopus-worker.js',
-            // wasmUrl: 'https://unpkg.com/libass-wasm@4.1.0/dist/js/subtitles-octopus-worker.wasm',
-            fallbackFont: 'https://github.com/magiclen/source-han-sans-cn-woff2/raw/refs/heads/master/SourceHanSansCN-Bold.woff2'
-        }),
-    ],
+    artplayerPluginLibass({
+      // debug: true,
+      workerUrl: 'https://unpkg.com/libass-wasm@4.1.0/dist/js/subtitles-octopus-worker.js',
+      // wasmUrl: 'https://unpkg.com/libass-wasm@4.1.0/dist/js/subtitles-octopus-worker.wasm',
+      fallbackFont: 'https://github.com/magiclen/source-han-sans-cn-woff2/raw/refs/heads/master/SourceHanSansCN-Bold.woff2'
+    }),
+  ],
   customType: {
     m3u8: function playM3u8(video: any, url: any, art: any) {
       if (Hls.isSupported()) {
@@ -77,13 +84,8 @@ const option = reactive({
     },
   },
   subtitle: {
-        url: '',
-    },
-});
-const style = reactive({
-  width: "1600px",
-  height: "800px",
-  margin: "60px auto 0",
+    url: '',
+  },
 });
 const episodes = ref([]);
 const videoDetail = reactive({});
@@ -112,7 +114,7 @@ async function fetchEpisodeList(animeId: string) {
       const filePathList = videoDetail.filePath;
       episodes.value = filePathList.map((file: any) => {
         return {
-          episode: `第${file.episodes}集`,
+          episode: `${file.episodes}`,
           videoUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.m3u8`,
           subtitleUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.ass`
         };
@@ -123,8 +125,8 @@ async function fetchEpisodeList(animeId: string) {
         option.subtitle.url = episodes.value[0].subtitleUrl;
         console.log("episodes.value")
         console.log(episodes.value)
-        EpisodeBuilder(Number(episode)-1);
-        
+        EpisodeBuilder(Number(episode) - 1);
+
       }
     } else {
       console.error('Failed to fetch video detail:', response.data.message);
@@ -148,7 +150,7 @@ function selectEpisode(index: number) {
       // artPlayerInstance.value.url=option.url;
       videoPlayerRef.value.switchVideo(option.url) //调用切换方法
       videoPlayerRef.value.switchSubtitle(option.subtitle.url);
-      router.push(`/Videoplayback/${animeId}/${index+1}`)
+      router.push(`/Videoplayback/${animeId}/${index + 1}`)
     }
   }
 }
@@ -193,78 +195,117 @@ onMounted(() => {
 
 <style scoped>
 .video-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  background-color: #e2e4e8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.middle {
+  width: 85%;
+  padding: 20px 35px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.wrapper {
+  margin-top: 20px;
+  display: flex;
+  gap: 50px;
+}
+
+.video {
+  width: 800px;
+  height: 500px;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 30%;
+  justify-content: flex-start;
+}
+
+.episode{
+  border-radius: 10px;
+  padding: 30px;
+  background-color: #e2e4e8;
+}
+
+.episode-title{
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 20px;
 }
 
 .episode-selector {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+  display: grid;
+  gap: 15px;
+  padding: 10px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 5fr));
+  overflow-y: auto;
 }
 
 .episode-btn {
-    background-color: #0080ff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #ff5811;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .episode-btn:hover {
-    background-color: #333;
+  background-color: #333;
 }
 
 .comment-section {
-    margin-top: 20px;
-    height: 80%;
-    width: 1600px;
-    padding: 15px;
-    background-color: #f5f5f5;
-    border-radius: 10px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  height: 80%;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 textarea {
-    width: 100%;
-    height: 100px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    /* padding: 5px; */
-    resize: none;
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  /* padding: 5px; */
+  resize: none;
 }
 
 button {
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 10px;
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
 }
 
 li {
-    padding: 10px;
-    background-color: white;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.05);
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.05);
 }
 </style>
