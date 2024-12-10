@@ -450,7 +450,13 @@ const uploadVideo = async () => {
   formData.append('animeId', uploadForm.animeId);
   formData.append('episodes', String(uploadForm.episodes));
   formData.append('file', selectedFile.value);
-  formData.append('subfile',selectedSubtitleFile.value);
+  if (selectedSubtitleFile.value) {
+    formData.append('subfile', selectedSubtitleFile.value);
+  } else {
+    // 如果没有选择字幕文件，仍然向表单中添加一个空的subfile字段
+    const emptyFile = new File([], "empty.txt");  // 创建一个空文件
+    formData.append('subfile', emptyFile);
+  }
 
   try {
     const loadingMessage = ElMessage({
