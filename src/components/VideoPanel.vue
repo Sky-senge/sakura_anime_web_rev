@@ -115,7 +115,7 @@
     </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="isUploadDialogVisible = false">取消</el-button>
+      <el-button @click="closeVideoUploadDialog()">取消</el-button>
       <el-button type="primary" @click="uploadVideo">上传</el-button>
     </div>
   </el-dialog>
@@ -355,6 +355,13 @@ const submitCreate = async () => {
 const removeFilePath = (index) => {
   editForm.filePath.splice(index, 1);
 };
+
+//关闭对话框
+const closeVideoUploadDialog = () =>{
+  isUploadDialogVisible.value = false
+  selectedFile.value = null
+  selectedSubtitleFile.value = null
+}
 
 // 添加新集
 const addFilePath = () => {
