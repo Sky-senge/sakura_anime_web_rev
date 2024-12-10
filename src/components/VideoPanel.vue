@@ -22,7 +22,7 @@
         <template #default="{ row }">
           <el-button type="primary" size="small" @click="openUploadVideo(row)">上传视频</el-button>
           <el-button type="success" size="small" :disabled="row.filePath.length === 0" @click="openUploadCover(row)">上传封面</el-button>
-          <el-button type="info" size="small" :disabled="row.filePath.length === 0" @click="openUploadSubtitle(row)">上传字幕</el-button>
+          <el-button type="info" size="small" :disabled="row.filePath.length === 0" @click="openUploadSubtitle(row)">外挂字幕</el-button>
           <el-button type="warning" size="small" @click="editVideoInfo(row)">修改信息</el-button>
           <el-button type="danger" size="small" @click="unpublishVideo(row)">下架视频</el-button>
         </template>
@@ -104,6 +104,15 @@
         />
         <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
       </el-form-item>
+      <el-form-item label="字幕文件 (可选)">
+      <input
+        type="file"
+        @change="handleSubtitleChange"
+        accept=".txt,.ass,.vtt,.srt"
+        class="file-input"
+      />
+      <span v-if="selectedSubtitleFile" class="file-name">已选择字幕: {{ selectedSubtitleFile.name }}</span>
+    </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="isUploadDialogVisible = false">取消</el-button>
@@ -131,12 +140,13 @@
   </el-dialog>
 
   <!-- 上传字幕对话框 -->
-  <el-dialog v-model="isUploadSubtitleDialogVisible" title="上传视频">
+  <el-dialog v-model="isUploadSubtitleDialogVisible" title="上传字幕">
     <el-form :model="uploadForm" label-width="100px">
+      <p style="color: red;">注意：web播放器可能不支持外挂字幕，建议上传视频时选中直接渲染</p>
       <el-form-item label="集数">
         <el-input-number v-model="uploadForm.episodes" :min="1" />
       </el-form-item>
-      <el-form-item label="选择文件">
+      <el-form-item label="选择外挂字幕文件">
         <input
           type="file"
           @change="handleFileChange"
@@ -189,8 +199,10 @@ const uploadForm = reactive({
   animeId: null,
   episodes: 1,
 });
+//准备上传的文件
 const selectedFile = ref(null);
-
+//准备上传的字幕文件
+const selectedSubtitleFile = ref(null);
 // 加载视频列表
 const loadVideoList = async () => {
   try {
@@ -416,6 +428,17 @@ const handleFileChange = (event) => {
   }
 };
 
+// 处理字幕文件选择（可选）
+const handleSubtitleChange = (event) => {
+  const input = event.target;
+  const files = input.files;
+  if (files && files.length > 0) {
+    selectedSubtitleFile.value = files[0];
+  } else {
+    selectedSubtitleFile.value = null; // 清空字幕文件
+  }
+};
+
 // 上传视频
 const uploadVideo = async () => {
   if (!selectedFile.value) {
@@ -427,6 +450,7 @@ const uploadVideo = async () => {
   formData.append('animeId', uploadForm.animeId);
   formData.append('episodes', String(uploadForm.episodes));
   formData.append('file', selectedFile.value);
+  formData.append('subfile',selectedSubtitleFile.value);
 
   try {
     const loadingMessage = ElMessage({
