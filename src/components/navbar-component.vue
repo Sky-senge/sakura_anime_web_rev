@@ -3,7 +3,7 @@
     <div class="nav">
       <span class="logo"> sakura </span>
       <nav class="left-nav">
-        <button type="primary" size="small" class="nav-button-l" @click="home">首页</button>
+        <button type="primary" size="small" class="nav-button-l" @click="home()">首页</button>
         <button size="small" class="nav-button-l" @click="sort()">全部</button>
         <button size="small" class="nav-button-l" @click="ranking()">排行榜</button>
       </nav>
@@ -62,6 +62,7 @@ const ranking = () => {
 }
 const home = () => {
   router.push('/')
+  window.location.href="/" //确保不会被播放器卡住
 }
 
 // 提交登录
