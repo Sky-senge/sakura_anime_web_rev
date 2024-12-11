@@ -172,6 +172,7 @@ const videoPlayerRef = ref(null);
 const isDesktop = ref(false); // 是否为桌面
 const isPad = ref(false); // 是否为平板
 const isMobile = ref(false); // 是否为手机
+const isFullscreen = ref(false); //检测全屏变化
 
 // 定义响应式数据
 const option = reactive({
@@ -308,27 +309,6 @@ const checkDevice = () => {
   }
 };
 
-// 根据设备宽度判断
-const checkDeviceRefetch = () => {
-  const width = window.innerWidth;
-  if (width > 1280) {
-    isDesktop.value = true;
-    isPad.value = false;
-    isMobile.value = false;
-    location. reload()
-  } else if (width > 768 && width <= 1280) {
-    isDesktop.value = false;
-    isPad.value = true;
-    isMobile.value = false;
-    location. reload()
-  } else {
-    isDesktop.value = false;
-    isPad.value = false;
-    isMobile.value = true;
-    location. reload()
-  }
-};
-
 // 添加评论
 function addComment() {
   if (newComment.value.trim() !== "") {
@@ -340,11 +320,54 @@ function addComment() {
   }
 }
 
+// 根据设备宽度判断
+const checkDeviceRefetch = () => {
+  if (isFullscreen.value) {
+    // 如果是全屏模式，跳过逻辑
+    console.log("全屏播放，跳过"+isFullscreen.value)
+    return;
+  }
+  const width = window.innerWidth;
+  if (width > 1280) {
+    isDesktop.value = true;
+    isPad.value = false;
+    isMobile.value = false;
+    console.log("侦测到PC")
+    location. reload()
+  } else if (width > 768 && width <= 1280) {
+    isDesktop.value = false;
+    isPad.value = true;
+    isMobile.value = false;
+    console.log("侦测到Pad")
+    location. reload()
+  } else {
+    isDesktop.value = false;
+    isPad.value = false;
+    isMobile.value = true;
+    console.log("侦测到Mobile")
+    location. reload()
+  }
+};
+
+// 监听全屏模式的变化
+const handleFullscreenChange = () => {
+  var isFullScreenVar = !!document.fullscreenElement; // 如果有全屏元素，则为 true
+  if(isFullScreenVar==false){
+    setTimeout(() => {
+    isFullscreen.value = isFullScreenVar;
+  }, 200); // 延迟 200ms，以免退出就刷新了
+  }else{
+    isFullscreen.value=isFullScreenVar;
+  }
+  console.log("检测到全屏变化，当前值："+isFullscreen.value)
+};
+
 // 在组件挂载时获取视频详情
 onMounted(() => {
   if (animeId) {
     checkDevice();
     window.addEventListener('resize', checkDeviceRefetch); // 监听窗口变化
+    window.addEventListener('fullscreenchange', handleFullscreenChange); //忽略全屏导致的变化
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
   } else {
     console.error('animeId is missing');
