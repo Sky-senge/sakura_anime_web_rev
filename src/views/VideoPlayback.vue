@@ -4,7 +4,7 @@
       <div class="wrapper">
         <!-- 视频播放器 -->
         <div class="left">
-          <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
+          <Artplayer v-if="isDesktop" @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
           <div class="tags">
             <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
               {{ tag }}
@@ -55,7 +55,7 @@
     <div class="middle2">
       <div class="wrappe-m">
         <!-- 视频播放器 -->
-        <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-p" />
+        <Artplayer v-if="isPad" @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-p" />
         <div class="about-m">
           <div class="about-pad">
             <div class="about">
@@ -105,7 +105,7 @@
     <div class="middle3">
       <div class="wrappe-m">
         <!-- 视频播放器 -->
-        <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-m" />
+        <Artplayer v-if="isMobile" @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-m" />
         <div class="about-m">
           <div class="title-warp">
             <div class="dot"></div>
@@ -168,6 +168,10 @@ const episode = route.params.episode as string;
 
 // 创建对VideoPlayer子组件的引用
 const videoPlayerRef = ref(null);
+
+const isDesktop = ref(false); // 是否为桌面
+const isPad = ref(false); // 是否为平板
+const isMobile = ref(false); // 是否为手机
 
 // 定义响应式数据
 const option = reactive({
@@ -286,6 +290,45 @@ function EpisodeBuilder(index: number) {
   }
 }
 
+// 根据设备宽度判断
+const checkDevice = () => {
+  const width = window.innerWidth;
+  if (width > 1280) {
+    isDesktop.value = true;
+    isPad.value = false;
+    isMobile.value = false;
+  } else if (width > 768 && width <= 1280) {
+    isDesktop.value = false;
+    isPad.value = true;
+    isMobile.value = false;
+  } else {
+    isDesktop.value = false;
+    isPad.value = false;
+    isMobile.value = true;
+  }
+};
+
+// 根据设备宽度判断
+const checkDeviceRefetch = () => {
+  const width = window.innerWidth;
+  if (width > 1280) {
+    isDesktop.value = true;
+    isPad.value = false;
+    isMobile.value = false;
+    location. reload()
+  } else if (width > 768 && width <= 1280) {
+    isDesktop.value = false;
+    isPad.value = true;
+    isMobile.value = false;
+    location. reload()
+  } else {
+    isDesktop.value = false;
+    isPad.value = false;
+    isMobile.value = true;
+    location. reload()
+  }
+};
+
 // 添加评论
 function addComment() {
   if (newComment.value.trim() !== "") {
@@ -300,6 +343,8 @@ function addComment() {
 // 在组件挂载时获取视频详情
 onMounted(() => {
   if (animeId) {
+    checkDevice();
+    window.addEventListener('resize', checkDeviceRefetch); // 监听窗口变化
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
   } else {
     console.error('animeId is missing');
