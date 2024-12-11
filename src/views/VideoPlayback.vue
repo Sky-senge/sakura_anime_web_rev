@@ -207,11 +207,32 @@ const option = reactive({
     url: '',
   },
 });
-const episodes = ref([]);
-const videoDetail = reactive({});
+const episodes = ref<Episode[]>([]);
+const videoDetail = reactive({} as VideoDetail);
 const comments = ref([]);
 const newComment = ref("");
 const username = ref("匿名用户");
+
+interface FileDetail {
+  episodes: number;
+  fileName: string;
+}
+
+interface VideoDetail {
+  id: number;
+  name: string;
+  tags: string[];
+  description: string;
+  rating: number;
+  releaseDate: string;
+  filePath: FileDetail[];
+}
+
+interface Episode{
+  episode: string,
+  videoUrl: string,
+  subtitleUrl: string
+}
 
 // 保存Artplayer实例
 const artPlayerInstance = ref<any>(null);
