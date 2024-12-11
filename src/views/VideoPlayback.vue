@@ -4,7 +4,7 @@
       <div class="wrapper">
         <!-- 视频播放器 -->
         <div class="left">
-          <Artplayer v-if="isDesktop" @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
+          <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
           <div class="tags">
             <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
               {{ tag }}
@@ -12,11 +12,10 @@
           </div>
           <!-- 评论区 -->
           <div class="comment-section">
-            <div class="section-title">评论<div class="section-title2">评论</div>
-            </div>
+            <div class="section-title">评论<div class="section-title2">评论</div></div>
             <div class="textarea">
               <textarea v-model="newComment" placeholder="这里是评论区,不是无人区"></textarea>
-              <button @click="addComment">发表评论</button>
+              <button @click="addComment" >发表评论</button>
             </div>
             <ul>
               <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
@@ -51,102 +50,6 @@
         </div>
       </div>
     </div>
-    <!-- 平板端 -->
-    <div class="middle2">
-      <div class="wrappe-m">
-        <!-- 视频播放器 -->
-        <Artplayer v-if="isPad" @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-p" />
-        <div class="about-m">
-          <div class="about-pad">
-            <div class="about">
-              <div class="title-warp">
-                <div class="dot"></div>
-                <div class="title">{{ videoDetail.name }}</div>
-              </div>
-              <div class="info">
-                <div class="releaseDate">{{ videoDetail.releaseDate }}</div>
-                <div class="rating">评分: {{ videoDetail.rating }}</div>
-              </div>
-              <div class="description">{{ videoDetail.description }}</div>
-              <div class="tags">
-                <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
-                  {{ tag }}
-                </span>
-              </div>
-            </div>
-            <div class="episode-p">
-              <div class="episode-title">选集播放</div>
-              <div class="episode-selector">
-                <button v-for="(episode, index) in episodes" :key="index" @click="selectEpisode(index)"
-                  class="episode-btn">
-                  {{ episode.episode }}
-                </button>
-              </div>
-            </div>
-          </div>
-          <!-- 评论区 -->
-          <div class="comment-section">
-            <div class="section-title">评论<div class="section-title2">评论</div>
-            </div>
-            <div class="textarea">
-              <textarea v-model="newComment" placeholder="这里是评论区,不是无人区"></textarea>
-              <button @click="addComment">发表评论</button>
-            </div>
-            <ul>
-              <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
-                <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- 移动端 -->
-    <div class="middle3">
-      <div class="wrappe-m">
-        <!-- 视频播放器 -->
-        <Artplayer v-if="isMobile" @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-m" />
-        <div class="about-m">
-          <div class="title-warp">
-            <div class="dot"></div>
-            <div class="title">{{ videoDetail.name }}</div>
-          </div>
-          <div class="info">
-            <div class="releaseDate">{{ videoDetail.releaseDate }}</div>
-            <div class="rating">评分: {{ videoDetail.rating }}</div>
-          </div>
-          <div class="description">{{ videoDetail.description }}</div>
-          <div class="episode">
-            <div class="episode-title">选集播放</div>
-            <div class="episode-selector">
-              <button v-for="(episode, index) in episodes" :key="index" @click="selectEpisode(index)"
-                class="episode-btn">
-                {{ episode.episode }}
-              </button>
-            </div>
-          </div>
-          <div class="tags">
-            <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
-              {{ tag }}
-            </span>
-          </div>
-          <!-- 评论区 -->
-          <div class="comment-section">
-            <div class="section-title">评论<div class="section-title2">评论</div>
-            </div>
-            <div class="textarea">
-              <textarea v-model="newComment" placeholder="这里是评论区,不是无人区"></textarea>
-              <button @click="addComment">发表评论</button>
-            </div>
-            <ul>
-              <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
-                <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -168,11 +71,6 @@ const episode = route.params.episode as string;
 
 // 创建对VideoPlayer子组件的引用
 const videoPlayerRef = ref(null);
-
-const isDesktop = ref(false); // 是否为桌面
-const isPad = ref(false); // 是否为平板
-const isMobile = ref(false); // 是否为手机
-const isFullscreen = ref(false); //检测全屏变化
 
 // 定义响应式数据
 const option = reactive({
@@ -207,32 +105,11 @@ const option = reactive({
     url: '',
   },
 });
-const episodes = ref<Episode[]>([]);
-const videoDetail = reactive({} as VideoDetail);
+const episodes = ref([]);
+const videoDetail = reactive({});
 const comments = ref([]);
 const newComment = ref("");
 const username = ref("匿名用户");
-
-interface FileDetail {
-  episodes: number;
-  fileName: string;
-}
-
-interface VideoDetail {
-  id: number;
-  name: string;
-  tags: string[];
-  description: string;
-  rating: number;
-  releaseDate: string;
-  filePath: FileDetail[];
-}
-
-interface Episode{
-  episode: string,
-  videoUrl: string,
-  subtitleUrl: string
-}
 
 // 保存Artplayer实例
 const artPlayerInstance = ref<any>(null);
@@ -312,24 +189,6 @@ function EpisodeBuilder(index: number) {
   }
 }
 
-// 根据设备宽度判断
-const checkDevice = () => {
-  const width = window.innerWidth;
-  if (width > 1280) {
-    isDesktop.value = true;
-    isPad.value = false;
-    isMobile.value = false;
-  } else if (width > 768 && width <= 1280) {
-    isDesktop.value = false;
-    isPad.value = true;
-    isMobile.value = false;
-  } else {
-    isDesktop.value = false;
-    isPad.value = false;
-    isMobile.value = true;
-  }
-};
-
 // 添加评论
 function addComment() {
   if (newComment.value.trim() !== "") {
@@ -341,54 +200,9 @@ function addComment() {
   }
 }
 
-// 根据设备宽度判断
-const checkDeviceRefetch = () => {
-  if (isFullscreen.value) {
-    // 如果是全屏模式，跳过逻辑
-    console.log("全屏播放，跳过"+isFullscreen.value)
-    return;
-  }
-  const width = window.innerWidth;
-  if (width > 1280) {
-    isDesktop.value = true;
-    isPad.value = false;
-    isMobile.value = false;
-    console.log("侦测到PC")
-    location. reload()
-  } else if (width > 768 && width <= 1280) {
-    isDesktop.value = false;
-    isPad.value = true;
-    isMobile.value = false;
-    console.log("侦测到Pad")
-    location. reload()
-  } else {
-    isDesktop.value = false;
-    isPad.value = false;
-    isMobile.value = true;
-    console.log("侦测到Mobile")
-    location. reload()
-  }
-};
-
-// 监听全屏模式的变化
-const handleFullscreenChange = () => {
-  var isFullScreenVar = !!document.fullscreenElement; // 如果有全屏元素，则为 true
-  if(isFullScreenVar==false){
-    setTimeout(() => {
-    isFullscreen.value = isFullScreenVar;
-  }, 200); // 延迟 200ms，以免退出就刷新了
-  }else{
-    isFullscreen.value=isFullScreenVar;
-  }
-  console.log("检测到全屏变化，当前值："+isFullscreen.value)
-};
-
 // 在组件挂载时获取视频详情
 onMounted(() => {
   if (animeId) {
-    checkDevice();
-    window.addEventListener('resize', checkDeviceRefetch); // 监听窗口变化
-    window.addEventListener('fullscreenchange', handleFullscreenChange); //忽略全屏导致的变化
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
   } else {
     console.error('animeId is missing');
@@ -415,14 +229,6 @@ onMounted(() => {
   background: #fff;
 }
 
-.middle2 {
-  display: none;
-}
-
-.middle3 {
-  display: none;
-}
-
 .wrapper {
   margin-top: 20px;
   display: flex;
@@ -432,11 +238,6 @@ onMounted(() => {
 .video {
   width: 900px;
   height: 500px;
-}
-
-.video-p,
-.video-m {
-  display: none;
 }
 
 .left {
@@ -484,11 +285,13 @@ onMounted(() => {
 }
 
 .releaseDate {
+  user-select: none;
   font-size: 0.95rem;
   font-weight: 600;
 }
 
 .rating {
+  user-select: none;
   font-size: 0.95rem;
   font-weight: 600;
   color: #ff9500;
@@ -508,6 +311,7 @@ onMounted(() => {
 }
 
 .episode {
+  user-select: none;
   margin-top: 30px;
   border-radius: 10px;
   padding: 20px;
@@ -542,7 +346,7 @@ onMounted(() => {
   background-color: #ff0d00;
 }
 
-.tags {
+.tags{
   margin: 15px 5px;
   display: flex;
   align-items: center;
@@ -550,11 +354,12 @@ onMounted(() => {
   flex-wrap: nowrap;
 }
 
-.tag {
-  border-radius: 8px;
-  background: #dcdcdc;
-  padding: 6px 12px;
-  font-weight: 600;
+.tag{
+user-select: none;
+ border-radius: 8px;
+ background: #dcdcdc;
+ padding: 6px 12px;
+ font-weight: 600;
 }
 
 .comment-section {
@@ -566,6 +371,7 @@ onMounted(() => {
 }
 
 .section-title {
+  user-select: none;
   position: relative;
   font-size: 1.6rem;
   font-weight: 600;
@@ -573,6 +379,7 @@ onMounted(() => {
 }
 
 .section-title2 {
+  user-select: none;
   position: absolute;
   font-size: 1.4rem;
   font-weight: 800;
@@ -600,6 +407,7 @@ textarea {
   padding: 10px;
   border-radius: 8px;
   border: 5px solid transparent;
+  transition: all .5s;
 }
 
 .textarea:hover {
@@ -615,11 +423,11 @@ button {
   border-radius: 6px;
   font-weight: 600;
   letter-spacing: 2px;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 button:hover {
-  background-color: #484848;
+  background-color: #535353;
 }
 
 ul {
@@ -632,119 +440,6 @@ li {
   padding: 5px 10px;
   border-radius: 5px;
   margin-bottom: 10px;
-  color: #666;
-}
-
-@media (max-width: 1280px) {
-  .middle {
-    display: none;
-  }
-
-  .middle2 {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-  }
-
-  .middle3 {
-    display: none;
-  }
-
-  .wrapper-m {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .video {
-    width: 900px;
-    height: 500px;
-  }
-
-  .video,
-  .video-m {
-    display: none;
-  }
-
-  .video-p {
-    display: block;
-    width: 100%;
-    height: 500px;
-  }
-
-  .about-m {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    margin-top: 20px;
-  }
-
-  .about-pad {
-    display: flex;
-    border-radius: 10px;
-    gap: 20px;
-  }
-
-  .about {
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    width: 50%;
-    border-radius: 10px;
-    background-color: #e2e4e8;
-  }
-
-  .episode-p {
-    width: 50%;
-    border-radius: 10px;
-    padding: 10px;
-    background-color: #e2e4e8;
-  }
-
-}
-
-@media (max-width: 768px) {
-  .middle {
-    display: none;
-  }
-
-  .middle2 {
-    display: none;
-  }
-
-  .middle3 {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-  }
-
-  .wrapper-m {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .video,
-  .video-p {
-    display: none;
-  }
-
-  .video-m {
-    display: block;
-    width: 100%;
-    height: 500px;
-  }
-
-
-  .about-m {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-  }
-
+color: #666;
 }
 </style>
