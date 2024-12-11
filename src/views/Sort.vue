@@ -165,9 +165,10 @@ export default defineComponent({
 }
 
 .tab button.active {
-  font-weight: 800;
-  color: #ff8d00;
-  border-bottom: 3px solid #ff8d00;;
+  font-weight: 900;
+  font-size: 1rem;
+  color: #ff3700;
+  border-bottom: 3px solid #ff5e00;;
 }
 
 .tabcontent {
@@ -221,12 +222,12 @@ export default defineComponent({
   font-size: 0.9em;
   font-weight: 600;
   padding: 5px 16px;
-  background: #ff8d00;
+  background: #ff4d00;
 }
 
 /* 重新筛选按钮样式 */
 .reset-button {
-  background-color: #ff8d00;
+  background-color: #ff0d00;
   color: white;
   border: none;
   border-radius: 4px;
@@ -238,10 +239,10 @@ export default defineComponent({
 }
 
 .reset-button:hover{
-  background-color: #ff9a1f;
+  background-color: #ff3300;
 }
 
 .reset-button:active{
-  background-color: #ffa231;
+  background-color: #ff4800;
 }
 </style>

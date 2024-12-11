@@ -75,7 +75,7 @@ export default defineComponent({
      * 根据动漫ID跳转到详情页
      * @param animeId - 动漫ID 
      */
-     const jumpToDetail = (animeId: number) =>{
+    const jumpToDetail = (animeId: number) => {
       router.push(`/Videoplayback/${animeId}/1`)
     };
     // 在组件挂载时调用 fetchAnimeList
@@ -96,11 +96,17 @@ export default defineComponent({
   display: grid;
   gap: 15px;
   padding: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   background-color: #f2f4f8;
   margin: 0 auto;
   user-select: none;
   transition: all .3s;
+}
+
+@media (max-width: 768px) {
+  .video-list {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
 }
 
 .video-card {

@@ -53,19 +53,19 @@ const loginFormRef = ref()
 // }
 const jumpToLogin = () => {
   router.push('/login')
-  window.location.href="/login"
+  window.location.href = "/login"
 }
 const sort = () => {
   router.push('/sort')
-  window.location.href="/sort"
+  window.location.href = "/sort"
 }
 const ranking = () => {
   router.push('/ranking')
-  window.location.href="/ranking"
+  window.location.href = "/ranking"
 }
 const home = () => {
   router.push('/')
-  window.location.href="/" //确保不会被播放器卡住
+  window.location.href = "/" //确保不会被播放器卡住
 }
 
 // 提交登录
@@ -100,7 +100,7 @@ const home = () => {
   justify-content: center;
   position: sticky;
   top: 0;
-  background-color: #ff8d00;
+  background-color: #ff4d00;
   box-shadow: 0 2px 10px #ff8c001c;
   z-index: 1000;
   padding: 10px 35px;
@@ -129,6 +129,13 @@ const home = () => {
   padding: 12px 15px;
   border-radius: 5px;
   transition: all .3s ease;
+}
+
+.left-nav,
+.right-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 @media (min-width: 1800px) {
@@ -194,17 +201,13 @@ const home = () => {
   }
 }
 
-@media (max-width: 500px) {
-  .search-concent {
-    width: 100px;
+@media (max-width: 550px) {
+  .left-nav {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
   }
-}
-
-.left-nav,
-.right-nav {
-  display: flex;
-  align-items: center;
-  gap: 20px;
 }
 
 .bi {

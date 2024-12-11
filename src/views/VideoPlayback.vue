@@ -3,8 +3,38 @@
     <div class="middle">
       <div class="wrapper">
         <!-- 视频播放器 -->
-        <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
+        <div class="left">
+          <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
+          <div class="tags">
+            <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
+              {{ tag }}
+            </span>
+          </div>
+          <!-- 评论区 -->
+          <div class="comment-section">
+            <div class="section-title">评论<div class="section-title2">评论</div>
+            </div>
+            <div class="textarea">
+              <textarea v-model="newComment" placeholder="这里是评论区,不是无人区"></textarea>
+              <button @click="addComment">发表评论</button>
+            </div>
+            <ul>
+              <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
+                <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
         <div class="right">
+          <div class="title-warp">
+            <div class="dot"></div>
+            <div class="title">{{ videoDetail.name }}</div>
+          </div>
+          <div class="info">
+            <div class="releaseDate">{{ videoDetail.releaseDate }}</div>
+            <div class="rating">评分: {{ videoDetail.rating }}</div>
+          </div>
+          <div class="description">{{ videoDetail.description }}</div>
           <div class="episode">
             <div class="episode-title">选集播放</div>
             <div class="episode-selector">
@@ -20,16 +50,101 @@
           </div>
         </div>
       </div>
-      <!-- 评论区 -->
-      <div class="comment-section">
-        <h3>评论区</h3>
-        <textarea v-model="newComment" placeholder="发表你的评论"></textarea>
-        <button @click="addComment">发表评论</button>
-        <ul>
-          <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
-            <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
-          </li>
-        </ul>
+    </div>
+    <!-- 平板端 -->
+    <div class="middle2">
+      <div class="wrappe-m">
+        <!-- 视频播放器 -->
+        <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-p" />
+        <div class="about-m">
+          <div class="about-pad">
+            <div class="about">
+              <div class="title-warp">
+                <div class="dot"></div>
+                <div class="title">{{ videoDetail.name }}</div>
+              </div>
+              <div class="info">
+                <div class="releaseDate">{{ videoDetail.releaseDate }}</div>
+                <div class="rating">评分: {{ videoDetail.rating }}</div>
+              </div>
+              <div class="description">{{ videoDetail.description }}</div>
+              <div class="tags">
+                <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
+                  {{ tag }}
+                </span>
+              </div>
+            </div>
+            <div class="episode-p">
+              <div class="episode-title">选集播放</div>
+              <div class="episode-selector">
+                <button v-for="(episode, index) in episodes" :key="index" @click="selectEpisode(index)"
+                  class="episode-btn">
+                  {{ episode.episode }}
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- 评论区 -->
+          <div class="comment-section">
+            <div class="section-title">评论<div class="section-title2">评论</div>
+            </div>
+            <div class="textarea">
+              <textarea v-model="newComment" placeholder="这里是评论区,不是无人区"></textarea>
+              <button @click="addComment">发表评论</button>
+            </div>
+            <ul>
+              <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
+                <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 移动端 -->
+    <div class="middle3">
+      <div class="wrappe-m">
+        <!-- 视频播放器 -->
+        <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video-m" />
+        <div class="about-m">
+          <div class="title-warp">
+            <div class="dot"></div>
+            <div class="title">{{ videoDetail.name }}</div>
+          </div>
+          <div class="info">
+            <div class="releaseDate">{{ videoDetail.releaseDate }}</div>
+            <div class="rating">评分: {{ videoDetail.rating }}</div>
+          </div>
+          <div class="description">{{ videoDetail.description }}</div>
+          <div class="episode">
+            <div class="episode-title">选集播放</div>
+            <div class="episode-selector">
+              <button v-for="(episode, index) in episodes" :key="index" @click="selectEpisode(index)"
+                class="episode-btn">
+                {{ episode.episode }}
+              </button>
+            </div>
+          </div>
+          <div class="tags">
+            <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
+              {{ tag }}
+            </span>
+          </div>
+          <!-- 评论区 -->
+          <div class="comment-section">
+            <div class="section-title">评论<div class="section-title2">评论</div>
+            </div>
+            <div class="textarea">
+              <textarea v-model="newComment" placeholder="这里是评论区,不是无人区"></textarea>
+              <button @click="addComment">发表评论</button>
+            </div>
+            <ul>
+              <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
+                <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -199,57 +314,133 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
 }
 
 .middle {
-  width: 85%;
+  width: 80%;
+  min-width: 1200px;
   padding: 20px 35px;
   display: flex;
   flex-direction: column;
   background: #fff;
 }
 
+.middle2 {
+  display: none;
+}
+
+.middle3 {
+  display: none;
+}
+
 .wrapper {
   margin-top: 20px;
   display: flex;
-  gap: 50px;
+  gap: 40px;
 }
 
 .video {
-  width: 800px;
+  width: 900px;
   height: 500px;
+}
+
+.video-p,
+.video-m {
+  display: none;
+}
+
+.left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .right {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 30%;
-  justify-content: flex-start;
+  width: 35%;
 }
 
-.episode{
+.title-warp {
+  margin: 15px 4px;
+  gap: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.dot {
+  color: #ff7300;
+  padding: 9px 3px;
+  border-radius: 25px;
+}
+
+.title {
+  margin: 4px;
+  z-index: 8;
+  color: #2c2f31;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+
+.info {
+  margin-top: 12px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 12%;
+}
+
+.releaseDate {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.rating {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ff9500;
+}
+
+.description {
+  margin: 16px 0px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #606668;
+  word-break: break-all;
+  letter-spacing: 1.2px;
+  line-height: 1.2rem;
+  height: 80px;
+  overflow-y: auto;
+  transition: all .3s;
+}
+
+.episode {
+  margin-top: 30px;
   border-radius: 10px;
-  padding: 30px;
+  padding: 20px;
   background-color: #e2e4e8;
 }
 
-.episode-title{
-  font-size: 1.2rem;
+.episode-title {
+  font-size: 1.1rem;
   font-weight: 800;
   margin-bottom: 20px;
 }
 
 .episode-selector {
   display: grid;
-  gap: 15px;
-  padding: 10px 20px;
-  grid-template-columns: repeat(auto-fit, minmax(50px, 5fr));
+  gap: 16px;
+  padding: 10px 12px;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 5fr));
   overflow-y: auto;
 }
 
 .episode-btn {
-  background-color: #ff5811;
+  background-color: #ff6421;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -259,40 +450,87 @@ onMounted(() => {
 }
 
 .episode-btn:hover {
-  background-color: #333;
+  background-color: #ff0d00;
+}
+
+.tags {
+  margin: 15px 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.tag {
+  border-radius: 8px;
+  background: #dcdcdc;
+  padding: 6px 12px;
+  font-weight: 600;
 }
 
 .comment-section {
   margin-top: 20px;
-  height: 80%;
   padding: 15px;
-  background-color: #f5f5f5;
+  background-color: #e2e4e8;
   border-radius: 10px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
+.section-title {
+  position: relative;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.section-title2 {
+  position: absolute;
+  font-size: 1.4rem;
+  font-weight: 800;
+  top: 10px;
+  left: 15px;
+  opacity: 0.3;
+}
+
 textarea {
-  width: 100%;
-  height: 100px;
+  width: calc(100% - 20px);
+  height: 60px;
   margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  /* padding: 5px; */
+  font-size: 1rem;
+  font-weight: 600;
+  background: none;
   resize: none;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+
+}
+
+.textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 5px solid transparent;
+}
+
+.textarea:hover {
+  border: 5px solid #ccc;
 }
 
 button {
-  padding: 5px 10px;
-  background-color: #007bff;
+  padding: 8px 14px;
+  background-color: #000;
   color: white;
   border: none;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 6px;
+  font-weight: 600;
+  letter-spacing: 2px;
   transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #484848;
 }
 
 ul {
@@ -302,10 +540,122 @@ ul {
 }
 
 li {
-  padding: 10px;
-  background-color: white;
+  padding: 5px 10px;
   border-radius: 5px;
   margin-bottom: 10px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.05);
+  color: #666;
+}
+
+@media (max-width: 1280px) {
+  .middle {
+    display: none;
+  }
+
+  .middle2 {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  .middle3 {
+    display: none;
+  }
+
+  .wrapper-m {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .video {
+    width: 900px;
+    height: 500px;
+  }
+
+  .video,
+  .video-m {
+    display: none;
+  }
+
+  .video-p {
+    display: block;
+    width: 100%;
+    height: 500px;
+  }
+
+  .about-m {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin-top: 20px;
+  }
+
+  .about-pad {
+    display: flex;
+    border-radius: 10px;
+    gap: 20px;
+  }
+
+  .about {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    width: 50%;
+    border-radius: 10px;
+    background-color: #e2e4e8;
+  }
+
+  .episode-p {
+    width: 50%;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #e2e4e8;
+  }
+
+}
+
+@media (max-width: 768px) {
+  .middle {
+    display: none;
+  }
+
+  .middle2 {
+    display: none;
+  }
+
+  .middle3 {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  .wrapper-m {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .video,
+  .video-p {
+    display: none;
+  }
+
+  .video-m {
+    display: block;
+    width: 100%;
+    height: 500px;
+  }
+
+
+  .about-m {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+
 }
 </style>
