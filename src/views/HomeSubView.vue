@@ -2,6 +2,8 @@
     <!-- 推荐大图区域 -->
     <div class="banner">
       <Carousel />
+      <!-- <div class="title-name">随机推荐</div>
+      <RandomRecommendationPicturesCom/> -->
     </div>
     <!-- 视频分类展示 -->
     <section class="video-section">
@@ -19,6 +21,7 @@
 <script setup>
 import VideoList from '/src/components/video-list-component.vue';
 import Carousel from '/src/components/carousel-component.vue';
+// import RandomRecommendationPicturesCom from '@/components/RandomRecommendationPicturesCom.vue'; //引入随机化此贴图，暂时未完善，可作为轮播图补充
 import '../assets/home.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 </script>

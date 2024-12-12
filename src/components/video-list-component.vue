@@ -36,21 +36,33 @@ export default defineComponent({
   setup() {
     // 定义响应式变量 animeList
     const animeList = ref<Anime[]>([]);
+    //是否启用随机推荐模式
+    const isEnableRandomRecommend = ref(false);
+    //请求的长度参数，随机模式下会获取三倍数据用于roll
+    const querySize = ref(12);
 
     /**
      * 获取动漫列表
      */
     const fetchAnimeList = async () => {
       try {
+        if(isEnableRandomRecommend.value){
+          querySize.value = 36; //更大范围获取进行随机请求
+        }
         const response = await request.get<{
           status: boolean;
           data: Anime[];
           message: string;
-        }>('/anime/getAnimeList?page=1&size=12');
+        }>(`/anime/getAnimeList?page=1&size=${querySize.value}`);
 
         if (response.data.status) {
           // 成功获取数据，赋值给 animeList
-          animeList.value = response.data.data;
+          if(isEnableRandomRecommend.value){
+            const shuffled = response.data.data.sort(()=> 0.36 -Math.random());
+            animeList.value = shuffled.slice(0,12); //产生随机动漫列表
+          }else{
+            animeList.value = response.data.data;
+          }
           console.log(animeList.value)
         } else {
           // 接口返回失败信息，打印日志
