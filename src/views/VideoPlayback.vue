@@ -55,7 +55,7 @@
 
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import Artplayer from '/src/components/Artplayer.vue';
@@ -72,7 +72,7 @@ const animeId = route.params.animeId as string;
 const episode = route.params.episode as string;
 
 // 创建对VideoPlayer子组件的引用
-const videoPlayerRef = ref(null);
+const videoPlayerRef = ref<InstanceType<typeof Artplayer> | null>(null);
 //userStore实例化
 const userStore = useUserStore();
 
@@ -109,7 +109,7 @@ const option = reactive({
     url: '',
   },
 });
-const episodes = ref([]);
+const episodes: Ref<Episode[]> = ref([]);
 const videoDetail = reactive<Video>({
   id: 0,
   name: '',
@@ -145,6 +145,11 @@ interface commentResponse {
     username: string,
     content: string,
     createAt: string
+}
+interface Episode {
+  episode: string;
+  videoUrl: string;
+  subtitleUrl: string;
 }
 const username = ref("匿名用户");
 

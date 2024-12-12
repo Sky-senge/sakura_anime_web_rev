@@ -3,13 +3,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, defineEmits } from 'vue';
+import { ref, onMounted, onBeforeUnmount, defineEmits, type PropType } from 'vue';
 import Artplayer from 'artplayer';
 import artplayerPluginLibass from 'artplayer-plugin-libass';
 // 定义接收的 props
 const props = defineProps({
   option: {
-    type: Object,
+    type: Object as PropType<{
+      url: string; // 必需的播放地址
+      fullscreen?: boolean; // 是否启用全屏模式
+      type?: string; // 播放类型，比如 'm3u8'
+      plugins?: Array<(art: any) => any>; // 插件列表
+      customType?: Record<string, (video: HTMLVideoElement, url: string, art: any) => void>; // 自定义播放逻辑
+      subtitle?: { url: string }; // 字幕配置
+    }>,
     required: true,
   },
 });
@@ -21,7 +28,7 @@ const artPlayerInstance = ref<any>(null);
 onMounted(() => {
   artPlayerInstance.value = new Artplayer({
     ...props.option,
-    container: artRef.value,
+    container: artRef.value!,
     plugins: [
     artplayerPluginLibass({
       workerUrl: 'https://unpkg.com/libass-wasm@4.1.0/dist/js/subtitles-octopus-worker.js',
