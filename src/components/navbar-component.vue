@@ -3,9 +3,9 @@
     <div class="nav">
       <span class="logo">sakura</span>
       <nav class="left-nav" v-show="!isSearchActive">
-        <button type="primary" size="small" class="nav-button-l" @click="home()">首页</button>
-        <button size="small" class="nav-button-l" @click="sort()">全部</button>
-        <button size="small" class="nav-button-l" @click="ranking()">排行榜</button>
+        <button size="small" class="nav-button-l" @click="jumpTo('/')">首页</button>
+        <button size="small" class="nav-button-l" @click="jumpTo('/sort')">全部</button>
+        <button size="small" class="nav-button-l" @click="jumpTo('/ranking')">排行榜</button>
       </nav>
       <div class="search-concent" v-show="!isSearchActive">
         <i class="bi bi-search"></i>
@@ -19,7 +19,7 @@
       </div>
       <nav class="right-nav" v-show="!isSearchActive">
         <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
-        <button size="small" class="nav-button" @click="jumpToLogin()">登录</button>
+        <button size="small" class="nav-button" @click="jumpTo('/login')">登录</button>
         <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
       </nav>
     </div>
@@ -28,12 +28,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 // import request from '@/utils/request'
 
 // 控制登录框的显示状态
 // const dialogVisible = ref(false)
 const router = useRouter();
+const route = useRoute();
 
 // 登录表单数据
 // const loginForm = reactive({
@@ -64,24 +65,12 @@ const searchText = ref('')
 // }
 
 // 导航跳转方法
-const jumpToLogin = () => {
-  router.push('/login')
-  window.location.href = "/login"
-}
-
-const sort = () => {
-  router.push('/sort')
-  window.location.href = "/sort"
-}
-
-const ranking = () => {
-  router.push('/ranking')
-  window.location.href = "/ranking"
-}
-
-const home = () => {
-  router.push('/')
-  window.location.href = "/" // 确保不会被播放器卡住
+const jumpTo = (path: string) => {
+  router.push(path)
+  // 防止被播放器卡住
+  if(route.name==='Videoplayback'){
+    window.location.href = path;
+  }
 }
 
 // 提交登录
