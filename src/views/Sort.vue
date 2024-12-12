@@ -73,6 +73,13 @@
       <div class="video-name">{{ anime.name }}</div>
     </div>
   </div>
+  <!-- 分页器 -->
+  <el-pagination
+      background
+      layout="prev, pager, next"
+      :total="total"
+      @current-change="handleCurrentPageChange"
+    />
   </div>
 </template>
 
@@ -80,6 +87,7 @@
 import { onMounted, ref, watch } from 'vue';
 import Navbar from '/src/components/navbar-component.vue';
 import request from '@/utils/request';
+import router from '@/router';
 
 
 const animeList = ref<Anime[]>([]);
@@ -100,6 +108,10 @@ const tabs = [
   { name: 'anime', label: '番剧' }
 ];
 const activeTab = ref('anime');
+// 总页数
+const total = ref(0);
+// 当前页
+const currentPage = ref(1);
 
 // 类型数据
 const types = [
@@ -156,10 +168,13 @@ const resetFilters = () => {
     const queryString = tags.length > 0
       ? tags.map(tag => `tag=${encodeURIComponent(tag)}`).join('&')
       : ''; //没有参数就不要查询这个了
-      const tagsQueryUrl = `/anime/getAnimeListByTags?${queryString}&page=1&size=100`;
-      let url = '/anime/getAnimeList?page=1&size=100';
+      const tagsQueryUrl = `/anime/getAnimeListByTags?${queryString}&page=${currentPage.value}&size=21`;
+      const tagsTotallyQueryUrl = `/anime/countAnimeListByTags?${queryString}&page=${currentPage.value}&size=21`;
+      let url = `/anime/getAnimeList?page=${currentPage.value}&size=21`;
+      let totalQUrl = '/anime/countAnimePage?size=21'
       if(tags.length>0){
         url=tagsQueryUrl //如果有tags，就把它转为tags查询，否则直接查询总表
+        totalQUrl = tagsTotallyQueryUrl
       }
 
     const response = await request.get<{
@@ -168,6 +183,14 @@ const resetFilters = () => {
       message: string;
     }>(url);
 
+    const responseTotalNum = await request.get<{
+      status: boolean;
+      data: number;
+      message: string;
+    }>(totalQUrl);
+    if(responseTotalNum.data.status){ //查询总页数
+      total.value=(responseTotalNum.data.data)*10
+    }
     if (response.data.status) {
       // 成功获取数据，赋值给 animeList
       animeList.value = response.data.data;
@@ -198,6 +221,12 @@ const resetFilters = () => {
     const jumpToDetail = (animeId: number) => {
       router.push(`/Videoplayback/${animeId}/1`)
     };
+
+// 分页处理
+const handleCurrentPageChange = (page: number) => {
+  currentPage.value = page;
+  fetchAnimeList();
+};
 
 // 监听筛选条件变化并重新获取动漫列表
 watch([
