@@ -60,82 +60,155 @@
         </div>
       </div>
     </div>
+    <div class="video-list">
+    <!-- 循环展示 animeList 中的每个视频 -->
+    <div v-for="anime in animeList" :key="anime.id" class="video-card" @click="jumpToDetail(anime.id)">
+      <div class="video-thumbnail">
+        <!-- 如果 filePath 存在且有内容，展示封面图片 -->
+        <img v-if="anime.filePath?.length > 0" :src="getCoverUrl(anime.filePath[0].fileName)" :alt="anime.name">
+        <!-- 如果 filePath 不存在或为空，展示默认占位符 -->
+        <div v-else class="no-cover">No cover</div>
+      </div>
+      <!-- 展示视频名称 -->
+      <div class="video-name">{{ anime.name }}</div>
+    </div>
+  </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { onMounted, ref, watch } from 'vue';
 import Navbar from '/src/components/navbar-component.vue';
+import request from '@/utils/request';
 
-export default defineComponent({
-  name: 'HomePage',
-  components: {
-    Navbar
-  },
-  setup() {
-    // 选项卡数据
-    const tabs = [
-      // { name: 'selected', label: '已选' },
-      { name: 'anime', label: '番剧' }
-    ];
-    const activeTab = ref('anime');
 
-    // 类型数据
-    const types = [
-      '全部', '热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园',
-      '青春', '恋爱', '爱情', '日常', '耽美', '推理', '悬疑', '机战', '运动', '战争', '战斗',
-      '励志', '职场', '泡面番', '其他'
-    ];
-    const selectedType = ref('全部');
+const animeList = ref<Anime[]>([]);
+// 定义 Anime 接口类型
+interface Anime {
+  id: number;
+  name: string;
+  tags: string[];
+  description: string;
+  rating: number;
+  releaseDate: string;
+  filePath: { episodes: number; fileName: string }[];
+}
 
-    // 地区数据
-    const regions = ['全部', '日本', '大陆', '香港', '台湾', '韩国', '美国', '其它'];
-    const selectedRegion = ref('全部');
+// 选项卡数据
+const tabs = [
+  // { name: 'selected', label: '已选' },
+  { name: 'anime', label: '番剧' }
+];
+const activeTab = ref('anime');
 
-    // 年份数据
-    const years = [
-      '全部', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015',
-      '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2006', '2005', '2004'
-    ];
-    const selectedYear = ref('全部');
+// 类型数据
+const types = [
+  '全部', '热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园',
+  '青春', '恋爱', '爱情', '日常', '耽美', '推理', '悬疑', '机战', '运动', '战争', '战斗',
+  '励志', '职场', '泡面番', '其他'
+];
+const selectedType = ref('全部');
 
-    // 语言数据
-    const languages = ['全部', '日语', '国语', '英语', '粤语', '韩语', '其它'];
-    const selectedLanguage = ref('全部');
+// 地区数据
+const regions = ['全部', '日本', '大陆', '香港', '台湾', '韩国', '美国', '其它'];
+const selectedRegion = ref('全部');
 
-    // 字母数据
-    const letters = [
-      '全部', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0-9'
-    ];
-    const selectedLetter = ref('全部');
+// 年份数据
+const years = [
+  '全部', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015',
+  '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2006', '2005', '2004'
+];
+const selectedYear = ref('全部');
 
-    // 重置筛选方法
-    const resetFilters = () => {
-      selectedType.value = '全部';
-      selectedRegion.value = '全部';
-      selectedYear.value = '全部';
-      selectedLanguage.value = '全部';
-      selectedLetter.value = '全部';
-    };
+// 语言数据
+const languages = ['全部', '日语', '国语', '英语', '粤语', '韩语', '其它'];
+const selectedLanguage = ref('全部');
 
-    return {
-      tabs,
-      activeTab,
-      types,
-      selectedType,
-      regions,
-      selectedRegion,
-      years,
-      selectedYear,
-      languages,
-      selectedLanguage,
-      letters,
-      selectedLetter,
-      resetFilters
-    };
+// 字母数据
+const letters = [
+  '全部', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+  'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0-9'
+];
+const selectedLetter = ref('全部');
+
+// 重置筛选方法
+const resetFilters = () => {
+  selectedType.value = '全部';
+  selectedRegion.value = '全部';
+  selectedYear.value = '全部';
+  selectedLanguage.value = '全部';
+  selectedLetter.value = '全部';
+};
+
+/**
+ * 获取动漫列表
+ */
+ const fetchAnimeList = async () => {
+  try {
+    // 构造 tag 参数
+    const tags = [];
+    if (selectedType.value !== '全部') tags.push(selectedType.value);
+    if (selectedRegion.value !== '全部') tags.push(selectedRegion.value);
+    if (selectedYear.value !== '全部') tags.push(selectedYear.value);
+    if (selectedLanguage.value !== '全部') tags.push(selectedLanguage.value);
+    if (selectedLetter.value !== '全部') tags.push(selectedLetter.value);
+
+    const queryString = tags.length > 0
+      ? tags.map(tag => `tag=${encodeURIComponent(tag)}`).join('&')
+      : ''; //没有参数就不要查询这个了
+      const tagsQueryUrl = `/anime/getAnimeListByTags?${queryString}&page=1&size=100`;
+      let url = '/anime/getAnimeList?page=1&size=100';
+      if(tags.length>0){
+        url=tagsQueryUrl //如果有tags，就把它转为tags查询，否则直接查询总表
+      }
+
+    const response = await request.get<{
+      status: boolean;
+      data: Anime[];
+      message: string;
+    }>(url);
+
+    if (response.data.status) {
+      // 成功获取数据，赋值给 animeList
+      animeList.value = response.data.data;
+      console.log(animeList.value);
+    } else {
+      // 接口返回失败信息，打印日志
+      console.error('Failed to fetch anime list:', response.data.message);
+    }
+  } catch (error) {
+    // 捕获并处理请求错误
+    console.error('Error fetching anime list:', error);
   }
-});
+};
+
+    /**
+     * 根据文件名生成封面图片的完整 URL
+     * @param fileName - 文件名
+     * @returns 完整的封面 URL
+     */
+     const getCoverUrl = (fileName: string) => {
+      return `http://localhost:8080/files/getCover/${fileName}`;
+    };
+
+    /**
+     * 根据动漫ID跳转到详情页
+     * @param animeId - 动漫ID 
+     */
+    const jumpToDetail = (animeId: number) => {
+      router.push(`/Videoplayback/${animeId}/1`)
+    };
+
+// 监听筛选条件变化并重新获取动漫列表
+watch([
+  selectedType,
+  selectedRegion,
+  selectedYear,
+  selectedLanguage,
+  selectedLetter
+], fetchAnimeList);
+
+onMounted(fetchAnimeList)
 </script>
 
 <style scoped>
@@ -244,5 +317,61 @@ export default defineComponent({
 
 .reset-button:active{
   background-color: #ff4800;
+}
+
+/* Video List Part */
+.video-list {
+  display: grid;
+  gap: 15px;
+  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  background-color: #f2f4f8;
+  margin: 0 auto;
+  user-select: none;
+  transition: all .3s;
+}
+
+@media (max-width: 768px) {
+  .video-list {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+.video-card {
+  cursor: pointer;
+  background: #ececec;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.video-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.video-thumbnail {
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+}
+
+.video-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-name {
+  padding: 20px 5px;
+  font-size: 1em;
+  color: #333;
+  background: #fff;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
