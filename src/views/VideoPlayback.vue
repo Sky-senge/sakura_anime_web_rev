@@ -14,12 +14,12 @@
           <div class="comment-section">
             <div class="section-title">评论<div class="section-title2">评论</div></div>
             <div class="textarea">
-              <textarea v-model="newComment" placeholder="这里是评论区,不是无人区"></textarea>
+              <textarea v-model="newComment.content" placeholder="这里是评论区,不是无人区"></textarea>
               <button @click="addComment" >发表评论</button>
             </div>
             <ul>
               <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
-                <p><strong>{{ comment.username }}</strong>：{{ comment.text }}</p>
+                <p><strong>{{ comment.username }}</strong>：{{ comment.content }}</p>
               </li>
             </ul>
           </div>
@@ -57,11 +57,13 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 import Artplayer from '/src/components/Artplayer.vue';
 import Hls from 'hls.js';
 import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitles';
 import artplayerPluginLibass from 'artplayer-plugin-libass';
 import { request } from '@/utils/request';
+import { ElMessage } from 'element-plus';
 
 // 获取路由参数
 const router = useRouter();
@@ -71,6 +73,8 @@ const episode = route.params.episode as string;
 
 // 创建对VideoPlayer子组件的引用
 const videoPlayerRef = ref(null);
+//userStore实例化
+const userStore = useUserStore();
 
 // 定义响应式数据
 const option = reactive({
@@ -106,9 +110,42 @@ const option = reactive({
   },
 });
 const episodes = ref([]);
-const videoDetail = reactive({});
-const comments = ref([]);
-const newComment = ref("");
+const videoDetail = reactive<Video>({
+  id: 0,
+  name: '',
+  tags: [],
+  description: '',
+  rating: 0,
+  releaseDate: '',
+  filePath: []
+});
+const comments = ref<commentResponse[]>([]);
+const newComment = ref<Comment>({animeId:-1,userId:-1,content:""});
+interface Comment {
+  animeId: number | null,
+  userId: number | null,
+  content: string
+}
+interface Video {
+  id: number;
+  name: string;
+  tags: string[];
+  description: string;
+  rating: number;
+  releaseDate: string;
+  filePath: {
+    episodes: number;
+    fileName: string;
+  }[];
+}
+interface commentResponse {
+    id: number,
+    animeId: number,
+    userId: number,
+    username: string,
+    content: string,
+    createAt: string
+}
 const username = ref("匿名用户");
 
 // 保存Artplayer实例
@@ -189,14 +226,36 @@ function EpisodeBuilder(index: number) {
   }
 }
 
+async function fetchCommentList(animeId:number) {
+  const response = await request.get(`/comment/getCommentList/${animeId}?page=1&size=30`)
+  if(response.data.status){
+    comments.value = response.data.data.map((item: { username: any; }) => ({
+        ...item,
+        username: item.username || '[匿名用户]',
+      }));
+    console.log(`更新评论区，动漫ID: ${animeId}`)
+  }
+}
+
 // 添加评论
-function addComment() {
-  if (newComment.value.trim() !== "") {
-    comments.value.push({
-      username: username.value,
-      text: newComment.value,
-    });
-    newComment.value = "";
+async function addComment() {
+  if (newComment.value.content.trim() !== "") {
+    userStore.loadUser();
+    newComment.value.userId = userStore.userId
+    newComment.value.animeId = videoDetail.id
+    const payload = newComment.value; //包含字段
+    const response = await request.post(`/comment/addComment`,payload);
+    if(response.data.status){
+      ElMessage.success('评论成功！');
+      fetchCommentList(videoDetail.id);
+    }else{
+      ElMessage.error(`评论失败！${response.data.error}`)
+    }
+    // comments.value.push({
+    //   username: username.value,
+    //   text: newComment.value,
+    // });
+    // newComment.value = "";
   }
 }
 
@@ -204,6 +263,7 @@ function addComment() {
 onMounted(() => {
   if (animeId) {
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
+    fetchCommentList(Number(animeId)); //获取评论列表
   } else {
     console.error('animeId is missing');
   }
