@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, defineEmits, type PropType } from 'vue';
+import { ref, onMounted, onBeforeUnmount, type PropType } from 'vue';
 import Artplayer from 'artplayer';
 import artplayerPluginLibass from 'artplayer-plugin-libass';
 // 定义接收的 props
