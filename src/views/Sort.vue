@@ -7,6 +7,7 @@
         :class="{ active: activeTab === tab.name }"
         @click="activeTab = tab.name"
       >{{ tab.label }}</button>
+      <button class="reset-button" @click="resetFilters">重新筛选</button>
     </div>
     <div v-for="(tab, index) in tabs" :key="index" :class="{ tabcontent: true, active: activeTab === tab.name }">
       <div v-if="tab.name === 'anime'">
@@ -65,11 +66,11 @@
               @click="selectedLetter = letter"
             >{{ letter }}</span>
           </div>
-          <button class="reset-button" @click="resetFilters">重新筛选</button>
         </div>
       </div>
     </div>
     <div class="video-list">
+      <div v-if="animeList.length==0"><p style="font-weight:bold">无数据，请重新筛选</p></div>
     <!-- 循环展示 animeList 中的每个视频 -->
     <div v-for="anime in animeList" :key="anime.id" class="video-card" @click="jumpToDetail(anime.id)">
       <div class="video-thumbnail">
@@ -125,14 +126,14 @@ const currentPage = ref(1);
 // 类型数据
 const types = [
   '全部', '热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园',
-  '青春', '恋爱', '爱情', '日常', '耽美', '推理', '悬疑', '机战', '运动', '战争', '战斗',
-  '励志', '职场', '泡面番', '其他'
+  '青春', '恋爱', '爱情', '日常', '搞笑', '推理', '悬疑', '机战', '运动', '战争', '战斗',
+  '励志', '感人', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他'
 ];
 const selectedType = ref('全部');
 const selectedType2 = ref('全部');
 
 // 地区数据
-const regions = ['全部', '日本', '大陆', '香港', '台湾', '韩国', '美国', '其它'];
+const regions = ['全部', '日本', '大陆', '香港', '台湾', '韩国', '美国','欧洲', '其它'];
 const selectedRegion = ref('全部');
 
 // 年份数据
