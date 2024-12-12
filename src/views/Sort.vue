@@ -189,13 +189,13 @@ const resetFilters = () => {
         url=tagsQueryUrl //如果有tags，就把它转为tags查询，否则直接查询总表
         totalQUrl = tagsTotallyQueryUrl
       }
-
+      //请求动漫列表数据
     const response = await request.get<{
       status: boolean;
       data: Anime[];
       message: string;
     }>(url);
-
+    //请求动漫总数
     const responseTotalNum = await request.get<{
       status: boolean;
       data: number;
