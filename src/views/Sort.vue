@@ -21,6 +21,15 @@
             >{{ type }}</span>
           </div>
           <div class="filter-section">
+            <span class="filter-label">类型二</span>
+            <span
+              v-for="(type, typeIndex) in types"
+              :key="typeIndex"
+              :class="{ 'filter-option': true, active: selectedType2 === type }"
+              @click="selectedType2 = type"
+            >{{ type }}</span>
+          </div>
+          <div class="filter-section">
             <span class="filter-label">地区</span>
             <span
               v-for="(region, regionIndex) in regions"
@@ -120,6 +129,7 @@ const types = [
   '励志', '职场', '泡面番', '其他'
 ];
 const selectedType = ref('全部');
+const selectedType2 = ref('全部');
 
 // 地区数据
 const regions = ['全部', '日本', '大陆', '香港', '台湾', '韩国', '美国', '其它'];
@@ -146,6 +156,7 @@ const selectedLetter = ref('全部');
 // 重置筛选方法
 const resetFilters = () => {
   selectedType.value = '全部';
+  selectedType2.value = '全部';
   selectedRegion.value = '全部';
   selectedYear.value = '全部';
   selectedLanguage.value = '全部';
@@ -160,6 +171,7 @@ const resetFilters = () => {
     // 构造 tag 参数
     const tags = [];
     if (selectedType.value !== '全部') tags.push(selectedType.value);
+    if (selectedType2.value !== '全部') tags.push(selectedType2.value);
     if (selectedRegion.value !== '全部') tags.push(selectedRegion.value);
     if (selectedYear.value !== '全部') tags.push(selectedYear.value);
     if (selectedLanguage.value !== '全部') tags.push(selectedLanguage.value);
@@ -231,6 +243,7 @@ const handleCurrentPageChange = (page: number) => {
 // 监听筛选条件变化并重新获取动漫列表
 watch([
   selectedType,
+  selectedType2,
   selectedRegion,
   selectedYear,
   selectedLanguage,
