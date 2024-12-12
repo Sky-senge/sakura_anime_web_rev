@@ -46,7 +46,7 @@ export default defineComponent({
      */
     const fetchAnimeList = async () => {
       try {
-        if(isEnableRandomRecommend.value){
+        if (isEnableRandomRecommend.value) {
           querySize.value = 36; //更大范围获取进行随机请求
         }
         const response = await request.get<{
@@ -57,10 +57,10 @@ export default defineComponent({
 
         if (response.data.status) {
           // 成功获取数据，赋值给 animeList
-          if(isEnableRandomRecommend.value){
-            const shuffled = response.data.data.sort(()=> 0.36 -Math.random());
-            animeList.value = shuffled.slice(0,12); //产生随机动漫列表
-          }else{
+          if (isEnableRandomRecommend.value) {
+            const shuffled = response.data.data.sort(() => 0.36 - Math.random());
+            animeList.value = shuffled.slice(0, 12); //产生随机动漫列表
+          } else {
             animeList.value = response.data.data;
           }
           console.log(animeList.value)
@@ -110,7 +110,6 @@ export default defineComponent({
   padding: 20px;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   background-color: #f2f4f8;
-  margin: 0 auto;
   user-select: none;
   transition: all .3s;
 }
@@ -144,6 +143,7 @@ export default defineComponent({
 .video-thumbnail img {
   width: 100%;
   height: 100%;
+  filter: brightness(0.8);
   object-fit: cover;
 }
 

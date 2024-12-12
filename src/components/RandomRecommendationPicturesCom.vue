@@ -1,6 +1,21 @@
+<template>
+  <div v-if="randomAnimeList.length > 0" class="video-list">
+    <div v-for="anime in randomAnimeList" :key="anime.id" class="video-card" @click="jumpToDetail(anime.id)">
+      <div class="video-thumbnail">
+        <!-- 如果 filePath 存在且有内容，展示封面图片 -->
+        <img v-if="anime.filePath?.length > 0" :src="getCoverUrl(anime.filePath[0].fileName)" :alt="anime.name">
+        <!-- 如果 filePath 不存在或为空，展示默认占位符 -->
+        <div v-else class="no-cover">No cover</div>
+      </div>
+      <p class="video-name">{{ anime.name }}</p>
+    </div>
+  </div>
+</template>
+
+
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import request from '@/utils/request';
+import request from '@/utils/request'; // 引入封装好的 request 模块
 import router from '@/router';
 
 interface Anime {
@@ -18,7 +33,7 @@ export default defineComponent({
   setup() {
     const animeList = ref<Anime[]>([]);
     const randomAnimeList = ref<Anime[]>([]);
- //取得动漫列表前30个
+    //取得动漫列表前30个
     const fetchAnimeList = async () => {
       try {
         const response = await request.get<{
@@ -40,8 +55,8 @@ export default defineComponent({
 
     const pickRandomAnimes = () => {
       if (animeList.value.length > 0) {
-        const shuffled = animeList.value.sort(() => 0.36 - Math.random());//这里获取id(36)并随机抽取9个
-        randomAnimeList.value = shuffled.slice(0, 9);
+        const shuffled = animeList.value.sort(() => 0.36 - Math.random());
+        randomAnimeList.value = shuffled.slice(0, 4);
       }
     };
 
@@ -65,83 +80,51 @@ export default defineComponent({
 });
 </script>
 
-<template>
-  <div class="tile-container">
-    <div v-if="randomAnimeList.length > 0" class="tile-grid">
-      <div v-for="anime in randomAnimeList" :key="anime.id" class="tile" @click="jumpToDetail(anime.id)">
-        <img :src="getCoverUrl(anime.filePath[0]?.fileName || '')" alt="Cover Image" class="tile-image" />
-        <div class="tile-overlay">
-          <p class="tile-title">{{ anime.name }}</p>
-        </div>
-      </div>
-    </div>
-    <div v-else class="loading">
-      <p>Loading...</p>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-.tile-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.tile-grid {
+.video-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
-  width: 100%;
-  max-width: 1200px;
+  gap: 12px;
+  padding: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  background-color: #f2f4f8;
+  margin: 0 auto;
+  user-select: none;
+  transition: all .3s;
 }
 
-.tile {
-  position: relative;
+.video-card {
   cursor: pointer;
   overflow: hidden;
-  border-radius: 10px;
-  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.tile:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+.video-thumbnail {
+  width: 100%;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: all .2s;
 }
 
-.tile-image {
+.video-thumbnail:hover {
+  transform: scale(1);
+  box-shadow: 0 4px 10px rgba(4, 100, 255, 0.2);
+}
+
+.video-thumbnail img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
   filter: brightness(0.8);
-  transition: filter 0.3s;
+  object-fit: cover;
 }
 
-.tile:hover .tile-image {
-  filter: brightness(1);
-}
-
-.tile-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 10px;
-  text-align: center;
-}
-
-.tile-title {
-  color: #fff;
-  font-size: 1rem;
+.video-name {
+  font-size: 0.85rem;
+  color: #181818;
   font-weight: bold;
-}
-
-.loading {
   text-align: center;
-  font-size: 1.2rem;
-  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

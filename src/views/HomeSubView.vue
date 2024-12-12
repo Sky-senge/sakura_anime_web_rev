@@ -1,27 +1,95 @@
 <template>
-    <!-- 推荐大图区域 -->
-    <div class="banner">
-      <Carousel />
-      <!-- <div class="title-name">随机推荐</div>
-      <RandomRecommendationPicturesCom/> -->
-    </div>
-    <!-- 视频分类展示 -->
-    <section class="video-section">
-      <div class="section-header">
-        <div class="title">
-          <div class="dot"></div>
-          <div class="title-name">热门推荐</div>
-        </div>
-        <a href="/sort" class="view-more">更多</a>
+  <!-- 推荐大图区域 -->
+  <!--   <div class="banner">
+    <Carousel />
+  </div> -->
+  <section class="video-section">
+    <div class="section-header">
+      <div class="title">
+        <div class="dot"></div>
+        <div class="title-name">随便看看</div>
       </div>
-      <VideoList />
-    </section>
+      <a href="javascript:void(0)" class="view-more" @click="refreshRecommendations">刷新</a>
+    </div>
+    <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
+      <RandomRecommendationPicturesCom :key="refreshKey" />
+    </div>
+    <div class="section-header">
+      <div class="title">
+        <div class="dot"></div>
+        <div class="title-name">热门推荐</div>
+      </div>
+      <a href="/sort" class="view-more">更多</a>
+    </div>
+    <VideoList />
+  </section>
 </template>
 
+
 <script setup>
+import { ref } from 'vue';
 import VideoList from '/src/components/video-list-component.vue';
+import RandomRecommendationPicturesCom from '@/components/RandomRecommendationPicturesCom.vue';
 import Carousel from '/src/components/carousel-component.vue';
-// import RandomRecommendationPicturesCom from '@/components/RandomRecommendationPicturesCom.vue'; //引入随机化此贴图，暂时未完善，可作为轮播图补充
+// 引入样式
 import '../assets/home.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+
+
+// 定义刷新状态
+const refreshKey = ref(0);
+const animationClass = ref('');
+
+// 触发动画的函数
+const refreshRecommendations = () => {
+  animationClass.value = 'slide-out'; // 触发向上离场动画
+};
+
+// 监听动画结束
+const handleAnimationEnd = () => {
+  if (animationClass.value === 'slide-out') {
+    refreshKey.value += 1; // 更新内容
+    animationClass.value = 'slide-in'; // 触发从底部进入动画
+  } else {
+    animationClass.value = ''; // 清除动画类名
+  }
+};
 </script>
+
+<style>
+.random {
+  height: 250px;
+}
+
+.slide-out {
+  animation: slideOut 0.2s forwards;
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

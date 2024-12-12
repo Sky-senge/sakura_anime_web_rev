@@ -22,8 +22,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding: 0px 10px;
+    margin: 15px;
+    padding: 10px 5px;
 }
 
 .title {
@@ -41,15 +41,20 @@
 }
 
 .title-name {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     color: #252525;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 1.8px;
 }
 
 .section-header .view-more {
-    font-size: 0.9em;
-    color: #007bff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ff4f2c;
+    padding: 6px 10px;
+    background: #e2e4e8;
+    border-radius: 4px;
+    margin-right: 10px;
     text-decoration: none;
 }
 
