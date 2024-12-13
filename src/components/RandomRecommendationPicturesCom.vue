@@ -33,7 +33,9 @@ export default defineComponent({
   setup() {
     const animeList = ref<Anime[]>([]);
     const randomAnimeList = ref<Anime[]>([]);
-    //取得动漫列表前30个
+    const randomCount = ref(4);  // 默认选择4个动漫
+
+    // 取得动漫列表前36个
     const fetchAnimeList = async () => {
       try {
         const response = await request.get<{
@@ -44,7 +46,7 @@ export default defineComponent({
 
         if (response.data.status) {
           animeList.value = response.data.data;
-          pickRandomAnimes();
+          pickRandomAnimes();  // 获取随机动漫
         } else {
           console.error('Failed to fetch anime list:', response.data.message);
         }
@@ -53,17 +55,30 @@ export default defineComponent({
       }
     };
 
+    // Fisher-Yates 洗牌算法 - 高效且公平的打乱数组
+    const shuffleArray = (array: Anime[]) => {
+      let shuffledArray = [...array];
+      for (let i = shuffledArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // 交换元素
+      }
+      return shuffledArray;
+    };
+
+    // 随机选择动漫
     const pickRandomAnimes = () => {
       if (animeList.value.length > 0) {
-        const shuffled = animeList.value.sort(() => 0.36 - Math.random());
-        randomAnimeList.value = shuffled.slice(0, 4);
+        const shuffled = shuffleArray(animeList.value); // 打乱列表
+        randomAnimeList.value = shuffled.slice(0, randomCount.value); // 取前 randomCount 个
       }
     };
 
+    // 获取封面 URL
     const getCoverUrl = (fileName: string) => {
       return `http://localhost:8080/files/getCover/${fileName}`;
     };
 
+    // 跳转到详情页面
     const jumpToDetail = (animeId: number) => {
       router.push(`/Videoplayback/${animeId}/1`);
     };
@@ -74,11 +89,13 @@ export default defineComponent({
       animeList,
       randomAnimeList,
       getCoverUrl,
-      jumpToDetail
+      jumpToDetail,
+      randomCount  // 如果希望动态调整随机数量，可以绑定到 UI 上
     };
   },
 });
 </script>
+
 
 <style scoped>
 .video-list {
@@ -119,6 +136,7 @@ export default defineComponent({
 }
 
 .video-name {
+  margin-top: 5px;
   font-size: 0.85rem;
   color: #181818;
   font-weight: bold;
