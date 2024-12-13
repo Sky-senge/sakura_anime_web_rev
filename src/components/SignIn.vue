@@ -48,7 +48,16 @@ const signIn = async () => {
   var response = await request.post('/user/login', loginData.value)
   if (response.data.status) {
     const { token, userId } = response.data.data
-    userStore.setUser({ token, userId })
+    var isAdmin = false;
+    userStore.setUser({ token, userId, isAdmin}) //先作为正常用户写入Token
+    var checkResponse = await request.get('/user/getDetail')
+    if(checkResponse.data.status){
+      if(checkResponse.data.data.permission===0){
+        isAdmin = true;
+        console.log("已设置管理员状态：",isAdmin)
+        userStore.setUser({ token, userId, isAdmin}) //如果是管理员，那么更新为管理员状态
+      }
+    }
     ElMessage.success("登录成功！")
     router.push('/') //登录成功后返回主页
   } else {
