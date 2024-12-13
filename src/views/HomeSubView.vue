@@ -1,6 +1,6 @@
 <template>
   <!-- 推荐大图区域 -->
-    <div class="banner">
+  <div class="banner">
     <Carousel />
   </div>
   <section class="video-section">
@@ -9,7 +9,8 @@
         <div class="dot"></div>
         <div class="title-name">随便看看</div>
       </div>
-      <a href="javascript:void(0)" class="view-more" @click="refreshRecommendations"><i class="bi bi-arrow-clockwise"></i>换一批</a>
+      <a href="javascript:void(0)" class="view-more" @click="refreshRecommendations"><i
+          class="bi bi-arrow-clockwise"></i>换一批</a>
     </div>
     <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
       <RandomRecommendationPicturesCom :key="refreshKey" />

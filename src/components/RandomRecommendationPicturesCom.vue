@@ -121,6 +121,7 @@ export default defineComponent({
   overflow: hidden;
   transform: scale(0.95);
   transition: all .2s;
+  background: #e0e0e0;
 }
 
 .video-thumbnail:hover {
