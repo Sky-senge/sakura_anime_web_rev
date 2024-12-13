@@ -1,7 +1,7 @@
 <template>
   <header class="navbar">
     <div class="nav">
-      <span class="logo">sakura</span>
+      <!--       <span class="logo">sakura</span> -->
       <nav class="left-nav" v-show="!isSearchActive">
         <button size="small" class="nav-button-l" @click="jumpTo('/')">首页</button>
         <button size="small" class="nav-button-l" @click="jumpTo('/sort')">全部</button>
@@ -20,19 +20,20 @@
       </div>
       <nav class="right-nav" v-show="!isSearchActive">
         <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
+        <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
         <button size="small" class="nav-button" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
         <el-dropdown v-if="isLoggedIn">
-        <span class="nav-button">
-          欢迎！{{ currentUserName }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item :icon="User">用户详情</el-dropdown-item>
-            <el-dropdown-item :icon="SwitchButton" @click="logout">登出</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-        <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
+          <span class="nav-button">
+            <i class="bi bi-person-circle"></i>
+            {{ currentUserName }}
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item :icon="User">用户详情</el-dropdown-item>
+              <el-dropdown-item :icon="SwitchButton" @click="logout">登出</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </nav>
     </div>
   </header>
@@ -40,7 +41,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute,useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
@@ -99,7 +100,7 @@ const currentUserName = ref(''); //当前用户名
 const jumpTo = (path: string) => {
   router.push(path)
   // 防止被播放器卡住
-  if(route.name==='Videoplayback'){
+  if (route.name === 'Videoplayback') {
     playerStore.destroyPlayerInstance(); //跳转前销毁播放器实例
     router.replace(path)
   }
@@ -110,11 +111,11 @@ const logout = () => {
     "确定要登出吗？",
     '警告',
     {
-      confirmButtonText:'确定',
-      cancelButtonText:'取消',
-      type:'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  ).then(()=>{
+  ).then(() => {
     userStore.clearUser();
     isLoggedIn.value = false; // 退出登录成功，更新登录状态为未登录
     router.push('/')
@@ -140,19 +141,19 @@ const checkUserPermissionLv = async () => { // 检查用户权限是否满足
 };
 
 // 加载数据
-const loadData = () =>{
-userStore.loadUser()
-if(userStore.token.length!=0){
-  // checkUserPermissionLv()
-  isLoggedIn.value=true //标记已登录
-  if(userStore.displayName!=''){
-    currentUserName.value = userStore.displayName; //如果有的话，获取DisplayName，否则获取username
-  }else{
-    currentUserName.value = userStore.username;
-  }
-  if(userStore.isAdmin===true){
-    isAdmin.value=true; //从UserStore中获取状态
-  }
+const loadData = () => {
+  userStore.loadUser()
+  if (userStore.token.length != 0) {
+    // checkUserPermissionLv()
+    isLoggedIn.value = true //标记已登录
+    if (userStore.displayName != '') {
+      currentUserName.value = userStore.displayName; //如果有的话，获取DisplayName，否则获取username
+    } else {
+      currentUserName.value = userStore.username;
+    }
+    if (userStore.isAdmin === true) {
+      isAdmin.value = true; //从UserStore中获取状态
+    }
   }
 }
 
@@ -198,7 +199,7 @@ const clearOrCancelSearch = () => {
 // 监听窗口大小变化
 const handleResize = () => {
   // 当窗口宽度大于移动端断点时
-  if (window.innerWidth >= 768) {
+  if (window.innerWidth >= 805) {
     isSearchActive.value = false  // 关闭搜索状态
     searchText.value = ''         // 清空搜索文本
   }
@@ -248,9 +249,8 @@ onBeforeUnmount(() => {
 }
 
 .nav {
-  transform: translateX(-150px);
   user-select: none;
-  width: 1280px;
+  width: 80%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -278,62 +278,34 @@ onBeforeUnmount(() => {
 .right-nav {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
 }
 
-@media (min-width: 1800px) {
+@media (max-width: 1280px) {
   .nav {
-    transform: translateX(-100px);
-    width: 1600px;
-  }
-
+  width: 100%;
 }
-
-@media (max-width: 1800px) {
-  .nav {
-    transform: translateX(-80px);
-    width: 1300px;
-  }
 
   .search-concent {
-    width: 600px;
+    width: 550px;
   }
 }
 
-@media (max-width: 1620px) {
+@media (max-width: 1100px) {
   .nav {
-    transform: translateX(-60px);
-    width: 1200px;
-  }
+  width: 90%;
 }
-
-@media (max-width: 1350px) {
-  .nav {
-    transform: translateX(-30px);
-    width: 980px;
-  }
-
-  .search-concent {
-    width: 400px;
-  }
-}
-
-@media (max-width: 1000px) {
-  .nav {
-    transform: translateX(-10px);
-    width: 768px;
-  }
 
   .search-concent {
     width: 300px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 805px) {
+
   .nav {
-    transform: translateX(0px);
-    width: 100%;
-  }
+  width: 100%;
+}
 
   .left-nav,
   .right-nav {
@@ -387,10 +359,10 @@ onBeforeUnmount(() => {
     color: #ff4d00;
   }
 
-  .logo {
-    display: none;
+  .bi{
+    cursor: pointer;
   }
-
+  
   .nav-button-l,
   .nav-button {
     font-size: 0.88rem;

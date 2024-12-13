@@ -169,13 +169,10 @@ const fetchAnimeList = async () => {
     if (selectedCompletionStatus.value !== '全部') {
       const isCompleted = selectedCompletionStatus.value === '已完结';
 
-      // 如果选择了已完结，则要求动漫有非空标签
-      // 如果选择了连载中，则要求动漫没有标签或标签为空
+      // 如果选择了已完结，则要求动漫有"完结"标签
+      // 如果选择了连载中，则不添加"完结"标签
       if (isCompleted) {
         tags.push('完结');
-      } else {
-        // 添加一个特殊的查询条件，表示没有标签
-        tags.push('!hastags');
       }
     }
 
@@ -206,14 +203,14 @@ const fetchAnimeList = async () => {
       total.value = (responseTotalNum.data.data) * 10
     }
     if (response.data.status) {
-      // 在前端额外过滤（作为后备方案）
+      // 在前端额外过滤
       animeList.value = response.data.data.filter(anime => {
         if (selectedCompletionStatus.value === '全部') return true;
         if (selectedCompletionStatus.value === '已完结') {
-          return anime.tags && anime.tags.length > 0;
+          return anime.tags && anime.tags.some(tag => tag === '完结');
         }
         if (selectedCompletionStatus.value === '连载中') {
-          return !anime.tags || anime.tags.length === 0;
+          return !anime.tags || !anime.tags.some(tag => tag === '完结');
         }
         return true;
       });
@@ -356,6 +353,8 @@ onMounted(fetchAnimeList)
   cursor: pointer;
   padding: 5px;
   font-size: 0.9em;
+  font-weight: 400;
+  color: #333;
   transition: all .3s;
 }
 
@@ -366,7 +365,6 @@ onMounted(fetchAnimeList)
 
 .filter-option.active {
   color: rgb(255, 30, 30);
-  font-size: 0.9em;
   font-weight: 800;
 }
 
@@ -399,16 +397,33 @@ onMounted(fetchAnimeList)
   display: grid;
   gap: 15px;
   padding: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   background-color: #f2f4f8;
   margin: 0 auto;
   user-select: none;
   transition: all .3s;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
+  .filter-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .filter {
+    width: 100%;
+  }
+
+  .video {
+    flex: 1;
+    width: calc(100% - 40px);
+  }
+
   .video-list {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -435,7 +450,13 @@ onMounted(fetchAnimeList)
 .video-thumbnail img {
   width: 100%;
   height: 100%;
+  filter: brightness(0.8);
   object-fit: cover;
+  transition: all .3s;
+}
+
+.video-card:hover .video-thumbnail img{
+  transform: scale(1.2);
 }
 
 .video-name {
@@ -448,5 +469,9 @@ onMounted(fetchAnimeList)
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.video-card:hover .video-name{
+  background: #dadada;
 }
 </style>

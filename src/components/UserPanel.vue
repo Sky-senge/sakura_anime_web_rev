@@ -275,12 +275,13 @@ onMounted(loadData);
 }
 
 .el-button:hover {
+  color: #696969;
   background-color: #f0f0f0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .el-table .el-button {
-  margin: 0; /* 表格中的按钮不需要额外的外边距 */
+  margin: 2px 0; /* 表格中的按钮不需要额外的外边距 */
 }
 
 .el-table {

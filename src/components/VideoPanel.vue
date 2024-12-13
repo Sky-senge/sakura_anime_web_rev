@@ -7,11 +7,10 @@
         <i class="el-icon-upload"></i>
         <span>新建视频</span>
       </el-button>
-
     </div>
 
     <!-- 视频列表展示区域 -->
-    <el-table :data="videoList" style="width: 100%">
+    <el-table :data="videoList" style="width: 100%;">
       <el-table-column prop="name" label="视频标题" align="left"></el-table-column>
       <el-table-column prop="tags" label="标签" align="left"></el-table-column>
       <el-table-column prop="description" label="视频描述" align="left"></el-table-column>
@@ -19,7 +18,7 @@
       <el-table-column prop="releaseDate" label="发行日期" align="center"></el-table-column>
       <el-table-column prop="status" label="视频状态" align="center"></el-table-column>
       <el-table-column label="操作">
-        <template #default="{ row }">
+        <template #default="{ row }" class="tile">
           <el-button type="primary" size="small" @click="openUploadVideo(row)">上传视频</el-button>
           <el-button type="success" size="small" :disabled="row.filePath.length === 0"
             @click="openUploadCover(row)">上传封面</el-button>
@@ -195,9 +194,9 @@ const isTagSelected = (tag) => {
 const toggleTag = (tag) => {
   // 阻止默认表单提交行为
   event.preventDefault();
-  
+
   const existingTags = editForm.tags.split(',').map(t => t.trim()).filter(t => t);
-  
+
   if (existingTags.includes(tag)) {
     // 如果标签已经存在，从标签列表中移除
     const updatedTags = existingTags.filter((existingTag) => existingTag !== tag);
@@ -647,18 +646,19 @@ onMounted(() => {
 }
 
 .el-table .el-button {
-  margin: 0;
+  margin: 2px 0;
   /* 表格中的按钮不需要额外的外边距 */
 }
 
 .el-button:hover {
+  color: #696969;
   background-color: #f0f0f0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* 视频列表表格样式 */
 .el-table {
-  border: 1px solid #e0e0e0;
+  border: 3px solid #e3e3e3;
   border-radius: 4px;
   margin-top: 20px;
 }

@@ -145,11 +145,16 @@ export default defineComponent({
   height: 100%;
   filter: brightness(0.8);
   object-fit: cover;
+  transition: all .3s;
+}
+
+.video-card:hover .video-thumbnail img{
+  transform: scale(1.2);
 }
 
 .video-name {
-  padding: 20px 5px;
-  font-size: 1em;
+  padding: 12px 5px;
+  font-size: 1rem;
   color: #333;
   background: #fff;
   font-weight: bold;
@@ -157,5 +162,10 @@ export default defineComponent({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: all .3s;
+}
+
+.video-card:hover .video-name{
+  background: #dadada;
 }
 </style>
