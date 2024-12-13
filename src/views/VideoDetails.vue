@@ -6,17 +6,17 @@
             <header class="header">
                 <div class="left-header">
                     <div class="left-image-section"> <!-- 新增左边图片区域的容器 -->
-                        <img :src="anime.poster" alt="Anime Poster" class="poster-image" />
+                        <img :src="getCoverUrl()" alt="Anime Poster" class="poster-image" />
                     </div>
                 </div>
                 <div class="right-header">
                     <div class="anime-info-wrapper"> <!-- 新增包裹详细信息的容器 -->
                         <div class="right-text-section"> <!-- 新增右边文字区域的容器 -->
-                            <h1 class="anime-title">{{ anime.title }}</h1>
+                            <h1 class="anime-title">{{ videoDetail.name }}</h1>
                             <div class="rating-favorite-container"> <!-- 新增的包裹评分和收藏的容器 -->
                                 <div class="rating-and-favorite">
                                     <span class="rating-value">
-                                        <strong>评分:</strong> {{ anime.rating }}
+                                        <strong>评分:</strong> {{ videoDetail.rating }}
                                         <i class="el-icon-star-on" :style="{ color: '#ff9800' }"></i>
                                     </span>
                                     <el-button type="primary" class="favorite-button" @click="addToFavorites"
@@ -28,34 +28,35 @@
                                 </div>
                             </div>
                             <div class="info-section">
-                                <p><strong>导演:</strong> <span class="director-value">{{ anime.director }}</span></p>
-                                <p><strong>编剧:</strong> <span class="writer-value">{{ anime.writer }}</span></p>
-                                <p><strong>年份:</strong> <span class="year-value">{{ anime.year }}</span></p>
-                                <p><strong>类型:</strong> <span class="genres-value">{{ anime.genres.join(', ') }}</span>
+                                <!-- <p><strong>导演:</strong> <span class="director-value">{{ anime.director }}</span></p> -->
+                                <!-- <p><strong>编剧:</strong> <span class="writer-value">{{ anime.writer }}</span></p> -->
+                                <p><strong>年份:</strong> <span class="year-value">{{ videoDetail.releaseDate }}</span></p>
+                                <p><strong>类型:</strong> <span class="genres-value">{{ videoDetail.tags.join(', ') }}</span>
                                 </p>
-                                <p><strong>地区:</strong> <span class="area-value">{{ anime.area }}</span></p>
-                                <p><strong>语言:</strong> <span class="language-value">{{ anime.language }}</span></p>
-                                <p><strong>时长:</strong> <span class="duration-value">{{ anime.duration }}</span></p>
-                                <p><strong>上映:</strong> <span class="release-value">{{ anime.release }}</span></p>
-                                <p><strong>更新:</strong> <span class="update-value">{{ anime.update }}</span></p>
+                                <!-- <p><strong>地区:</strong> <span class="area-value">{{ anime.area }}</span></p> -->
+                                <!-- <p><strong>语言:</strong> <span class="language-value">{{ anime.language }}</span></p> -->
+                                <!-- <p><strong>时长:</strong> <span class="duration-value">{{ anime.duration }}</span></p> -->
+                                <p><strong>上映:</strong> <span class="release-value">{{ videoDetail.releaseDate }}</span></p>
+                                <!-- <p><strong>更新:</strong> <span class="update-value">{{ anime.update }}</span></p> -->
                             </div>
-                            <p><strong>简介:</strong> <span class="description-value">{{ anime.description }}</span></p>
+                            <p><strong>简介:</strong> <span class="description-value">{{ videoDetail.description }}</span></p>
                         </div>
                     </div>
                 </div>
             </header>
             <section class="action-section">
-                <el-button type="text" @click="generateQRCode">生成二维码</el-button>
+                <!-- <el-button type="text" @click="generateQRCode">生成二维码</el-button> -->
                 <el-button type="text" @click="reportAnime">举报</el-button>
             </section>
             <h2>剧集列表</h2>
             <section class="episode-list">
                 <ul>
-                    <li v-for="(episode, index) in anime.episodes" :key="index">
-                        <a :href="'/videoplayback/' + anime.id + '/' + (index + 1)" @click="playEpisode(index)"
+                    <li v-for="(episode, index) in episodes" :key="index">
+                        <a :href="'/videoplayback/' + videoDetail.id + '/' + (index + 1)" @click="playEpisode(index)"
                             class="episode-link">
                             <span class="episode-number">第{{ index + 1 }}集</span>
-                            <span class="episode-name">{{ episode.name }}</span>
+                            <!-- 没有名字数据，所以注释掉吧 -->
+                            <!-- <span class="episode-name">{{ episode.name }}</span> -->
                         </a>
                     </li>
                 </ul>
@@ -64,34 +65,47 @@
     </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { ElButton } from 'element-plus';
+<script setup lang="ts">
+import { onMounted, ref, reactive, type Ref } from 'vue';
+import { ElButton, ElMessageBox } from 'element-plus';
 import { ElMessage } from 'element-plus';
+import { useRoute,useRouter } from 'vue-router';
+import request from '@/utils/request';
 
-// 模拟动漫详情数据，根据图片展示的丰富信息进行对应字段添加
-const anime = ref({
-    id: 1,
-    title: '灵武大陆',
-    status: '43 - 五 - 10:00',
-    director: '未知',
-    writer: '未知',
-    year: '2024',
-    rating: '8.5',
-    genres: ['热血', '奇幻'],
-    area: '大陆',
-    language: '国语',
-    duration: '10分钟',
-    release: '2024 - 07 - 26(中国大陆)',
-    update: '2024 - 12 - 09 13:00',
-    description: '灵武大陆，一个灵力和武魂并存的世界，灵修一念动山河，武者徒手摘天地，星辰储昔日天才辰，受尽他人冷遇。在一次生死搏斗中，辰天降下星辰，融入上古神器混沌之杖，在天武之力的作用下混沌之杖化为灵武双体。',
-    poster: 'https://bpic.588ku.com/illus_water_img/23/04/28/02a2e05e7a97598924c60cece23b1723.jpg!/fw/750/quality/99/unsharp/true/compress/true',
-    episodes: [
-        { name: '第一集', videoUrl: '/videos/episode1.mp4' },
-        { name: '第二集', videoUrl: '/videos/episode2.mp4' },
-        // 更多剧集数据
-    ]
+const route=useRoute();
+const router=useRouter();
+//获取路由参数
+const animeId = route.params.animeId as string;
+
+const episodes: Ref<Episode[]> = ref([]);
+const videoDetail = reactive<Video>({
+  id: 0,
+  name: '',
+  tags: [],
+  description: '',
+  rating: 0,
+  releaseDate: '',
+  filePath: []
 });
+
+interface Video {
+  id: number;
+  name: string;
+  tags: string[];
+  description: string;
+  rating: number;
+  releaseDate: string;
+  filePath: {
+    episodes: number;
+    fileName: string;
+  }[];
+}
+
+interface Episode {
+  episode: string;
+  videoUrl: string;
+  subtitleUrl: string;
+}
 
 // 控制收藏状态
 const isFavorite = ref(false);
@@ -104,23 +118,67 @@ const addToFavorites = () => {
     ElMessage.success('已添加到收藏夹');
 };
 
-// 生成二维码的功能函数，目前仅提示待开发，实际应用需添加具体逻辑
-const generateQRCode = () => {
-    ElMessage.info('二维码生成功能待开发，可添加相关逻辑');
-    // 实际应用中可在此处添加生成二维码的具体逻辑，比如调用二维码生成库等
-};
 
-// 举报动漫的功能函数，目前仅提示确认操作，实际应用需添加具体举报逻辑
+// 举报动漫的功能方法
 const reportAnime = () => {
-    ElMessage.warning('确认要举报该动漫吗？');
-    // 实际应用中可添加举报相关逻辑，如弹出确认框后提交举报信息到后端等
+    ElMessageBox.confirm(
+    "确定要举报该动漫吗？",
+    '警告',
+    {
+      confirmButtonText:'确定',
+      cancelButtonText:'取消',
+      type:'warning',
+    }
+  ).then(()=>{
+    ElMessageBox.alert('举报成功！感谢您对网络环境作出的净化','举报结果',{
+        confirmButtonText:'好',
+    })
+  })
 };
 
-// 播放剧集的功能函数，目前仅提示即将播放，实际应用需添加播放视频相关逻辑
-const playEpisode = (index) => {
+// 播放剧集的功能函数，目前仅提示即将播放，实际应用会使用路由跳转
+const playEpisode = (index: number) => {
     ElMessage.info(`即将播放第${index + 1}集，请稍候...`);
-    // 实际应用中可在此处添加播放视频的相关逻辑，比如跳转到播放页面等
 };
+
+// 获取动漫列表并更新视频信息
+async function fetchEpisodeList(animeId: string) {
+  try {
+    const response = await request.get(`/anime/getDetail/${animeId}`);
+    if (response.data.status) {
+      // 更新 videoDetail 数据
+      Object.assign(videoDetail, response.data.data);
+      console.log("更新VideoDetail")
+      // 从 videoDetail 中提取 filePath，生成 episodes 列表
+      const filePathList = videoDetail.filePath;
+      episodes.value = filePathList.map((file: any) => {
+        return {
+          episode: `${file.episodes}`,
+          videoUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.m3u8`,
+          subtitleUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.ass`
+        };
+      });
+    } else {
+      console.error('Failed to fetch video detail:', response.data.message);
+    }
+  } catch (error) {
+    console.error('Error fetching video detail:', error);
+  }
+}
+
+/**
+ * 自动生成封面图片的完整 URL
+ * @returns 完整的封面 URL
+ */
+const getCoverUrl = () => {
+const fileObj = videoDetail.filePath.find(item => item.episodes === 1);
+const fileName = fileObj?.fileName || 'default';
+return `http://localhost:8080/files/getCover/${fileName}`;
+};
+
+onMounted(()=>{
+    fetchEpisodeList(animeId);
+})
 </script>
 
 <style scoped>

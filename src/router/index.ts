@@ -37,8 +37,8 @@ const router = createRouter({
           component: Sort,
         },
         {
-          path: '/videodetails',
-          name: 'VideoDetails',
+          path: '/videodetail/:animeId',
+          name: 'VideoDetail',
           component: VideoDetails,
         },
         {
