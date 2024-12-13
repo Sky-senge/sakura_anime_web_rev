@@ -1,8 +1,8 @@
 <template>
   <!-- 推荐大图区域 -->
-  <!--   <div class="banner">
+    <div class="banner">
     <Carousel />
-  </div> -->
+  </div>
   <section class="video-section">
     <div class="section-header">
       <div class="title">
