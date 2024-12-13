@@ -509,7 +509,7 @@ const uploadCover = async () => {
     loadingMessage.close();
     if (response.data.status) {
       ElMessage.success('封面上传完成！');
-      isUploadDialogVisible.value = false;
+      isUploadCoverDialogVisible.value = false;
       selectedFile.value = null; // 清空选择的文件
       loadVideoList(); // 刷新视频列表
     } else {
@@ -543,7 +543,7 @@ const uploadSubtitle = async () => {
     loadingMessage.close();
     if (response.data.status) {
       ElMessage.success('字幕上传完成！');
-      isUploadDialogVisible.value = false;
+      isUploadSubtitleDialogVisible.value = false;
       selectedFile.value = null; // 清空选择的文件
       loadVideoList(); // 刷新视频列表
     } else {
