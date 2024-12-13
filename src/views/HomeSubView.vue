@@ -20,7 +20,7 @@
         <div class="dot"></div>
         <div class="title-name">热门推荐</div>
       </div>
-      <a href="/sort" class="view-more">更多<i class="bi bi-chevron-compact-right"></i></a>
+      <a href="javascript:void(0)" @click="jumpTo('/sort')" class="view-more">更多<i class="bi bi-chevron-compact-right"></i></a>
     </div>
     <VideoList />
   </section>
@@ -35,8 +35,10 @@ import Carousel from '/src/components/carousel-component.vue';
 // 引入样式
 import '../assets/home.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useRouter } from 'vue-router';
 
-
+//实例化路由
+const router = useRouter();
 // 定义刷新状态
 const refreshKey = ref(0);
 const animationClass = ref('');
@@ -55,6 +57,11 @@ const handleAnimationEnd = () => {
     animationClass.value = ''; // 清除动画类名
   }
 };
+
+// 导航跳转方法
+const jumpTo = (path) => {
+  router.push(path)
+}
 </script>
 
 <style>

@@ -49,14 +49,22 @@ try{
   if (response.data.status) {
     const { token, userId } = response.data.data
     var isAdmin = false;
-    userStore.setUser({ token, userId, isAdmin}) //先作为正常用户写入Token
+    var username = '';
+    var displayName = '';
+    var email = '';
+    var remarks = '';
+    var avatar = '';
+    userStore.setUser({ token, userId, isAdmin,username,displayName,email,remarks,avatar}) //先作为正常用户写入Token
     var checkResponse = await request.get('/user/getDetail')
     if(checkResponse.data.status){
+      username = checkResponse.data.data.username;
+      displayName = checkResponse.data.data.displayName;
+      email = checkResponse.data.data.email;
+      remarks = checkResponse.data.data.remarks;
       if(checkResponse.data.data.permission===0){
-        isAdmin = true;
-        console.log("已设置管理员状态：",isAdmin)
-        userStore.setUser({ token, userId, isAdmin}) //如果是管理员，那么更新为管理员状态
+        isAdmin = true; //如果是管理员，那么更新为管理员状态
       }
+      userStore.setUser({ token, userId, isAdmin,username,displayName,email,remarks,avatar}) //取得后完整写入
     }
     ElMessage.success("登录成功！")
     router.push('/') //登录成功后返回主页
