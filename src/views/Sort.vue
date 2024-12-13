@@ -404,7 +404,7 @@ onMounted(()=>{
 
 /* 重新筛选按钮样式 */
 .reset-button {
-  backgroundr: none;
+  background: none;
   color: rgb(68, 68, 68);
   border: none;
   border-radius: 4px;
