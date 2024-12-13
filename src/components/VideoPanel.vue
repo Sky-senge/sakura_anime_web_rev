@@ -33,6 +33,7 @@
     <!-- 分页器 -->
     <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
 
+    <!-- 编辑/新建 视频对话框 -->
     <el-dialog v-model="isEditDialogVisible" title="修改视频信息">
       <div v-loading="loadingDetail">
         <el-form :model="editForm" label-width="100px">
@@ -274,7 +275,7 @@ const openCreateDialog = () => {
   editForm.name = '';
   editForm.tags = [];
   editForm.description = '';
-  editForm.rating = '';
+  editForm.rating = 1.0;
   editForm.releaseDate = '';
   editForm.filePath = [];
   // 显示对话框
