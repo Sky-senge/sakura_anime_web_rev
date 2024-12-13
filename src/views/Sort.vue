@@ -12,6 +12,12 @@
                 }}</span>
             </div>
             <div class="filter-section">
+              <span class="filter-label">状态</span>
+              <span v-for="(status, statusIndex) in completionStatuses" :key="statusIndex"
+                :class="{ 'filter-option': true, active: selectedCompletionStatus === status }"
+                @click="selectedCompletionStatus = status">{{ status }}</span>
+            </div>
+            <div class="filter-section">
               <span class="filter-label">地区</span>
               <span v-for="(region, regionIndex) in regions" :key="regionIndex"
                 :class="{ 'filter-option': true, active: selectedRegion === region }"
@@ -106,13 +112,16 @@ const currentPage = ref(1);
 const types = [
   '全部', '热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园',
   '青春', '恋爱', '爱情', '日常', '搞笑', '推理', '悬疑', '机战', '运动', '战争', '战斗',
-  '励志', '感人', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他'
+  '励志', '致郁', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他'
 ];
 const selectedType = ref('全部');
-const selectedType2 = ref('全部');
+
+//完结状态数据
+const completionStatuses = ['全部', '已完结', '连载中'];
+const selectedCompletionStatus = ref('全部');
 
 // 地区数据
-const regions = ['全部', '日本', '大陆', '香港', '台湾', '韩国', '美国', '欧洲', '其它'];
+const regions = ['全部', '日本', '大陆', '中国香港', '中国台湾', '韩国', '欧美', '其它'];
 const selectedRegion = ref('全部');
 
 // 年份数据
@@ -123,7 +132,7 @@ const years = [
 const selectedYear = ref('全部');
 
 // 语言数据
-const languages = ['全部', '日语', '国语', '英语', '粤语', '韩语', '其它'];
+const languages = ['全部', '日语', '国语', '粤语', '英语', '韩语', '其它'];
 const selectedLanguage = ref('全部');
 
 // 字母数据
@@ -139,6 +148,7 @@ const resetFilters = () => {
   selectedRegion.value = '全部';
   selectedYear.value = '全部';
   selectedLanguage.value = '全部';
+  selectedCompletionStatus.value = '全部';
   selectedLetter.value = '全部';
 };
 
@@ -154,6 +164,20 @@ const fetchAnimeList = async () => {
     if (selectedYear.value !== '全部') tags.push(selectedYear.value);
     if (selectedLanguage.value !== '全部') tags.push(selectedLanguage.value);
     if (selectedLetter.value !== '全部') tags.push(selectedLetter.value);
+
+    // 完结状态筛选逻辑
+    if (selectedCompletionStatus.value !== '全部') {
+      const isCompleted = selectedCompletionStatus.value === '已完结';
+
+      // 如果选择了已完结，则要求动漫有非空标签
+      // 如果选择了连载中，则要求动漫没有标签或标签为空
+      if (isCompleted) {
+        tags.push('完结');
+      } else {
+        // 添加一个特殊的查询条件，表示没有标签
+        tags.push('!hastags');
+      }
+    }
 
     const queryString = tags.length > 0
       ? tags.map(tag => `tag=${encodeURIComponent(tag)}`).join('&')
@@ -182,15 +206,23 @@ const fetchAnimeList = async () => {
       total.value = (responseTotalNum.data.data) * 10
     }
     if (response.data.status) {
-      // 成功获取数据，赋值给 animeList
-      animeList.value = response.data.data;
+      // 在前端额外过滤（作为后备方案）
+      animeList.value = response.data.data.filter(anime => {
+        if (selectedCompletionStatus.value === '全部') return true;
+        if (selectedCompletionStatus.value === '已完结') {
+          return anime.tags && anime.tags.length > 0;
+        }
+        if (selectedCompletionStatus.value === '连载中') {
+          return !anime.tags || anime.tags.length === 0;
+        }
+        return true;
+      });
+
       console.log(animeList.value);
     } else {
-      // 接口返回失败信息，打印日志
       console.error('Failed to fetch anime list:', response.data.message);
     }
   } catch (error) {
-    // 捕获并处理请求错误
     console.error('Error fetching anime list:', error);
   }
 };
@@ -224,6 +256,7 @@ watch([
   selectedRegion,
   selectedYear,
   selectedLanguage,
+  selectedCompletionStatus,
   selectedLetter
 ], fetchAnimeList);
 
@@ -234,29 +267,29 @@ onMounted(fetchAnimeList)
 /* 整体容器样式 */
 .filter-container {
   padding: 20px;
-  width: 88%;
+  width: 84%;
   display: flex;
   justify-content: flex-start;
   margin: 0 auto;
 }
 
 .filter {
-  width: 25%;
+  width: 24%;
 }
 
 .video {
   flex: 1;
 }
 
-.video-title{
- display: flex;
- align-items: center;
- justify-content: space-between;
- margin-bottom: 10px;
- padding: 0 20px;
+.video-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 20px;
 }
 
-.f-title{
+.f-title {
   margin: 20px;
   font-size: 1.2rem;
   font-weight: 800;
@@ -313,6 +346,7 @@ onMounted(fetchAnimeList)
 }
 
 .filter-label {
+  font-size: 1.1rem;
   font-weight: 1000;
   letter-spacing: 1px;
   margin-right: 8px;
@@ -321,7 +355,7 @@ onMounted(fetchAnimeList)
 .filter-option {
   cursor: pointer;
   padding: 5px;
-  font-size: 0.85em;
+  font-size: 0.9em;
   transition: all .3s;
 }
 
@@ -338,8 +372,8 @@ onMounted(fetchAnimeList)
 
 /* 重新筛选按钮样式 */
 .reset-button {
-  background-color: #ff0d00;
-  color: white;
+  backgroundr: none;
+  color: rgb(68, 68, 68);
   border: none;
   border-radius: 4px;
   padding: 8px 20px;
@@ -347,14 +381,17 @@ onMounted(fetchAnimeList)
   margin-top: 12px;
   letter-spacing: 2px;
   font-weight: 600;
+  transition: all .3s;
 }
 
 .reset-button:hover {
-  background-color: #ff3300;
+  color: #f2f4f8;
+  background-color: #282828;
 }
 
 .reset-button:active {
-  background-color: #ff4800;
+  color: #f2f4f8;
+  background-color: #222;
 }
 
 /* Video List Part */

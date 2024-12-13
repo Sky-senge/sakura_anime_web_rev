@@ -7,7 +7,7 @@
         <i class="el-icon-upload"></i>
         <span>新建视频</span>
       </el-button>
-     
+
     </div>
 
     <!-- 视频列表展示区域 -->
@@ -21,8 +21,10 @@
       <el-table-column label="操作">
         <template #default="{ row }">
           <el-button type="primary" size="small" @click="openUploadVideo(row)">上传视频</el-button>
-          <el-button type="success" size="small" :disabled="row.filePath.length === 0" @click="openUploadCover(row)">上传封面</el-button>
-          <el-button type="info" size="small" :disabled="row.filePath.length === 0" @click="openUploadSubtitle(row)">外挂字幕</el-button>
+          <el-button type="success" size="small" :disabled="row.filePath.length === 0"
+            @click="openUploadCover(row)">上传封面</el-button>
+          <el-button type="info" size="small" :disabled="row.filePath.length === 0"
+            @click="openUploadSubtitle(row)">外挂字幕</el-button>
           <el-button type="warning" size="small" @click="editVideoInfo(row)">修改信息</el-button>
           <el-button type="danger" size="small" @click="unpublishVideo(row)">下架视频</el-button>
         </template>
@@ -30,137 +32,128 @@
     </el-table>
 
     <!-- 分页器 -->
-    <el-pagination
-      background
-      layout="prev, pager, next"
-      :total="total"
-      @current-change="handleCurrentPageChange"
-    />
+    <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
 
-    <!-- 编辑视频信息对话框 -->
     <el-dialog v-model="isEditDialogVisible" title="修改视频信息">
-    <div v-loading="loadingDetail"> 
-    <el-form :model="editForm" label-width="100px">
-      <el-form-item label="视频标题">
-        <el-input v-model="editForm.name" />
-      </el-form-item>
-      <el-form-item label="视频标签">
-        <el-form-item v-model="editForm.tags" multiple placeholder="动漫标签，用逗号分隔">
-          <el-input v-model="editForm.tags" />
-        </el-form-item>
-      </el-form-item>
-      <el-form-item label="视频描述">
-        <el-input type="textarea" v-model="editForm.description" rows="3" />
-      </el-form-item>
-      <el-form-item label="评分">
-        <el-input-number v-model="editForm.rating" :min="0" :max="10" step="0.1" />
-      </el-form-item>
-      <el-form-item label="资源管理">
-        <div v-for="(file, index) in editForm.filePath" :key="index" class="file-item">
-          <el-row>
-            <el-col :span="4">
-              <el-input-number v-model="file.episodes" :min="1" label="集数" />
-            </el-col>
-            <el-col :span="12">
-              <div style="padding-left: 80px;padding-right: 20px;">
-                <el-input v-model="file.fileName" placeholder="文件名" />
+      <div v-loading="loadingDetail">
+        <el-form :model="editForm" label-width="100px">
+          <!-- Tab栏 -->
+          <el-tabs v-model="activeTab">
+            <el-tab-pane label="信息" name="info">
+              <el-form-item label="视频标题">
+                <el-input v-model="editForm.name" />
+              </el-form-item>
+              <el-form-item label="评分">
+                <el-input-number v-model="editForm.rating" :min="0" :max="10" step="0.1" />
+              </el-form-item>
+            </el-tab-pane>
+
+            <el-tab-pane label="简介" name="description">
+              <el-form-item label="视频描述">
+                <el-input type="textarea" v-model="editForm.description" rows="10" />
+              </el-form-item>
+            </el-tab-pane>
+
+            <el-tab-pane label="标签" name="tags">
+              <el-form-item label="视频标签">
+                <el-input v-model="editForm.tags" placeholder="动漫标签，用逗号分隔" />
+              </el-form-item>
+              <div class="tag-list">
+                <button class="tag-btn" v-for="(tag, index) in types" :key="index"
+                  :class="{ 'selected': isTagSelected(tag) }" @click.prevent="toggleTag(tag)">
+                  {{ tag }}
+                </button>
               </div>
-              
-            </el-col>
-            <el-col :span="6">
-              <el-button type="danger" size="mini" @click="removeFilePath(index)" >删除一集</el-button>
-            </el-col>
-          </el-row>
-        </div>
-      </el-form-item>
-      <el-form-item>
-        <div style="padding-left: 5px;">
-          <el-button type="primary" plain icon="el-icon-plus" @click="addFilePath">添加一集</el-button>
-        </div>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="isEditDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="editForm.id ? submitEdit() : submitCreate()">
-        {{ editForm.id ? '保存' : '创建' }}
-      </el-button>
-    </div>
-  </div>
-  </el-dialog>
+            </el-tab-pane>
+
+            <el-tab-pane label="资源管理" name="resources">
+              <el-form-item label="资源管理">
+                <div v-for="(file, index) in editForm.filePath" :key="index" class="file-item">
+                  <el-row>
+                    <el-col :span="4">
+                      <el-input-number v-model="file.episodes" :min="1" label="集数" />
+                    </el-col>
+                    <el-col :span="12">
+                      <div style="padding-left: 80px;padding-right: 20px;">
+                        <el-input v-model="file.fileName" placeholder="文件名" />
+                      </div>
+                    </el-col>
+                    <el-col :span="6">
+                      <el-button type="danger" size="mini" @click="removeFilePath(index)">删除一集</el-button>
+                    </el-col>
+                  </el-row>
+                </div>
+              </el-form-item>
+              <el-form-item>
+                <div style="padding-left: 5px;">
+                  <el-button type="primary" plain icon="el-icon-plus" @click="addFilePath">添加一集</el-button>
+                </div>
+              </el-form-item>
+            </el-tab-pane>
+          </el-tabs>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isEditDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="editForm.id ? submitEdit() : submitCreate()">
+          {{ editForm.id ? '保存' : '创建' }}
+        </el-button>
+      </div>
+    </el-dialog>
 
 
-   <!-- 上传视频对话框 -->
-   <el-dialog v-model="isUploadDialogVisible" title="上传视频">
-    <el-form :model="uploadForm" label-width="100px">
-      <el-form-item label="集数">
-        <el-input-number v-model="uploadForm.episodes" :min="1" />
-      </el-form-item>
-      <el-form-item label="选择文件">
-        <input
-          type="file"
-          @change="handleFileChange"
-          accept="video/*"
-          class="file-input"
-        />
-        <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
-      </el-form-item>
-      <el-form-item label="字幕文件 (可选)">
-      <input
-        type="file"
-        @change="handleSubtitleChange"
-        accept=".txt,.ass,.vtt,.srt"
-        class="file-input"
-      />
-      <span v-if="selectedSubtitleFile" class="file-name">已选择字幕: {{ selectedSubtitleFile.name }}</span>
-    </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="closeVideoUploadDialog()">取消</el-button>
-      <el-button type="primary" @click="uploadVideo">上传</el-button>
-    </div>
-  </el-dialog>
+    <!-- 上传视频对话框 -->
+    <el-dialog v-model="isUploadDialogVisible" title="上传视频">
+      <el-form :model="uploadForm" label-width="100px">
+        <el-form-item label="集数">
+          <el-input-number v-model="uploadForm.episodes" :min="1" />
+        </el-form-item>
+        <el-form-item label="选择文件">
+          <input type="file" @change="handleFileChange" accept="video/*" class="file-input" />
+          <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
+        </el-form-item>
+        <el-form-item label="字幕文件 (可选)">
+          <input type="file" @change="handleSubtitleChange" accept=".txt,.ass,.vtt,.srt" class="file-input" />
+          <span v-if="selectedSubtitleFile" class="file-name">已选择字幕: {{ selectedSubtitleFile.name }}</span>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeVideoUploadDialog()">取消</el-button>
+        <el-button type="primary" @click="uploadVideo">上传</el-button>
+      </div>
+    </el-dialog>
 
-  <!-- 上传封面对话框 -->
-  <el-dialog v-model="isUploadCoverDialogVisible" title="上传封面">
-    <el-form :model="uploadForm" label-width="100px">
-      <el-form-item label="选择文件">
-        <input
-          type="file"
-          @change="handleFileChange"
-          accept="image/*"
-          class="file-input"
-        />
-        <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="isUploadCoverDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="uploadCover">上传</el-button>
-    </div>
-  </el-dialog>
+    <!-- 上传封面对话框 -->
+    <el-dialog v-model="isUploadCoverDialogVisible" title="上传封面">
+      <el-form :model="uploadForm" label-width="100px">
+        <el-form-item label="选择文件">
+          <input type="file" @change="handleFileChange" accept="image/*" class="file-input" />
+          <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isUploadCoverDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="uploadCover">上传</el-button>
+      </div>
+    </el-dialog>
 
-  <!-- 上传字幕对话框 -->
-  <el-dialog v-model="isUploadSubtitleDialogVisible" title="上传字幕">
-    <el-form :model="uploadForm" label-width="100px">
-      <p style="color: red;">注意：web播放器可能不支持外挂字幕，建议上传视频时选中直接渲染</p>
-      <el-form-item label="集数">
-        <el-input-number v-model="uploadForm.episodes" :min="1" />
-      </el-form-item>
-      <el-form-item label="选择外挂字幕文件">
-        <input
-          type="file"
-          @change="handleFileChange"
-          accept="*"
-          class="file-input"
-        />
-        <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="isUploadSubtitleDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="uploadSubtitle">上传</el-button>
-    </div>
-  </el-dialog>
+    <!-- 上传字幕对话框 -->
+    <el-dialog v-model="isUploadSubtitleDialogVisible" title="上传字幕">
+      <el-form :model="uploadForm" label-width="100px">
+        <p style="color: red;">注意：web播放器可能不支持外挂字幕，建议上传视频时选中直接渲染</p>
+        <el-form-item label="集数">
+          <el-input-number v-model="uploadForm.episodes" :min="1" />
+        </el-form-item>
+        <el-form-item label="选择外挂字幕文件">
+          <input type="file" @change="handleFileChange" accept="*" class="file-input" />
+          <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isUploadSubtitleDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="uploadSubtitle">上传</el-button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
@@ -168,8 +161,9 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { request,fileRequest } from '@/utils/request'; // 引入自定义 request
+import { request, fileRequest } from '@/utils/request'; // 引入自定义 request
 
+const activeTab = ref('info'); // 默认选中的 Tab
 const videoList = ref([]);
 const total = ref(0);
 const pageSize = ref(15);
@@ -185,6 +179,35 @@ const editForm = reactive({
   releaseDate: '',
   filePath: [],
 });
+
+const types = [
+  '日系', '完结', '热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园',
+  '青春', '恋爱', '爱情', '日常', '搞笑', '推理', '悬疑', '机战', '运动', '战争', '战斗',
+  '励志', '致郁', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他'
+];
+
+// 判断标签是否被选中
+const isTagSelected = (tag) => {
+  return editForm.tags.includes(tag);
+};
+
+// 切换标签选择状态
+const toggleTag = (tag) => {
+  // 阻止默认表单提交行为
+  event.preventDefault();
+  
+  const existingTags = editForm.tags.split(',').map(t => t.trim()).filter(t => t);
+  
+  if (existingTags.includes(tag)) {
+    // 如果标签已经存在，从标签列表中移除
+    const updatedTags = existingTags.filter((existingTag) => existingTag !== tag);
+    editForm.tags = updatedTags.join(', ');
+  } else {
+    // 否则，添加标签
+    const updatedTags = [...existingTags, tag];
+    editForm.tags = updatedTags.join(', ');
+  }
+};
 
 // 当前操作的视频行
 const currentRow = ref(null);
@@ -231,10 +254,17 @@ const loadVideoList = async () => {
       params: { size: pageSize.value },
     });
     if (pageResponse.data.status) {
-      total.value = pageResponse.data.data*10; // ElementPlus为什么要页数乘以10，而不能直接赋值？我也不知道，反正官方是这样操作的
+      total.value = pageResponse.data.data * 10; // ElementPlus为什么要页数乘以10，而不能直接赋值？我也不知道，反正官方是这样操作的
     }
   } catch (error) {
     console.error('加载视频列表失败', error);
+  }
+};
+
+// 添加标签
+const addTag = (tag) => {
+  if (!editForm.tags.includes(tag)) {
+    editForm.tags = editForm.tags ? editForm.tags + ',' + tag : tag;
   }
 };
 
@@ -257,10 +287,11 @@ const editVideoInfo = async (row) => {
   loadingDetail.value = true;
   try {
     currentRow.value = row;
-    Object.assign(editForm, { ...row,
+    Object.assign(editForm, {
+      ...row,
       rating: parseFloat(row.rating),
-     });
-     console.log(editForm);
+    });
+    console.log(editForm);
     const response = await request.get(`/anime/getDetail/${row.id}`);
     if (response.data.status) {
       editForm.filePath = response.data.data.filePath || [];
@@ -281,30 +312,30 @@ const editVideoInfo = async (row) => {
 // 提交修改
 const submitEdit = async () => {
   try {
-    try{
-      if(editForm.tags){
+    try {
+      if (editForm.tags) {
         // 替换中文逗号为英文逗号
-      editForm.tags = editForm.tags.replace(/，/g, ',');
-      const invalidCharRegex = /[@\$%\^&\*\(\)\_+\-={}\[\]:";'<>\?\/`]/;
-      if (invalidCharRegex.test(editForm.tags)) {
-        ElMessage.error('标签中包含非法字符！');
-        throw new Error('标签中包含非法字符！');
+        editForm.tags = editForm.tags.replace(/，/g, ',');
+        const invalidCharRegex = /[@\$%\^&\*\(\)\_+\-={}\[\]:";'<>\?\/`]/;
+        if (invalidCharRegex.test(editForm.tags)) {
+          ElMessage.error('标签中包含非法字符！');
+          throw new Error('标签中包含非法字符！');
+        }
+        editForm.tags = editForm.tags.split(',').map(tag => tag.trim());
       }
-        editForm.tags=editForm.tags.split(',').map(tag => tag.trim());
-      }
-    }catch(error){
+    } catch (error) {
       ElMessage.error('Tags类型转换失败，请联络管理员！');
       throw new Error('Tags类型转换失败，请联络管理员！');
     }
     const payload = { ...editForm }; // 准备发送的数据
     const response = await request.post(`/anime/updateAnime`, payload);
-    if(response.data.status) {
+    if (response.data.status) {
       ElMessage.success('视频信息更新成功！');
-    }else{
+    } else {
       ElMessage({
-          type: 'error',
-          message: `修改失败: ${response.data.error || '未知错误'}`,
-        });
+        type: 'error',
+        message: `修改失败: ${response.data.error || '未知错误'}`,
+      });
     }
     isEditDialogVisible.value = false;
     loadVideoList(); // 刷新列表
@@ -333,7 +364,7 @@ const submitCreate = async () => {
 
     // 发送请求，创建新的视频
     const response = await request.post(`/anime/createAnime`, payload);
-    
+
     // 判断返回结果
     if (response.data.status) {
       ElMessage.success('视频信息创建成功！');
@@ -357,7 +388,7 @@ const removeFilePath = (index) => {
 };
 
 //关闭对话框
-const closeVideoUploadDialog = () =>{
+const closeVideoUploadDialog = () => {
   isUploadDialogVisible.value = false
   selectedFile.value = null
   selectedSubtitleFile.value = null
@@ -493,7 +524,7 @@ const uploadCover = async () => {
     ElMessage.error('请先选择文件！');
     return;
   }
-  uploadForm.episodes=1; //封面只会存在于第一集，先重置变量
+  uploadForm.episodes = 1; //封面只会存在于第一集，先重置变量
   const formData = new FormData();
   formData.append('animeId', uploadForm.animeId);
   formData.append('episodes', String(uploadForm.episodes));
@@ -576,6 +607,31 @@ onMounted(() => {
   padding: 20px;
 }
 
+.tag-list {
+  display: grid;
+  padding: 15px;
+  gap: 10px;
+  grid-template-columns: repeat(5, 5fr);
+}
+
+.tag-btn {
+  border: 2px solid #ff8c0000;
+  background: #e2e4e8;
+  padding: 8px 2px;
+  border-radius: 4px;
+}
+
+.tag-btn.selected {
+  color: #ff8d00;
+  border: 2px solid #ff8d00;
+  background: #ffffff;
+}
+
+.tag-btn:hover {
+  color: #ff8d00;
+  border: 2px solid #ff8d00;
+}
+
 /* 操作按钮组样式 */
 .button-group {
   display: flex;
@@ -591,9 +647,9 @@ onMounted(() => {
 }
 
 .el-table .el-button {
-  margin: 0; /* 表格中的按钮不需要额外的外边距 */
+  margin: 0;
+  /* 表格中的按钮不需要额外的外边距 */
 }
-
 
 .el-button:hover {
   background-color: #f0f0f0;
@@ -688,7 +744,7 @@ onMounted(() => {
 }
 
 
-.file-item{
+.file-item {
   padding: 6px;
 }
 </style>

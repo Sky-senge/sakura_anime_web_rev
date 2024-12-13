@@ -10,7 +10,7 @@
         <div class="title-name">随便看看</div>
       </div>
       <a href="javascript:void(0)" class="view-more" @click="refreshRecommendations"><i
-          class="bi bi-arrow-clockwise"></i>换一批</a>
+          class="bi bi-arrow-clockwise"></i> 换一批</a>
     </div>
     <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
       <RandomRecommendationPicturesCom :key="refreshKey" />
@@ -20,7 +20,7 @@
         <div class="dot"></div>
         <div class="title-name">热门推荐</div>
       </div>
-      <a href="javascript:void(0)" @click="jumpTo('/sort')" class="view-more">更多<i class="bi bi-chevron-compact-right"></i></a>
+      <a href="javascript:void(0)" @click="jumpTo('/sort')" class="view-more">更多 <i class="bi bi-chevron-compact-right"></i></a>
     </div>
     <VideoList />
   </section>

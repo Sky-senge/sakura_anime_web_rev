@@ -103,7 +103,7 @@ export default defineComponent({
   gap: 12px;
   padding: 20px;
   grid-template-columns: repeat(4, 1fr);
-  background-color: #f2f4f8;
+  background-color: #f0f2f8;
   margin: 0 auto;
   user-select: none;
   transition: all .3s;
@@ -121,7 +121,7 @@ export default defineComponent({
   overflow: hidden;
   transform: scale(0.95);
   transition: all .2s;
-  background: #e0e0e0;
+  background: #ececec;
 }
 
 .video-thumbnail:hover {
