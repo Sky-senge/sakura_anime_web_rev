@@ -58,6 +58,7 @@
 import { ref, reactive, onMounted, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
+import { usePlayerStore } from '@/stores/playerStore';
 import Artplayer from '/src/components/Artplayer.vue';
 import Hls from 'hls.js';
 import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitles';
@@ -68,6 +69,7 @@ import { ElMessage } from 'element-plus';
 // 获取路由参数
 const router = useRouter();
 const route = useRoute();
+const playerStore = usePlayerStore();
 const animeId = route.params.animeId as string;
 const episode = route.params.episode as string;
 
@@ -159,6 +161,7 @@ const artPlayerInstance = ref<any>(null);
 // 获取 Artplayer 实例
 function getInstance(instance: any) {
   artPlayerInstance.value = instance;
+  playerStore.setPlayerInstance(instance) //设置到Pinia进行跨状态管理
   console.log('Artplayer 实例:', instance);
 }
 

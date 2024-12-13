@@ -33,6 +33,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute,useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user';
+import { usePlayerStore } from '@/stores/playerStore';
 import { ElMessageBox } from 'element-plus';
 
 // 控制登录框的显示状态
@@ -40,8 +41,9 @@ import { ElMessageBox } from 'element-plus';
 const router = useRouter();
 const route = useRoute();
 
-// userStore实例化
+// userStore,artPlayerStore实例化
 const userStore = useUserStore();
+const playerStore = usePlayerStore();
 
 // 登录表单数据
 // const loginForm = reactive({
@@ -82,7 +84,8 @@ const jumpTo = (path: string) => {
   router.push(path)
   // 防止被播放器卡住
   if(route.name==='Videoplayback'){
-    window.location.href = path;
+    playerStore.destroyPlayerInstance(); //跳转前销毁播放器实例
+    router.replace(path)
   }
 }
 
