@@ -9,7 +9,7 @@
         <div class="dot"></div>
         <div class="title-name">随便看看</div>
       </div>
-      <a href="javascript:void(0)" class="view-more" @click="refreshRecommendations">刷新</a>
+      <a href="javascript:void(0)" class="view-more" @click="refreshRecommendations"><i class="bi bi-arrow-clockwise"></i>换一批</a>
     </div>
     <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
       <RandomRecommendationPicturesCom :key="refreshKey" />
@@ -19,7 +19,7 @@
         <div class="dot"></div>
         <div class="title-name">热门推荐</div>
       </div>
-      <a href="/sort" class="view-more">更多</a>
+      <a href="/sort" class="view-more">更多<i class="bi bi-chevron-compact-right"></i></a>
     </div>
     <VideoList />
   </section>
@@ -62,7 +62,7 @@ const handleAnimationEnd = () => {
 }
 
 .slide-out {
-  animation: slideOut 0.2s forwards;
+  animation: slideOut 0.3s forwards;
 }
 
 .slide-in {
@@ -77,14 +77,14 @@ const handleAnimationEnd = () => {
 
   100% {
     opacity: 0;
-    transform: translateY(-100%);
+    transform: translateY(-20%);
   }
 }
 
 @keyframes slideIn {
   0% {
     opacity: 0;
-    transform: translateY(100%);
+    transform: translateY(20%);
   }
 
   100% {
