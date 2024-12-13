@@ -52,7 +52,7 @@
             <section class="episode-list">
                 <ul>
                     <li v-for="(episode, index) in episodes" :key="index">
-                        <a :href="'/videoplayback/' + videoDetail.id + '/' + (index + 1)" @click="playEpisode(index)"
+                        <a href="javascript:void(0)" @click="playEpisode(index)"
                             class="episode-link">
                             <span class="episode-number">第{{ index + 1 }}集</span>
                             <!-- 没有名字数据，所以注释掉吧 -->
@@ -118,6 +118,10 @@ const addToFavorites = () => {
     ElMessage.success('已添加到收藏夹');
 };
 
+// 导航跳转方法
+const jumpTo = (path: string) => {
+  router.push(path)
+}
 
 // 举报动漫的功能方法
 const reportAnime = () => {
@@ -139,6 +143,8 @@ const reportAnime = () => {
 // 播放剧集的功能函数，目前仅提示即将播放，实际应用会使用路由跳转
 const playEpisode = (index: number) => {
     ElMessage.info(`即将播放第${index + 1}集，请稍候...`);
+    const url='/videoplayback/' + videoDetail.id + '/' + (index + 1)
+    jumpTo(url)
 };
 
 // 获取动漫列表并更新视频信息
