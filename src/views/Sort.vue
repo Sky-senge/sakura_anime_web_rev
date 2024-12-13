@@ -83,6 +83,7 @@ import { onMounted, ref, watch } from 'vue';
 import Navbar from '/src/components/navbar-component.vue';
 import request from '@/utils/request';
 import router from '@/router';
+import { ElMessage } from 'element-plus';
 
 
 const animeList = ref<Anime[]>([]);
@@ -95,6 +96,21 @@ interface Anime {
   rating: number;
   releaseDate: string;
   filePath: { episodes: number; fileName: string }[];
+}
+
+// 最后更新时间
+const lastTableUpdateTimestap =ref<LTUTModel>(
+  { 
+    videoLastUpdate:'',
+    userLastUpdate:'0',
+    commentLastUpdate:''
+  }
+);
+// 定义 lastTableUpdateTimestap 接口类型
+interface LTUTModel{
+  videoLastUpdate: string,
+  userLastUpdate: string,
+  commentLastUpdate: string
 }
 
 // 选项卡数据
@@ -247,6 +263,21 @@ const handleCurrentPageChange = (page: number) => {
   fetchAnimeList();
 };
 
+const fetchLastUpdateTimestep = async () =>{
+  try{ //获取最后更新的时间点的方法
+    const response = await request.get('/getLastUpdate');
+    if(response.data.status){
+      const responseData = response.data.data
+      lastTableUpdateTimestap.value.commentLastUpdate = responseData.commentLastUpdate;
+      lastTableUpdateTimestap.value.videoLastUpdate = responseData.videoLastUpdate;
+      console.log("最后更新数据")
+      console.log(lastTableUpdateTimestap.value)
+    }
+  }catch(e){
+    console.error(e);
+    ElMessage.error("网络异常");
+  }
+}
 // 监听筛选条件变化并重新获取动漫列表
 watch([
   selectedType,
@@ -257,7 +288,10 @@ watch([
   selectedLetter
 ], fetchAnimeList);
 
-onMounted(fetchAnimeList)
+onMounted(()=>{
+  fetchAnimeList()
+  // fetchLastUpdateTimestep() //获取最后更新的时间点
+})
 </script>
 
 <style scoped>
