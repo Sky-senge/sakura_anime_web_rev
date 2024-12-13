@@ -44,7 +44,7 @@ const loginData = ref({
 const router = useRouter();
 
 const signIn = async () => {
-  console.log('Sign In:', loginData.value);
+try{
   var response = await request.post('/user/login', loginData.value)
   if (response.data.status) {
     const { token, userId } = response.data.data
@@ -65,6 +65,10 @@ const signIn = async () => {
       ElMessage.error("登录失败！" + response.data.error)
     }
   }
+}catch{
+  ElMessage.error('网络错误')
+}
+  
 };
 const handleClose = () => {
   return null;
