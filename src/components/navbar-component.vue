@@ -6,6 +6,7 @@
         <button size="small" class="nav-button-l" @click="jumpTo('/')">首页</button>
         <button size="small" class="nav-button-l" @click="jumpTo('/sort')">全部</button>
         <button size="small" class="nav-button-l" @click="jumpTo('/ranking')">排行榜</button>
+        <button size="small" class="nav-button-l" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
       </nav>
       <div class="search-concent" v-show="!isSearchActive">
         <i class="bi bi-search"></i>
@@ -19,7 +20,8 @@
       </div>
       <nav class="right-nav" v-show="!isSearchActive">
         <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
-        <button size="small" class="nav-button" @click="jumpTo('/login')">登录</button>
+        <button size="small" class="nav-button" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
+        <button size="small" class="nav-button" @click="logout" v-if="isLoggedIn">退出登录</button>
         <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
       </nav>
     </div>
@@ -29,12 +31,17 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute,useRouter } from 'vue-router'
-// import request from '@/utils/request'
+import request from '@/utils/request'
+import { useUserStore } from '@/stores/user';
+import { ElMessageBox } from 'element-plus';
 
 // 控制登录框的显示状态
 // const dialogVisible = ref(false)
 const router = useRouter();
 const route = useRoute();
+
+// userStore实例化
+const userStore = useUserStore();
 
 // 登录表单数据
 // const loginForm = reactive({
@@ -57,6 +64,12 @@ const isSearchActive = ref(false)
 // 搜索文本
 const searchText = ref('')
 
+// 是否已登录
+const isLoggedIn = ref(false); // 记录用户是否登录的状态，初始为未登录
+
+//是否为管理员
+const isAdmin = ref(false); //检查是否为管理员
+
 // 重置表单
 // const resetForm = (done?: () => void) => {
 //   loginForm.username = ''
@@ -70,6 +83,52 @@ const jumpTo = (path: string) => {
   // 防止被播放器卡住
   if(route.name==='Videoplayback'){
     window.location.href = path;
+  }
+}
+
+const logout = () => {
+  ElMessageBox.confirm(
+    "确定要登出吗？",
+    '警告',
+    {
+      confirmButtonText:'确定',
+      cancelButtonText:'取消',
+      type:'warning',
+    }
+  ).then(()=>{
+    userStore.clearUser();
+    isLoggedIn.value = false; // 退出登录成功，更新登录状态为未登录
+    router.push('/')
+    window.location.href = '/'; //刷新完成登出
+  })
+};
+
+const checkUserPermissionLv = async () => { // 检查用户权限是否满足
+  try {
+    const response = await request.get('/user/getDetail');
+    if (response.data.status && response.data.data) {
+      if (response.data.data.permission === 0) {
+        isAdmin.value = true;  // 如果权限为0（管理员），设置flag
+      } else {
+        isAdmin.value = false;
+      }
+    } else {
+      isAdmin.value = false;
+    }
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+  }
+};
+
+// 加载数据
+const loadData = () =>{
+userStore.loadUser()
+if(userStore.token.length!=0){
+  // checkUserPermissionLv()
+  isLoggedIn.value=true
+  if(userStore.isAdmin===true){
+    isAdmin.value=true; //从UserStore中获取状态
+  }
   }
 }
 
@@ -132,6 +191,7 @@ onMounted(() => {
   window.addEventListener('resize', handleWindowMaximized)
   // 在初始化时检查一次窗口大小
   handleResize()
+  loadData()
 })
 
 // 在组件卸载时移除监听器

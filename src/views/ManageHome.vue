@@ -39,13 +39,13 @@
         </el-menu>
       </el-aside>
       <el-container>
-        <el-header class="header">
+        <!-- <el-header class="header">
           Sakura Anime 后台管理
           <div class="header-buttons">
             <button type="primary" @click="login" v-if="!isLoggedIn">登录</button>
             <button type="info" @click="logout" v-if="isLoggedIn">退出登录</button>
           </div>
-        </el-header>
+        </el-header> -->
         <el-main class="main">
           <component :is="currentPanel" />
         </el-main>
