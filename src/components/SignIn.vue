@@ -31,10 +31,10 @@ import request from '@/utils/request';
 const userStore = useUserStore();
 const dialogVisible = ref(false);
 
-const switchToSignUp = () => {
-  isSignUp.value = true;
-  currentComponent.value = SignUp;
-};
+// const switchToSignUp = () => {
+//   isSignUp.value = true;
+//   currentComponent.value = SignUp;
+// };
 
 const loginData = ref({
   username: '',
