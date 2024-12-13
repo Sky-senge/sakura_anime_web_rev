@@ -41,13 +41,18 @@ const router = createRouter({
           name: 'VideoDetails',
           component: VideoDetails,
         },
+        {
+          path: '/manage',
+          name: 'homeManage',
+          component: ManageHome,
+        },
       ]
     },
-    {
-      path: '/manage',
-      name: 'homeManage',
-      component: ManageHome,
-    },
+    // {
+    //   path: '/manage',
+    //   name: 'homeManage',
+    //   component: ManageHome,
+    // },
     {
       path: '/login',
       name: 'login',
