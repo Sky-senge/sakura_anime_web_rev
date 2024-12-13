@@ -21,7 +21,17 @@
       <nav class="right-nav" v-show="!isSearchActive">
         <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
         <button size="small" class="nav-button" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
-        <button size="small" class="nav-button" @click="logout" v-if="isLoggedIn">退出登录</button>
+        <el-dropdown v-if="isLoggedIn">
+        <span class="nav-button">
+          欢迎！{{ currentUserName }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item :icon="User">用户详情</el-dropdown-item>
+            <el-dropdown-item :icon="SwitchButton" @click="logout">登出</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
         <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
       </nav>
     </div>
@@ -35,6 +45,10 @@ import request from '@/utils/request'
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
 import { ElMessageBox } from 'element-plus';
+import {
+  SwitchButton,
+  User
+} from '@element-plus/icons-vue'
 
 // 控制登录框的显示状态
 // const dialogVisible = ref(false)
@@ -71,6 +85,8 @@ const isLoggedIn = ref(false); // 记录用户是否登录的状态，初始为�
 
 //是否为管理员
 const isAdmin = ref(false); //检查是否为管理员
+
+const currentUserName = ref(''); //当前用户名
 
 // 重置表单
 // const resetForm = (done?: () => void) => {
@@ -128,7 +144,12 @@ const loadData = () =>{
 userStore.loadUser()
 if(userStore.token.length!=0){
   // checkUserPermissionLv()
-  isLoggedIn.value=true
+  isLoggedIn.value=true //标记已登录
+  if(userStore.displayName!=''){
+    currentUserName.value = userStore.displayName; //如果有的话，获取DisplayName，否则获取username
+  }else{
+    currentUserName.value = userStore.username;
+  }
   if(userStore.isAdmin===true){
     isAdmin.value=true; //从UserStore中获取状态
   }
