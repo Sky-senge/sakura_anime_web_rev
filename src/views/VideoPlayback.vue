@@ -12,16 +12,22 @@
           </div>
           <!-- 评论区 -->
           <div class="comment-section">
-            <div class="section-title">评论<div class="section-title2">评论</div></div>
+            <div class="section-title">评论<div class="section-title2">评论</div>
+            </div>
             <div class="textarea">
               <textarea v-model="newComment.content" placeholder="这里是评论区,不是无人区"></textarea>
-              <button @click="addComment" >发表评论</button>
+              <button @click="addComment">发表评论</button>
             </div>
             <ul>
               <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
                 <p><strong>{{ comment.username }}</strong>：{{ comment.content }}</p>
               </li>
             </ul>
+            <!-- 分页器 -->
+            <el-pagination 
+              background 
+              layout="prev, pager, next" :total="total"
+              @current-change="handleCurrentPageChange" />
           </div>
         </div>
         <div class="right">
@@ -276,6 +282,29 @@ onMounted(() => {
     console.error('animeId is missing');
   }
 });
+
+// 总页数
+const total = ref(0);
+// 当前页
+const currentPage = ref(1);
+// 分页处理
+const handleCurrentPageChange = (page: number) => {
+  currentPage.value = page;
+  CommentListPage();
+};
+
+//获取评论页数
+// const CommentListPage = async () => {
+//   try {
+//     //获取评论标签页数据
+//     const Commentaccordingly = await request.get('/comment/countCommentPage',{
+//       params:{
+//         page:,
+//         size:,
+//       },
+//     });
+//   }
+// };
 </script>
 
 
