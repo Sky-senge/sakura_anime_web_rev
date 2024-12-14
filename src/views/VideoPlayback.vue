@@ -328,6 +328,7 @@ const handleCurrentPageChange = (page: number) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
 }
 
 .middle {
