@@ -1,4 +1,5 @@
 .container {
+    min-height: 170vh; /* 设置最小高度为视口高度 */
     background-color: #f2f4f8;
     color: #333;
     font-family: 'Arial', sans-serif;
