@@ -240,14 +240,27 @@ function EpisodeBuilder(index: number) {
   }
 }
 
-async function fetchCommentList(animeId:number) {
-  const response = await request.get(`/comment/getCommentList/${animeId}?page=1&size=30`)
+async function fetchCommentList(animeId:number, page: number) {
+  const response = await request.get(`/comment/getCommentList/${animeId}?page=${page}&size=30`)
   if(response.data.status){
     comments.value = response.data.data.map((item: { username: any; }) => ({
         ...item,
         username: item.username || '[匿名用户]',
       }));
     console.log(`更新评论区，动漫ID: ${animeId}`)
+  }
+}
+
+// 获取评论区总页数
+async function fetchTotalyCommentPageNumber(animeId: number) {
+  const response = await request.get('/comment/countCommentPage',{
+    params:{
+      animeId: animeId,
+      size: 30 //和上述fetchCommentList的size保持一致
+    }
+  });
+  if(response.data.status){ // 如果收到是有响应的，那么赋值
+    total.value = response.data.data;
   }
 }
 
@@ -261,7 +274,7 @@ async function addComment() {
     const response = await request.post(`/comment/addComment`,payload);
     if(response.data.status){
       ElMessage.success('评论成功！');
-      fetchCommentList(videoDetail.id);
+      fetchCommentList(videoDetail.id,currentPage.value);
     }else{
       ElMessage.error(`评论失败！${response.data.error}`)
     }
@@ -277,7 +290,8 @@ async function addComment() {
 onMounted(() => {
   if (animeId) {
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
-    fetchCommentList(Number(animeId)); //获取评论列表
+    fetchCommentList(Number(animeId),1); //获取评论列表,打开时默认显示第一页
+    fetchTotalyCommentPageNumber(Number(animeId)) //获取评论总页数
   } else {
     console.error('animeId is missing');
   }
@@ -289,8 +303,8 @@ const total = ref(0);
 const currentPage = ref(1);
 // 分页处理
 const handleCurrentPageChange = (page: number) => {
-  currentPage.value = page;
-  CommentListPage();
+  currentPage.value = page; //更新当前评论页数字
+  fetchCommentList(videoDetail.id,page)
 };
 
 //获取评论页数
