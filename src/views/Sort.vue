@@ -54,6 +54,7 @@
           <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === tab.name }"
             @click="activeTab = tab.name">{{ tab.label }}</button>
         </div>
+        <!-- 分页器 -->
         <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
       </div>
       <div class="video-list">
@@ -73,7 +74,7 @@
         </div>
       </div>
       <!-- 分页器 -->
-      <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
+      <!-- <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" /> -->
     </div>
   </div>
 </template>
