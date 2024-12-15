@@ -74,7 +74,7 @@
         </div>
       </div>
       <!-- 分页器 -->
-      <!-- <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" /> -->
+      <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
     </div>
   </div>
 </template>
