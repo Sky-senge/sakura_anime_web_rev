@@ -521,7 +521,7 @@ onMounted(() => {
 
 /* 重新筛选按钮样式 */
 .reset-button {
-  background: none;
+  background: #e1e5ef;
   color: rgb(68, 68, 68);
   border: none;
   border-radius: 4px;

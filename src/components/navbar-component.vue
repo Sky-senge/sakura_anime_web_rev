@@ -278,13 +278,17 @@ onBeforeUnmount(() => {
 .right-nav {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 25px;
 }
 
 @media (max-width: 1280px) {
   .nav {
-  width: 100%;
-}
+    width: 100%;
+  }
+
+  .left-nav {
+    gap: 15px;
+  }
 
   .search-concent {
     width: 550px;
@@ -293,8 +297,12 @@ onBeforeUnmount(() => {
 
 @media (max-width: 1100px) {
   .nav {
-  width: 90%;
-}
+    width: 90%;
+  }
+
+  .left-nav {
+    gap: 10px;
+  }
 
   .search-concent {
     width: 300px;
@@ -304,8 +312,8 @@ onBeforeUnmount(() => {
 @media (max-width: 805px) {
 
   .nav {
-  width: 100%;
-}
+    width: 100%;
+  }
 
   .left-nav,
   .right-nav {
@@ -359,10 +367,10 @@ onBeforeUnmount(() => {
     color: #ff4d00;
   }
 
-  .bi{
+  .bi {
     cursor: pointer;
   }
-  
+
   .nav-button-l,
   .nav-button {
     font-size: 0.88rem;
