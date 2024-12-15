@@ -165,6 +165,9 @@ onMounted(loadData);
   flex-direction: column;
   padding-top: 20px;
   gap: 10px;
+  height: 100%; /* 占满视口高度 */
+  width: 30vh; /* 保持原来的宽度比例 */
+  overflow: hidden; /* 禁止滚动 */
   align-items: center;
 }
 
@@ -245,5 +248,7 @@ border-radius: 25px;
 .main {
   padding: 20px;
   background-color: #f5f7fa;
+  height: calc(100vh - 40px); /* 减去顶部内边距或其他固定高度 */
+  overflow-y: auto; /* 允许纵向滚动，防止滚动传递到外部导致阻塞 */
 }
 </style>
