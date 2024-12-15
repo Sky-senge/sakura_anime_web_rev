@@ -51,7 +51,15 @@
           </div>
           <!-- 视频推荐 -->
           <div class="lll">
-
+            <div class="title-warp">
+              <div class="dot"></div>
+              <div class="title">为你推荐</div>
+            </div>
+            <div class="info-recommand-V">
+                <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
+                    <RandomRecommendationVideoPlayback :key="refreshKey" />
+                </div>
+              </div>
           </div>
         </div>
       </div>
@@ -66,6 +74,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
 import Artplayer from '/src/components/Artplayer.vue';
+import RandomRecommendationVideoPlayback from '@/components/RandomRecommendationVideoPlayback.vue';
 import Hls from 'hls.js';
 import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitles';
 import artplayerPluginLibass from 'artplayer-plugin-libass';
@@ -286,12 +295,31 @@ async function addComment() {
   }
 }
 
+const refreshKey = ref(0);
+const animationClass = ref('');
+
+// 触发动画的函数
+const refreshRecommendations = () => {
+  animationClass.value = 'slide-out'; // 触发向上离场动画
+};
+
+// 监听动画结束
+const handleAnimationEnd = () => {
+  if (animationClass.value === 'slide-out') {
+    refreshKey.value += 1; // 更新内容
+    animationClass.value = 'slide-in'; // 触发从底部进入动画
+  } else {
+    animationClass.value = ''; // 清除动画类名
+  }
+};
+
 // 在组件挂载时获取视频详情
 onMounted(() => {
   if (animeId) {
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
     fetchCommentList(Number(animeId),1); //获取评论列表,打开时默认显示第一页
     fetchTotalyCommentPageNumber(Number(animeId)) //获取评论总页数
+    refreshRecommendations() //随机刷新为你推荐
   } else {
     console.error('animeId is missing');
   }
@@ -393,6 +421,15 @@ const handleCurrentPageChange = (page: number) => {
   justify-content: left;
   align-items: center;
   gap: 12%;
+}
+
+.info-recommand-V {
+  margin-top: 12px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  /* gap: 80%; */
+  width: max-content;
 }
 
 .releaseDate {
