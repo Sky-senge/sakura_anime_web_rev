@@ -54,8 +54,8 @@
           <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === tab.name }"
             @click="activeTab = tab.name">{{ tab.label }}</button>
         </div>
-        <!-- 分页器 -->
-        <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
+      <!-- 分页器 -->
+      <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
       </div>
       <div class="video-list">
         <div v-if="animeList.length == 0">
@@ -64,6 +64,8 @@
         <!-- 循环展示 animeList 中的每个视频 -->
         <div v-for="anime in animeList" :key="anime.id" class="video-card" @click="jumpToDetail(anime.id)">
           <div class="video-thumbnail">
+            <!-- 如果包含完结标签，显示“完结” -->
+            <span class="finish" v-if="anime.tags.includes('完结')">完结撒花</span>
             <!-- 如果 filePath 存在且有内容，展示封面图片 -->
             <img v-if="anime.filePath?.length > 0" :src="getCoverUrl(anime.filePath[0].fileName)" :alt="anime.name">
             <!-- 如果 filePath 不存在或为空，展示默认占位符 -->
@@ -73,8 +75,8 @@
           <div class="video-name">{{ anime.name }}</div>
         </div>
       </div>
-      <!-- 分页器 -->
-      <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
+     <!-- 分页器 -->
+     <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
     </div>
   </div>
 </template>
@@ -100,15 +102,15 @@ interface Anime {
 }
 
 // 最后更新时间
-const lastTableUpdateTimestap =ref<LTUTModel>(
-  { 
-    videoLastUpdate:'',
-    userLastUpdate:'0',
-    commentLastUpdate:''
+const lastTableUpdateTimestap = ref<LTUTModel>(
+  {
+    videoLastUpdate: '',
+    userLastUpdate: '0',
+    commentLastUpdate: ''
   }
 );
 // 定义 lastTableUpdateTimestap 接口类型
-interface LTUTModel{
+interface LTUTModel {
   videoLastUpdate: string,
   userLastUpdate: string,
   commentLastUpdate: string
@@ -267,17 +269,17 @@ const handleCurrentPageChange = (page: number) => {
   fetchAnimeList();
 };
 
-const fetchLastUpdateTimestep = async () =>{
-  try{ //获取最后更新的时间点的方法
+const fetchLastUpdateTimestep = async () => {
+  try { //获取最后更新的时间点的方法
     const response = await request.get('/getLastUpdate');
-    if(response.data.status){
+    if (response.data.status) {
       const responseData = response.data.data
       lastTableUpdateTimestap.value.commentLastUpdate = responseData.commentLastUpdate;
       lastTableUpdateTimestap.value.videoLastUpdate = responseData.videoLastUpdate;
       console.log("最后更新数据")
       console.log(lastTableUpdateTimestap.value)
     }
-  }catch(e){
+  } catch (e) {
     console.error(e);
     ElMessage.error("网络异常");
   }
@@ -292,7 +294,7 @@ watch([
   selectedLetter
 ], fetchAnimeList);
 
-onMounted(()=>{
+onMounted(() => {
   fetchAnimeList()
   // fetchLastUpdateTimestep() //获取最后更新的时间点
 })
@@ -482,6 +484,7 @@ onMounted(()=>{
 .video-thumbnail {
   width: 100%;
   height: 150px;
+  position: relative;
   overflow: hidden;
 }
 
@@ -493,7 +496,7 @@ onMounted(()=>{
   transition: all .3s;
 }
 
-.video-card:hover .video-thumbnail img{
+.video-card:hover .video-thumbnail img {
   transform: scale(1.2);
 }
 
@@ -509,7 +512,19 @@ onMounted(()=>{
   text-overflow: ellipsis;
 }
 
-.video-card:hover .video-name{
+.video-card:hover .video-name {
   background: #dadada;
+}
+
+.finish {
+  top: 5px;
+  right: 5px;
+  position: absolute;
+  text-shadow: 1px 1px 1px #d2d2d249;
+  background: linear-gradient(to right, #29a3fa, #5a76ff); /*设置渐变的方向从左到右 颜色从ff0000到ffff00*/
+  -webkit-background-clip: text;/*将设置的背景颜色限制在文字中*/
+  -webkit-text-fill-color: transparent;/*给文字设置成透明*/
+  font-weight: 800;
+  z-index: 200;
 }
 </style>

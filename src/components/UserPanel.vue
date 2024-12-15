@@ -10,9 +10,9 @@
 
     <!-- 用户列表表格 -->
     <el-table :data="userList" style="width: 100%">
-      <el-table-column prop="username" label="真用户名"></el-table-column>
+      <el-table-column prop="username" label="用户名"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
-      <el-table-column prop="displayNameDisplay" label="显示名称"></el-table-column>
+      <el-table-column prop="displayNameDisplay" label="昵称"></el-table-column>
       <el-table-column prop="permissionDisplay" label="权限"></el-table-column>
       <el-table-column prop="remarks" label="备注"></el-table-column>
       <el-table-column label="操作">

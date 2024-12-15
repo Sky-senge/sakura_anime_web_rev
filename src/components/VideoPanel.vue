@@ -13,17 +13,17 @@
     <el-table :data="videoList" style="width: 100%;">
       <el-table-column prop="name" label="视频标题" align="left"></el-table-column>
       <el-table-column prop="tags" label="标签" align="left"></el-table-column>
-      <el-table-column prop="description" label="视频描述" align="left"></el-table-column>
+      <el-table-column prop="description" label="视频简介" align="left"></el-table-column>
       <el-table-column prop="rating" label="评分" align="center"></el-table-column>
       <el-table-column prop="releaseDate" label="发行日期" align="center"></el-table-column>
       <el-table-column prop="status" label="视频状态" align="center"></el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }" class="tile">
           <el-button type="primary" size="small" @click="openUploadVideo(row)">上传视频</el-button>
-          <el-button type="success" size="small" :disabled="row.filePath.length === 0"
+          <el-button type="primary" size="small" :disabled="row.filePath.length === 0"
             @click="openUploadCover(row)">上传封面</el-button>
-          <el-button type="info" size="small" :disabled="row.filePath.length === 0"
-            @click="openUploadSubtitle(row)">外挂字幕</el-button>
+          <el-button type="primary" size="small" :disabled="row.filePath.length === 0"
+            @click="openUploadSubtitle(row)">上传字幕(可选)</el-button>
           <el-button type="warning" size="small" @click="editVideoInfo(row)">修改信息</el-button>
           <el-button type="danger" size="small" @click="unpublishVideo(row)">下架视频</el-button>
         </template>
@@ -34,7 +34,7 @@
     <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
 
     <!-- 编辑/新建 视频对话框 -->
-    <el-dialog v-model="isEditDialogVisible" title="修改视频信息">
+    <el-dialog v-model="isEditDialogVisible" title="修改视频信息"  :before-close="handleDialogClose">
       <div v-loading="loadingDetail">
         <el-form :model="editForm" label-width="100px">
           <!-- Tab栏 -->
@@ -58,15 +58,28 @@
               <el-form-item label="视频标签">
                 <el-input v-model="editForm.tags" placeholder="动漫标签，用逗号分隔" />
               </el-form-item>
-              <div class="tag-list">
-                <button class="tag-btn" v-for="(tag, index) in types" :key="index"
-                  :class="{ 'selected': isTagSelected(tag) }" @click.prevent="toggleTag(tag)">
-                  {{ tag }}
-                </button>
+
+              <div class="tag-categories">
+                <!-- 按分类展示标签 -->
+                <div v-for="(tags, category) in tagCategories" :key="category" class="tag-category">
+                  <div class="category-title">{{ category }}</div>
+                  <div class="tag-list">
+                    <button class="tag-btn" v-for="(tag, index) in tags" :key="index"
+                      :class="{ 'selected': isTagSelected(tag) }" @click.prevent="toggleTag(tag)">
+                      {{ tag }}
+                    </button>
+                  </div>
+                </div>
               </div>
             </el-tab-pane>
 
+
             <el-tab-pane label="资源管理" name="resources">
+              <el-form-item>
+                <div style="padding-left: 5px;">
+                  <el-button type="primary" plain icon="el-icon-plus" @click="addFilePath">新增一集</el-button>
+                </div>
+              </el-form-item>
               <el-form-item label="资源管理">
                 <div v-for="(file, index) in editForm.filePath" :key="index" class="file-item">
                   <el-row>
@@ -79,14 +92,9 @@
                       </div>
                     </el-col>
                     <el-col :span="6">
-                      <el-button type="danger" size="mini" @click="removeFilePath(index)">删除一集</el-button>
+                      <el-button type="danger" size="mini" @click="removeFilePath(index)">删除本集</el-button>
                     </el-col>
                   </el-row>
-                </div>
-              </el-form-item>
-              <el-form-item>
-                <div style="padding-left: 5px;">
-                  <el-button type="primary" plain icon="el-icon-plus" @click="addFilePath">添加一集</el-button>
                 </div>
               </el-form-item>
             </el-tab-pane>
@@ -103,28 +111,34 @@
 
 
     <!-- 上传视频对话框 -->
-    <el-dialog v-model="isUploadDialogVisible" title="上传视频">
+    <el-dialog v-model="isUploadDialogVisible" title="上传视频"   :before-close="handleDialogClose">
       <el-form :model="uploadForm" label-width="100px">
         <el-form-item label="集数">
           <el-input-number v-model="uploadForm.episodes" :min="1" />
         </el-form-item>
+
         <el-form-item label="选择文件">
-          <input type="file" @change="handleFileChange" accept="video/*" class="file-input" />
+          <input type="file" @change="handleFileChange" accept="video/*" class="file-input" ref="videoFileInput" />
           <span v-if="selectedFile" class="file-name">已选择: {{ selectedFile.name }}</span>
         </el-form-item>
+
         <el-form-item label="字幕文件 (可选)">
-          <input type="file" @change="handleSubtitleChange" accept=".txt,.ass,.vtt,.srt" class="file-input" />
+          <input type="file" @change="handleSubtitleChange" accept=".txt,.ass,.vtt,.srt" class="file-input"
+            ref="subtitleFileInput" />
           <span v-if="selectedSubtitleFile" class="file-name">已选择字幕: {{ selectedSubtitleFile.name }}</span>
         </el-form-item>
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeVideoUploadDialog()">取消</el-button>
-        <el-button type="primary" @click="uploadVideo">上传</el-button>
+        <el-button type="primary" :loading="isUploading" :disabled="isUploading || !selectedFile" @click="uploadVideo">
+          上传
+        </el-button>
       </div>
     </el-dialog>
 
     <!-- 上传封面对话框 -->
-    <el-dialog v-model="isUploadCoverDialogVisible" title="上传封面">
+    <el-dialog v-model="isUploadCoverDialogVisible" title="上传封面"  :before-close="handleDialogClose">
       <el-form :model="uploadForm" label-width="100px">
         <el-form-item label="选择文件">
           <input type="file" @change="handleFileChange" accept="image/*" class="file-input" />
@@ -138,7 +152,7 @@
     </el-dialog>
 
     <!-- 上传字幕对话框 -->
-    <el-dialog v-model="isUploadSubtitleDialogVisible" title="上传字幕">
+    <el-dialog v-model="isUploadSubtitleDialogVisible" title="上传字幕"  :before-close="handleDialogClose">
       <el-form :model="uploadForm" label-width="100px">
         <p style="color: red;">注意：web播放器可能不支持外挂字幕，建议上传视频时选中直接渲染</p>
         <el-form-item label="集数">
@@ -159,7 +173,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { request, fileRequest } from '@/utils/request'; // 引入自定义 request
 
@@ -170,6 +184,7 @@ const pageSize = ref(15);
 const currentPage = ref(1);
 const isEditDialogVisible = ref(false);
 const loadingDetail = ref(false);
+const isFormModified = ref(false);
 const editForm = reactive({
   id: null,
   name: '',
@@ -180,25 +195,24 @@ const editForm = reactive({
   filePath: [],
 });
 
-const types = [
-  '完结', '热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园',
-  '青春', '恋爱', '爱情', '日常', '搞笑', '推理', '悬疑', '机战', '运动', '战争', '战斗',
-  '励志', '致郁', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他', 
-  '日本', '大陆', '中国香港', '中国台湾', '韩国', '欧美',
-  '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015',
-  '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2006', '2005', '2004'
-];
+// 监听 editForm 的变化
+watch(editForm, () => {
+  isFormModified.value = true;
+}, { deep: true });
+
+const tagCategories = {
+  状态: ['连载', '完结'],
+  类型: ['热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园', '青春', '恋爱', '爱情', '日常', '搞笑', '推理', '悬疑', '机战', '运动', '战争', '战斗', '励志', '致郁', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他'],
+  地区: ['日本', '大陆', '中国香港', '中国台湾', '韩国', '欧美'],
+  年份: ['2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2006', '2005', '2004']
+};
 
 // 判断标签是否被选中
 const isTagSelected = (tag) => {
   return editForm.tags.includes(tag);
 };
 
-// 切换标签选择状态
 const toggleTag = (tag) => {
-  // 阻止默认表单提交行为
-  event.preventDefault();
-
   const existingTags = editForm.tags.split(',').map(t => t.trim()).filter(t => t);
 
   if (existingTags.includes(tag)) {
@@ -264,23 +278,27 @@ const loadVideoList = async () => {
   }
 };
 
-// 添加标签
+/* // 添加标签
 const addTag = (tag) => {
   if (!editForm.tags.includes(tag)) {
     editForm.tags = editForm.tags ? editForm.tags + ',' + tag : tag;
   }
 };
-
+ */
 // 打开新建视频对话框
 const openCreateDialog = () => {
   // 清空表单数据，准备新增视频
-  editForm.id = null;  // 新建视频无需 id
+  editForm.id = null;  
   editForm.name = '';
   editForm.tags = [];
   editForm.description = '';
   editForm.rating = 1.0;
   editForm.releaseDate = '';
   editForm.filePath = [];
+  
+  // 重置表单修改状态
+  isFormModified.value = false;
+  
   // 显示对话框
   isEditDialogVisible.value = true;
 };
@@ -303,6 +321,9 @@ const editVideoInfo = async (row) => {
       editForm.filePath = [];
     }
 
+    // 重置表单修改状态
+    isFormModified.value = false;
+    
     isEditDialogVisible.value = true;
   } catch (error) {
     console.error('获取视频详情失败', error);
@@ -388,6 +409,33 @@ const submitCreate = async () => {
 // 删除某集
 const removeFilePath = (index) => {
   editForm.filePath.splice(index, 1);
+};
+
+// 修改对话框关闭前的拦截逻辑
+const handleDialogClose = (done) => {
+  if (!isFormModified.value) {
+    // 如果表单未修改，直接关闭
+    isEditDialogVisible.value = false;
+    done();
+  } else {
+    // 如果表单已修改，弹出确认框
+    ElMessageBox.confirm(
+      '您有未保存的修改，确定要关闭对话框吗？',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    ).then(() => {
+      // 确认关闭，重置表单修改状态
+      isFormModified.value = false;
+      isEditDialogVisible.value = false;
+      done();
+    }).catch(() => {
+      // 取消关闭
+    });
+  }
 };
 
 //关闭对话框

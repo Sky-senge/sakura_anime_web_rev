@@ -24,9 +24,7 @@
               </li>
             </ul>
             <!-- 分页器 -->
-            <el-pagination 
-              background 
-              layout="prev, pager, next" :total="total"
+            <el-pagination background layout="prev, pager, next" :total="total"
               @current-change="handleCurrentPageChange" />
           </div>
         </div>
@@ -50,16 +48,13 @@
             </div>
           </div>
           <!-- 视频推荐 -->
-          <div class="lll">
-            <div class="title-warp">
-              <div class="dot"></div>
-              <div class="title">为你推荐</div>
-            </div>
-            <div class="info-recommand-V">
-                <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
-                    <RandomRecommendationVideoPlayback :key="refreshKey" />
-                </div>
+          <div class="video-info-recommmand">
+            <div class="episode-title">相关推荐</div>
+            <div class="info-recommand">
+              <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
+                <RandomRecommendationVideoPlayback :key="refreshKey" />
               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -137,7 +132,7 @@ const videoDetail = reactive<Video>({
   filePath: []
 });
 const comments = ref<commentResponse[]>([]);
-const newComment = ref<Comment>({animeId:-1,userId:-1,content:""});
+const newComment = ref<Comment>({ animeId: -1, userId: -1, content: "" });
 interface Comment {
   animeId: number | null,
   userId: number | null,
@@ -156,12 +151,12 @@ interface Video {
   }[];
 }
 interface commentResponse {
-    id: number,
-    animeId: number,
-    userId: number,
-    username: string,
-    content: string,
-    createAt: string
+  id: number,
+  animeId: number,
+  userId: number,
+  username: string,
+  content: string,
+  createAt: string
 }
 interface Episode {
   episode: string;
@@ -249,26 +244,26 @@ function EpisodeBuilder(index: number) {
   }
 }
 
-async function fetchCommentList(animeId:number, page: number) {
+async function fetchCommentList(animeId: number, page: number) {
   const response = await request.get(`/comment/getCommentList/${animeId}?page=${page}&size=30`)
-  if(response.data.status){
+  if (response.data.status) {
     comments.value = response.data.data.map((item: { username: any; }) => ({
-        ...item,
-        username: item.username || '[匿名用户]',
-      }));
+      ...item,
+      username: item.username || '[匿名用户]',
+    }));
     console.log(`更新评论区，动漫ID: ${animeId}`)
   }
 }
 
 // 获取评论区总页数
 async function fetchTotalyCommentPageNumber(animeId: number) {
-  const response = await request.get('/comment/countCommentPage',{
-    params:{
+  const response = await request.get('/comment/countCommentPage', {
+    params: {
       animeId: animeId,
       size: 30 //和上述fetchCommentList的size保持一致
     }
   });
-  if(response.data.status){ // 如果收到是有响应的，那么赋值
+  if (response.data.status) { // 如果收到是有响应的，那么赋值
     total.value = response.data.data;
   }
 }
@@ -280,11 +275,12 @@ async function addComment() {
     newComment.value.userId = userStore.userId
     newComment.value.animeId = videoDetail.id
     const payload = newComment.value; //包含字段
-    const response = await request.post(`/comment/addComment`,payload);
-    if(response.data.status){
+    const response = await request.post(`/comment/addComment`, payload);
+    if (response.data.status) {
       ElMessage.success('评论成功！');
-      fetchCommentList(videoDetail.id,currentPage.value);
-    }else{
+      newComment.value.content = "";
+      fetchCommentList(videoDetail.id, currentPage.value);
+    } else {
       ElMessage.error(`评论失败！${response.data.error}`)
     }
     // comments.value.push({
@@ -317,7 +313,7 @@ const handleAnimationEnd = () => {
 onMounted(() => {
   if (animeId) {
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
-    fetchCommentList(Number(animeId),1); //获取评论列表,打开时默认显示第一页
+    fetchCommentList(Number(animeId), 1); //获取评论列表,打开时默认显示第一页
     fetchTotalyCommentPageNumber(Number(animeId)) //获取评论总页数
     refreshRecommendations() //随机刷新为你推荐
   } else {
@@ -332,7 +328,7 @@ const currentPage = ref(1);
 // 分页处理
 const handleCurrentPageChange = (page: number) => {
   currentPage.value = page; //更新当前评论页数字
-  fetchCommentList(videoDetail.id,page)
+  fetchCommentList(videoDetail.id, page)
 };
 
 //获取评论页数
@@ -360,7 +356,7 @@ const handleCurrentPageChange = (page: number) => {
 }
 
 .middle {
-  width: 80%;
+  width: 85%;
   min-width: 1200px;
   padding: 20px 35px;
   display: flex;
@@ -375,8 +371,8 @@ const handleCurrentPageChange = (page: number) => {
 }
 
 .video {
-  width: 900px;
-  height: 500px;
+  width: 100%;
+  height: 600px;
 }
 
 .left {
@@ -476,7 +472,7 @@ const handleCurrentPageChange = (page: number) => {
   display: grid;
   gap: 16px;
   padding: 10px 12px;
-  grid-template-columns: repeat(auto-fit, minmax(40px, 5fr));
+  grid-template-columns: repeat(6, 1fr);
   overflow-y: auto;
 }
 
@@ -494,7 +490,7 @@ const handleCurrentPageChange = (page: number) => {
   background-color: #ff0d00;
 }
 
-.tags{
+.tags {
   margin: 15px 5px;
   display: flex;
   align-items: center;
@@ -502,12 +498,12 @@ const handleCurrentPageChange = (page: number) => {
   flex-wrap: nowrap;
 }
 
-.tag{
-user-select: none;
- border-radius: 8px;
- background: #dcdcdc;
- padding: 6px 12px;
- font-weight: 600;
+.tag {
+  user-select: none;
+  border-radius: 8px;
+  background: #dcdcdc;
+  padding: 6px 12px;
+  font-weight: 600;
 }
 
 .comment-section {
@@ -588,6 +584,20 @@ li {
   padding: 5px 10px;
   border-radius: 5px;
   margin-bottom: 10px;
-color: #666;
+  color: #666;
+}
+
+.video-info-recommmand{
+  user-select: none;
+  margin-top: 30px;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #e2e4e8;
+
+}
+.info-recommand{
+  width: 100%;
+  height: 600px;
+  overflow-y: auto;
 }
 </style>
