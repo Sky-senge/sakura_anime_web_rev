@@ -55,7 +55,7 @@
             @click="activeTab = tab.name">{{ tab.label }}</button>
         </div>
         <!-- 分页器 -->
-        <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
+        <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
       </div>
       <div class="video-list">
         <div v-if="animeList.length == 0">
@@ -74,7 +74,7 @@
         </div>
       </div>
       <!-- 分页器 -->
-      <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
+      <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
     </div>
   </div>
 </template>
@@ -124,6 +124,8 @@ const activeTab = ref('anime');
 const total = ref(0);
 // 当前页
 const currentPage = ref(1);
+// 给个分页器刷新的key，使用Vue自带的刷新V-DOM功能
+const currentPageVD = ref(0);
 
 // 类型数据
 const types = [
@@ -261,6 +263,7 @@ const jumpToDetail = (animeId: number) => {
 // 分页处理
 const handleCurrentPageChange = (page: number) => {
   currentPage.value = page;
+  currentPageVD.value += 1; //触发V-DOM更新
   fetchAnimeList();
 };
 
