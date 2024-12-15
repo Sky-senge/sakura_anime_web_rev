@@ -54,6 +54,7 @@
           <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === tab.name }"
             @click="activeTab = tab.name">{{ tab.label }}</button>
         </div>
+        <!-- 分页器 -->
         <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
       </div>
       <div class="video-list">
@@ -73,7 +74,7 @@
         </div>
       </div>
       <!-- 分页器 -->
-      <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
+      <!-- <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" /> -->
     </div>
   </div>
 </template>
@@ -84,7 +85,7 @@ import Navbar from '/src/components/navbar-component.vue';
 import request from '@/utils/request';
 import router from '@/router';
 import { ElMessage } from 'element-plus';
-import { openDB } from 'idb'; // 引入 idb 库用于 IndexedDB 操作
+
 
 const animeList = ref<Anime[]>([]);
 // 定义 Anime 接口类型
@@ -99,11 +100,11 @@ interface Anime {
 }
 
 // 最后更新时间
-const lastTableUpdateTimestap = ref<LTUTModel>(
+const lastTableUpdateTimestap =ref<LTUTModel>(
   { 
-    videoLastUpdate: '',
-    userLastUpdate: '0',
-    commentLastUpdate: ''
+    videoLastUpdate:'',
+    userLastUpdate:'0',
+    commentLastUpdate:''
   }
 );
 // 定义 lastTableUpdateTimestap 接口类型
@@ -115,6 +116,7 @@ interface LTUTModel{
 
 // 选项卡数据
 const tabs = [
+  // { name: 'selected', label: '已选' },
   { name: 'anime', label: '番剧' }
 ];
 const activeTab = ref('anime');
@@ -122,9 +124,6 @@ const activeTab = ref('anime');
 const total = ref(0);
 // 当前页
 const currentPage = ref(1);
-
-// 每页显示条数
-const pageSize = ref(20);
 
 // 类型数据
 const types = [
@@ -160,24 +159,6 @@ const letters = [
 ];
 const selectedLetter = ref('全部');
 
-// 初始化 IndexedDB
-const initIndexedDB = async () => {
-  const db = await openDB('AnimeDatabase', 1, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains('animeList')) {
-        db.createObjectStore('animeList', { keyPath: 'id' });
-      }
-      if (!db.objectStoreNames.contains('lastUpdateTime')) {
-        db.createObjectStore('lastUpdateTime', { keyPath: 'type' });
-      }
-      if (!db.objectStoreNames.contains('pageCache')) {
-        db.createObjectStore('pageCache', { keyPath: 'page' });
-      }
-    }
-  });
-  return db;
-};
-
 // 重置筛选方法
 const resetFilters = () => {
   selectedType.value = '全部';
@@ -189,49 +170,10 @@ const resetFilters = () => {
 };
 
 /**
- * 获取动漫列表，根据 commentLastUpdate 决定是否从服务器获取数据
+ * 获取动漫列表
  */
- const fetchAnimeList = async () => {
+const fetchAnimeList = async () => {
   try {
-    const db = await initIndexedDB();
-    
-    // 获取服务器最后更新时间
-    let serverCommentLastUpdate;
-    try {
-      const updateResponse = await request.get<{
-        status: boolean;
-        data: { commentLastUpdate: string };
-        message: string;
-      }>('/getLastUpdate');
-
-      // 详细的响应验证
-      if (!updateResponse || !updateResponse.data) {
-        console.error('服务器响应无效:', updateResponse);
-        throw new Error('服务器响应无效');
-      }
-
-      if (!updateResponse.data.status) {
-        console.error('错误:', updateResponse.data.message);
-        throw new Error(updateResponse.data.message || '获取更新时间失败');
-      }
-
-      serverCommentLastUpdate = updateResponse.data.data.commentLastUpdate;
-    } catch (updateError) {
-      console.log('使用本地储存');
-      
-      // 使用本地存储的最后更新时间作为备用
-      const localLastUpdate = await db.get('lastUpdateTime', 'commentLastUpdate');
-      serverCommentLastUpdate = localLastUpdate ? localLastUpdate.value : new Date().toISOString();
-      
-      ElMessage.warning('测试用:正在使用本地缓存');
-    }
-
-    // 从 IndexedDB 获取本地最后更新时间
-    const localLastUpdate = await db.get('lastUpdateTime', 'commentLastUpdate');
-    const localCommentLastUpdate = localLastUpdate ? localLastUpdate.value : '';
-
-    let animeData: Anime[] = [];
-
     // 构造 tag 参数
     const tags = [];
     if (selectedType.value !== '全部') tags.push(selectedType.value);
@@ -243,6 +185,9 @@ const resetFilters = () => {
     // 完结状态筛选逻辑
     if (selectedCompletionStatus.value !== '全部') {
       const isCompleted = selectedCompletionStatus.value === '已完结';
+
+      // 如果选择了已完结，则要求动漫有"完结"标签
+      // 如果选择了连载中，则不添加"完结"标签
       if (isCompleted) {
         tags.push('完结');
       }
@@ -250,122 +195,49 @@ const resetFilters = () => {
 
     const queryString = tags.length > 0
       ? tags.map(tag => `tag=${encodeURIComponent(tag)}`).join('&')
-      : '';
-    const tagsQueryUrl = `/anime/getAnimeListByTags?${queryString}&page=${currentPage.value}&size=${pageSize.value}`;
-    const tagsTotallyQueryUrl = `/anime/countAnimeListByTags?${queryString}&page=${currentPage.value}&size=${pageSize.value}`;
-    let url = `/anime/getAnimeList?page=${currentPage.value}&size=${pageSize.value}`;
-    let totalQUrl = `/anime/countAnimePage?size=${pageSize.value}`;
-
+      : ''; //没有参数就不要查询这个了
+    const tagsQueryUrl = `/anime/getAnimeListByTags?${queryString}&page=${currentPage.value}&size=21`;
+    const tagsTotallyQueryUrl = `/anime/countAnimeListByTags?${queryString}&page=${currentPage.value}&size=21`;
+    let url = `/anime/getAnimeList?page=${currentPage.value}&size=20`;
+    let totalQUrl = '/anime/countAnimePage?size=20'
     if (tags.length > 0) {
-      url = tagsQueryUrl;
-      totalQUrl = tagsTotallyQueryUrl;
+      url = tagsQueryUrl //如果有tags，就把它转为tags查询，否则直接查询总表
+      totalQUrl = tagsTotallyQueryUrl
     }
-
-    // 检查本地缓存的页面数据
-    const cachedPageData = await db.get('pageCache', currentPage.value);
-
-    // 判断是否需要从服务器获取新数据
-    if (!localCommentLastUpdate || 
-        new Date(serverCommentLastUpdate) > new Date(localCommentLastUpdate) || 
-        !cachedPageData) {
-      try {
-        // 需要从服务器获取数据
-        const response = await request.get<{
-          status: boolean;
-          data: Anime[];
-          message: string;
-        }>(url);
-
-        // 请求动漫总数
-        const responseTotalNum = await request.get<{
-          status: boolean;
-          data: number;
-          message: string;
-        }>(totalQUrl);
-
-        if (responseTotalNum.data.status) {
-          total.value = (responseTotalNum.data.data) * 10;
+    //请求动漫列表数据
+    const response = await request.get<{
+      status: boolean;
+      data: Anime[];
+      message: string;
+    }>(url);
+    //请求动漫总数
+    const responseTotalNum = await request.get<{
+      status: boolean;
+      data: number;
+      message: string;
+    }>(totalQUrl);
+    if (responseTotalNum.data.status) { //查询总页数
+      total.value = (responseTotalNum.data.data) * 10
+    }
+    if (response.data.status) {
+      // 在前端额外过滤
+      animeList.value = response.data.data.filter(anime => {
+        if (selectedCompletionStatus.value === '全部') return true;
+        if (selectedCompletionStatus.value === '已完结') {
+          return anime.tags && anime.tags.some(tag => tag === '完结');
         }
-
-        if (response.data.status) {
-          animeData = response.data.data;
-          
-          // 更新 IndexedDB
-          const tx = db.transaction(['animeList', 'pageCache', 'lastUpdateTime'], 'readwrite');
-          const animeStore = tx.objectStore('animeList');
-          const pageCacheStore = tx.objectStore('pageCache');
-          
-          animeData.forEach(anime => {
-            animeStore.put(anime);
-          });
-
-          // 缓存当前页数据
-          pageCacheStore.put({
-            page: currentPage.value,
-            data: animeData
-          });
-
-          // 更新最后更新时间
-          await db.put('lastUpdateTime', {
-            type: 'commentLastUpdate',
-            value: serverCommentLastUpdate
-          });
-
-          await tx.done;
-        } else {
-          throw new Error('获取动漫列表失败：' + response.data.message);
+        if (selectedCompletionStatus.value === '连载中') {
+          return !anime.tags || !anime.tags.some(tag => tag === '完结');
         }
-      } catch (fetchError) {
-        console.error('获取服务器数据失败:', fetchError);
-        ElMessage.error('获取动漫列表失败，将使用本地缓存');
-        
-        // 尝试从缓存获取页面数据
-        const cachedPageData = await db.get('pageCache', currentPage.value);
-        if (cachedPageData) {
-          animeData = cachedPageData.data;
-        } else {
-          // 如果没有缓存数据，尝试获取所有数据并切分
-          const tx = db.transaction('animeList', 'readonly');
-          const store = tx.objectStore('animeList');
-          const allData = await store.getAll();
-          
-          // 根据当前页和每页大小切分数据
-          const startIndex = (currentPage.value - 1) * pageSize.value;
-          const endIndex = startIndex + pageSize.value;
-          animeData = allData.slice(startIndex, endIndex);
-        }
-      }
+        return true;
+      });
+
+      console.log(animeList.value);
     } else {
-      // 使用本地缓存的页面数据
-      animeData = cachedPageData.data;
-
-      // 请求动漫总数（使用本地缓存数据时）
-      const responseTotalNum = await request.get<{
-        status: boolean;
-        data: number;
-        message: string;
-      }>(totalQUrl);
-
-      if (responseTotalNum.data.status) {
-        total.value = (responseTotalNum.data.data) * 10;
-      }
+      console.error('Failed to fetch anime list:', response.data.message);
     }
-
-    // 前端过滤逻辑
-    animeList.value = animeData.filter(anime => {
-      if (selectedCompletionStatus.value === '全部') return true;
-      if (selectedCompletionStatus.value === '已完结') {
-        return anime.tags && anime.tags.some(tag => tag === '完结');
-      }
-      if (selectedCompletionStatus.value === '连载中') {
-        return !anime.tags || !anime.tags.some(tag => tag === '完结');
-      }
-      return true;
-    });
-
   } catch (error) {
-    console.error('获取动漫列表发生严重错误:', error);
-    ElMessage.error('获取动漫列表失败，请稍后重试');
+    console.error('Error fetching anime list:', error);
   }
 };
 
@@ -383,7 +255,7 @@ const getCoverUrl = (fileName: string) => {
  * @param animeId - 动漫ID 
  */
 const jumpToDetail = (animeId: number) => {
-  router.push(`/Videoplayback/${animeId}/1`);
+  router.push(`/Videoplayback/${animeId}/1`)
 };
 
 // 分页处理
@@ -392,6 +264,21 @@ const handleCurrentPageChange = (page: number) => {
   fetchAnimeList();
 };
 
+const fetchLastUpdateTimestep = async () =>{
+  try{ //获取最后更新的时间点的方法
+    const response = await request.get('/getLastUpdate');
+    if(response.data.status){
+      const responseData = response.data.data
+      lastTableUpdateTimestap.value.commentLastUpdate = responseData.commentLastUpdate;
+      lastTableUpdateTimestap.value.videoLastUpdate = responseData.videoLastUpdate;
+      console.log("最后更新数据")
+      console.log(lastTableUpdateTimestap.value)
+    }
+  }catch(e){
+    console.error(e);
+    ElMessage.error("网络异常");
+  }
+}
 // 监听筛选条件变化并重新获取动漫列表
 watch([
   selectedType,
@@ -400,15 +287,12 @@ watch([
   selectedLanguage,
   selectedCompletionStatus,
   selectedLetter
-], () => {
-  // 重置到第一页
-  currentPage.value = 1;
-  fetchAnimeList();
-});
+], fetchAnimeList);
 
-onMounted(() => {
-  fetchAnimeList();
-});
+onMounted(()=>{
+  fetchAnimeList()
+  // fetchLastUpdateTimestep() //获取最后更新的时间点
+})
 </script>
 
 <style scoped>

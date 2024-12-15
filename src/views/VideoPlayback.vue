@@ -51,7 +51,15 @@
           </div>
           <!-- 视频推荐 -->
           <div class="lll">
-
+            <div class="title-warp">
+              <div class="dot"></div>
+              <div class="title">为你推荐</div>
+            </div>
+            <div class="info-recommand-V">
+                <div class="random" :class="animationClass" @animationend="handleAnimationEnd">
+                    <RandomRecommendationVideoPlayback :key="refreshKey" />
+                </div>
+              </div>
           </div>
         </div>
       </div>
@@ -66,6 +74,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
 import Artplayer from '/src/components/Artplayer.vue';
+import RandomRecommendationVideoPlayback from '@/components/RandomRecommendationVideoPlayback.vue';
 import Hls from 'hls.js';
 import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitles';
 import artplayerPluginLibass from 'artplayer-plugin-libass';
@@ -240,14 +249,27 @@ function EpisodeBuilder(index: number) {
   }
 }
 
-async function fetchCommentList(animeId:number) {
-  const response = await request.get(`/comment/getCommentList/${animeId}?page=1&size=30`)
+async function fetchCommentList(animeId:number, page: number) {
+  const response = await request.get(`/comment/getCommentList/${animeId}?page=${page}&size=30`)
   if(response.data.status){
     comments.value = response.data.data.map((item: { username: any; }) => ({
         ...item,
         username: item.username || '[匿名用户]',
       }));
     console.log(`更新评论区，动漫ID: ${animeId}`)
+  }
+}
+
+// 获取评论区总页数
+async function fetchTotalyCommentPageNumber(animeId: number) {
+  const response = await request.get('/comment/countCommentPage',{
+    params:{
+      animeId: animeId,
+      size: 30 //和上述fetchCommentList的size保持一致
+    }
+  });
+  if(response.data.status){ // 如果收到是有响应的，那么赋值
+    total.value = response.data.data;
   }
 }
 
@@ -261,7 +283,7 @@ async function addComment() {
     const response = await request.post(`/comment/addComment`,payload);
     if(response.data.status){
       ElMessage.success('评论成功！');
-      fetchCommentList(videoDetail.id);
+      fetchCommentList(videoDetail.id,currentPage.value);
     }else{
       ElMessage.error(`评论失败！${response.data.error}`)
     }
@@ -273,11 +295,31 @@ async function addComment() {
   }
 }
 
+const refreshKey = ref(0);
+const animationClass = ref('');
+
+// 触发动画的函数
+const refreshRecommendations = () => {
+  animationClass.value = 'slide-out'; // 触发向上离场动画
+};
+
+// 监听动画结束
+const handleAnimationEnd = () => {
+  if (animationClass.value === 'slide-out') {
+    refreshKey.value += 1; // 更新内容
+    animationClass.value = 'slide-in'; // 触发从底部进入动画
+  } else {
+    animationClass.value = ''; // 清除动画类名
+  }
+};
+
 // 在组件挂载时获取视频详情
 onMounted(() => {
   if (animeId) {
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
-    fetchCommentList(Number(animeId)); //获取评论列表
+    fetchCommentList(Number(animeId),1); //获取评论列表,打开时默认显示第一页
+    fetchTotalyCommentPageNumber(Number(animeId)) //获取评论总页数
+    refreshRecommendations() //随机刷新为你推荐
   } else {
     console.error('animeId is missing');
   }
@@ -289,8 +331,8 @@ const total = ref(0);
 const currentPage = ref(1);
 // 分页处理
 const handleCurrentPageChange = (page: number) => {
-  currentPage.value = page;
-  CommentListPage();
+  currentPage.value = page; //更新当前评论页数字
+  fetchCommentList(videoDetail.id,page)
 };
 
 //获取评论页数
@@ -314,6 +356,7 @@ const handleCurrentPageChange = (page: number) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
 }
 
 .middle {
@@ -378,6 +421,15 @@ const handleCurrentPageChange = (page: number) => {
   justify-content: left;
   align-items: center;
   gap: 12%;
+}
+
+.info-recommand-V {
+  margin-top: 12px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  /* gap: 80%; */
+  width: max-content;
 }
 
 .releaseDate {
