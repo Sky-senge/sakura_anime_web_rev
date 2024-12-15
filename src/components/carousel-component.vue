@@ -4,6 +4,7 @@
       :style="{ width: '100%', height: '300px' }"
       :default-current="1"
       indicator-type="line"
+      :auto-play="true"
       @change="handleChange"
     >
       <a-carousel-item v-for="(image, index) in images" :key="index">
