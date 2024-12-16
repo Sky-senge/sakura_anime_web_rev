@@ -22,12 +22,14 @@ const registerData = ref({
   username: '',
   email: '',
   password: '',
+  displayName: ''
 });
 
 const router = useRouter();
 
 
 const signUp = async () => {
+  registerData.value.displayName = registerData.value.username; //给予默认显示的用户名
   var response = await request.post('/user/register', registerData.value)
   if (response.data.status) {
     ElMessage.success("注册成功，请登录！")
