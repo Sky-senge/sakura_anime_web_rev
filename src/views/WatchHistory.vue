@@ -7,19 +7,64 @@
 
         <el-table :data="watchHistoryList" style="width: 100%">
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column label="用户名" prop="userId"></el-table-column>
-            <el-table-column label="动漫" prop="animeId"></el-table-column>
+            <el-table-column label="用户名" prop="displayName"></el-table-column>
+            <el-table-column label="动漫" prop="animeName"></el-table-column>
             <el-table-column label="集数" prop="episodes"></el-table-column>
         </el-table>
 
-
-        <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pageSize"
-            layout="prev, pager, next" :total="totalCount" />
+        <el-pagination @current-change="handleCurrentPageChange" :current-page="currentPage"
+            layout="prev, pager, next" :total="total" />
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { useUserStore } from '@/stores/user';
+import request from '@/utils/request';
+import { onMounted, ref } from 'vue';
 
+const userStore = useUserStore();
+userStore.loadUser();
+
+const watchHistoryList = ref<WatchHistory[]>([]);
+// 定义接口
+interface WatchHistory {
+  id: number; // 唯一标识
+  userId: number; // 用户ID
+  displayName: string; // 用户名
+  animeId: number; // 动漫ID
+  animeName: string; // 动漫名
+  episodes: number; // 观看集数
+  createAt: string; // 创建时间ISO8601格式
+}
+
+const currentPage = ref(1);
+const total = ref(0);
+//一页查询的数量
+const size = ref(50);
+
+const fetchHistoryRecordCount = async() =>{
+    const countResponse = await request.get(`/user/countHistory?size=${size.value}`)
+    if(countResponse.data.status){
+        total.value = countResponse.data.data * 10;
+    }
+}
+
+const fetchHistoryRecord = async() =>{
+    const response = await request.get(`/user/getHistory?page=${currentPage.value}&size=${size.value}`)
+    if(response.data.status){
+        watchHistoryList.value = response.data.data;
+    }
+}
+
+const handleCurrentPageChange = async (page: number) => {
+  currentPage.value = page;
+  await fetchHistoryRecord();
+};
+
+onMounted(() => {
+    fetchHistoryRecordCount();
+    fetchHistoryRecord();
+})
 </script>
 
 <style scoped>
