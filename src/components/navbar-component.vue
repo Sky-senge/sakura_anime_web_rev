@@ -20,7 +20,7 @@
       </div>
       <nav class="right-nav" v-show="!isSearchActive">
         <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
-        <button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history"></i></button>
+        <router-link to="/WatchHistory"><button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history" ></i></button></router-link>
         <button size="small" class="nav-button" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
         <el-dropdown v-if="isLoggedIn">
           <span class="nav-button">
