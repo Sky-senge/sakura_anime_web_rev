@@ -119,7 +119,7 @@ interface LTUTModel {
 // 选项卡数据
 const tabs = [
   // { name: 'selected', label: '已选' },
-  { name: 'anime', label: '番剧' }
+  { name: 'anime', label: '最高分排行' }
 ];
 const activeTab = ref('anime');
 // 总页数
@@ -200,10 +200,10 @@ const fetchAnimeList = async () => {
     const queryString = tags.length > 0
       ? tags.map(tag => `tag=${encodeURIComponent(tag)}`).join('&')
       : ''; //没有参数就不要查询这个了
-    const tagsQueryUrl = `/anime/getAnimeListByTags?${queryString}&page=${currentPage.value}&size=21`;
-    const tagsTotallyQueryUrl = `/anime/countAnimeListByTags?${queryString}&page=${currentPage.value}&size=21`;
-    let url = `/anime/getAnimeList?page=${currentPage.value}&size=20`;
-    let totalQUrl = '/anime/countAnimePage?size=20'
+    const tagsQueryUrl = `/anime/getAnimeListByTags?${queryString}&page=${currentPage.value}&size=21&sort=ranking`;
+    const tagsTotallyQueryUrl = `/anime/countAnimeListByTags?${queryString}&page=${currentPage.value}&size=21&sort=ranking`;
+    let url = `/anime/getAnimeList?page=${currentPage.value}&size=20&sort=ranking`;
+    let totalQUrl = '/anime/countAnimePage?size=20&sort=ranking'
     if (tags.length > 0) {
       url = tagsQueryUrl //如果有tags，就把它转为tags查询，否则直接查询总表
       totalQUrl = tagsTotallyQueryUrl
