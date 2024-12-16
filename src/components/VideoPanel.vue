@@ -146,8 +146,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isUploadCoverDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="uploadCover">上传</el-button>
+        <el-button @click="closeCoverUploadDialog">取消</el-button>
+        <el-button type="primary" @click="uploadCover" :disabled="isUploading || !selectedFile">上传</el-button>
       </div>
     </el-dialog>
 
@@ -164,8 +164,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isUploadSubtitleDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="uploadSubtitle">上传</el-button>
+        <el-button @click="closeSubtitleUploadDialog">取消</el-button>
+        <el-button type="primary" @click="uploadSubtitle" :disabled="isUploading || !selectedFile">上传</el-button>
       </div>
     </el-dialog>
 
@@ -441,6 +441,18 @@ const handleDialogClose = (done) => {
 //关闭对话框
 const closeVideoUploadDialog = () => {
   isUploadDialogVisible.value = false
+  selectedFile.value = null
+  selectedSubtitleFile.value = null
+}
+
+const closeCoverUploadDialog = () => {
+  isUploadCoverDialogVisible.value = false
+  selectedFile.value = null
+  selectedSubtitleFile.value = null
+}
+
+const closeSubtitleUploadDialog = () => {
+  isUploadSubtitleDialogVisible.value = false
   selectedFile.value = null
   selectedSubtitleFile.value = null
 }
