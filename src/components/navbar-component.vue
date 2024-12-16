@@ -1,13 +1,7 @@
 <template>
   <header class="navbar">
-    <div class="nav">
-      <!--       <span class="logo">sakura</span> -->
-      <nav class="left-nav" v-show="!isSearchActive">
-        <button size="small" class="nav-button-l" @click="jumpTo('/')">首页</button>
-        <button size="small" class="nav-button-l" @click="jumpTo('/sort')">全部</button>
-        <button size="small" class="nav-button-l" @click="jumpTo('/ranking')">排行榜</button>
-        <button size="small" class="nav-button-l" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
-      </nav>
+    <div class="top-nav">
+      <span class="logo" v-show="!isSearchActive">Sakura</span>
       <div class="search-concent" v-show="!isSearchActive">
         <i class="bi bi-search"></i>
         <input type="text" placeholder="搜索" class="search-bar" />
@@ -20,8 +14,9 @@
       </div>
       <nav class="right-nav" v-show="!isSearchActive">
         <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
-        <router-link to="/WatchHistory"><button size="small" class="nav-button"><i title="历史记录" class="bi bi-clock-history" ></i></button></router-link>
-        <button size="small" class="nav-button" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
+        <router-link to="/WatchHistory"><button size="small" class="nav-button"><i title="历史记录"
+              class="bi bi-clock-history"></i></button></router-link>
+        <button size="small" class="nav-button-l" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
         <el-dropdown v-if="isLoggedIn">
           <span class="nav-button">
             <i class="bi bi-person-circle"></i>
@@ -34,6 +29,14 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
+      </nav>
+    </div>
+    <div class="bottom-nav">
+      <nav class="left-nav">
+        <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
+        <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
+        <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
+        <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
       </nav>
     </div>
   </header>
@@ -229,18 +232,20 @@ onBeforeUnmount(() => {
 <style scoped>
 .navbar {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   position: sticky;
   top: 0;
-  background-color: #ff4d00;
-  box-shadow: 0 2px 10px #ff8c001c;
+  background-color: #fff;
+  border-bottom: 1px solid #d8d8d8;
   z-index: 1000;
   padding: 10px 35px;
 }
 
 .logo {
   font-size: 1.3rem;
-  color: #fff;
+  color: #ff4040;
   font-weight: 800;
 }
 
@@ -248,19 +253,25 @@ onBeforeUnmount(() => {
   display: none;
 }
 
-.nav {
+.top-nav,
+.bottom-nav {
+  width: 88%;
   user-select: none;
-  width: 80%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 0px;
   transition: all .3s;
+}
+
+.bottom-nav {
+  padding: 15px 0px;
 }
 
 .search-bar-m,
 .search-concent {
   width: 500px;
-  background-color: #fff;
+  background-color: #e5e5e5;
   padding: 12px 15px;
   border-radius: 5px;
   transition: all 0.3s ease;
@@ -278,50 +289,26 @@ onBeforeUnmount(() => {
 .right-nav {
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 20px;
 }
 
-@media (max-width: 1280px) {
-  .nav {
-    width: 100%;
-  }
-
-  .left-nav {
-    gap: 15px;
-  }
-
-  .search-concent {
-    width: 550px;
-  }
+.left-nav{
+  gap: 30px;
 }
 
-@media (max-width: 1100px) {
-  .nav {
-    width: 90%;
-  }
-
-  .left-nav {
-    gap: 10px;
-  }
-
-  .search-concent {
-    width: 300px;
-  }
-}
 
 @media (max-width: 805px) {
-
-  .nav {
+  .top-nav {
     width: 100%;
-  }
-
-  .left-nav,
-  .right-nav {
-    padding: 12px 0px;
-  }
+  padding: 25px 0px;
+}
+  .bottom-nav {
+    width: 100%;
+  padding: 5px 0px;
+}
 
   .btnm {
-    color: #e5e5e5;
+    color: #373737;
     display: block;
   }
 
@@ -341,7 +328,8 @@ onBeforeUnmount(() => {
   }
 
   .search-concent-mobile.show {
-    background: #fff;
+    color: #373737;
+    background: #e2e4e7;
     max-width: 100%;
     width: 100%;
     border-radius: 6px;
@@ -392,22 +380,30 @@ onBeforeUnmount(() => {
 
 .nav-button-l,
 .nav-button {
-  color: #e5e5e5;
+  color: #373737;
   font-size: 0.88rem;
   font-weight: 700;
   background: none;
   border: none;
   cursor: pointer;
+  transition: all .3s;
 }
 
+.nav-button-l{
+  background: #ff4040;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.nav-button:hover,
 .nav-button-l:hover {
   background: none;
-  color: #fff;
+  color: #ff4848;
 }
 
 .nav-button:hover {
-  background: none;
-  color: #fff;
   text-decoration: none;
 }
 

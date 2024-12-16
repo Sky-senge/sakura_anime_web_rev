@@ -6,7 +6,7 @@
         <div class="left">
           <Artplayer @get-instance="getInstance" ref="videoPlayerRef" :option="option" class="video" />
           <div class="tags">
-            <span v-for="(tag, index) in videoDetail.tags" :key="index" class="tag">
+            <span v-for="(tag, index) in filteredTags" :key="index" class="tag">
               {{ tag }}
             </span>
           </div>
@@ -60,11 +60,12 @@
       </div>
     </div>
   </div>
+
 </template>
 
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, type Ref } from 'vue';
+import { ref, reactive, computed, onMounted, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
@@ -87,6 +88,19 @@ const episode = route.params.episode as string;
 const videoPlayerRef = ref<InstanceType<typeof Artplayer> | null>(null);
 //userStore实例化
 const userStore = useUserStore();
+
+const tagCategories = {
+  状态: ['连载', '完结'],
+  类型: ['热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园', '青春', '恋爱', '爱情', '日常', '搞笑', '推理', '悬疑', '机战', '运动', '战争', '战斗', '励志', '致郁', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他'],
+  地区: ['日本', '大陆', '中国香港', '中国台湾', '韩国', '欧美'],
+  年份: ['2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2006', '2005', '2004']
+};
+
+// 计算 "类型" 标签
+const filteredTags = computed(() => {
+  const typeTags = tagCategories['类型']; // 获取 "类型" 标签
+  return videoDetail.tags.filter(tag => typeTags.includes(tag)); // 仅显示属于 "类型" 的标签
+});
 
 // 定义响应式数据
 const option = reactive({
@@ -372,7 +386,7 @@ const handleCurrentPageChange = (page: number) => {
 
 .video {
   width: 100%;
-  height: 600px;
+  height: 555px;
 }
 
 .left {
@@ -587,7 +601,7 @@ li {
   color: #666;
 }
 
-.video-info-recommmand{
+.video-info-recommmand {
   user-select: none;
   margin-top: 30px;
   border-radius: 10px;
@@ -595,7 +609,8 @@ li {
   background-color: #e2e4e8;
 
 }
-.info-recommand{
+
+.info-recommand {
   width: 100%;
   height: 600px;
   overflow-y: auto;

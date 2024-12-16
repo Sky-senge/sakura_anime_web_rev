@@ -7,7 +7,7 @@
             alt="Logo" class="logo-img" />
         </div>
         <el-menu default-active="1-1" class="el-menu-vertical-demo" :default-openeds="['1', '2', '3', '4']"
-         text-color="#fff" active-text-color="#ff8d00">
+         text-color="#fff" active-text-color="#ff0d00">
           <el-submenu index="1">
             <template #title>
               <i class="el-icon-user"></i>
@@ -159,7 +159,8 @@ onMounted(loadData);
 }
 
 .sidebar {
-  background-color: #2d3a4b;
+  background-color: #fff;
+  border-right: 1.5px solid #e3e3e3;
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -180,6 +181,7 @@ onMounted(loadData);
 .logo-img {
   width: 60px;
   height: 60px;
+  border: 3px solid #dadada;
   border-radius: 50%;
 }
 
@@ -192,16 +194,16 @@ onMounted(loadData);
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  background-color: #2d3a4b;
-  color: #fff;
+  color: #666;
   font-size: 1rem; 
+  font-weight: 800;
  height: 80px;
-  transition: background-color .3s;
+  transition: all .3s;
 }
 
 .el-submenu__title:hover,
 .el-menu-item:hover {
-  background-color: #1e272e;
+  color: #ff20209f;
 }
 
 .el-submenu__title i,

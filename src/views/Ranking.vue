@@ -1,61 +1,14 @@
 <template>
   <div class="filter-container">
-    <div class="filter">
-      <div class="f-title">筛选</div>
-      <div v-for="(tab, index) in tabs" :key="index" :class="{ tabcontent: true, active: activeTab === tab.name }">
-        <div v-if="tab.name === 'anime'">
-          <div class="filter-wrapper">
-            <div class="filter-section">
-              <span class="filter-label">类型</span>
-              <span v-for="(type, typeIndex) in types" :key="typeIndex"
-                :class="{ 'filter-option': true, active: selectedType === type }" @click="selectedType = type">{{ type
-                }}</span>
-            </div>
-            <div class="filter-section">
-              <span class="filter-label">状态</span>
-              <span v-for="(status, statusIndex) in completionStatuses" :key="statusIndex"
-                :class="{ 'filter-option': true, active: selectedCompletionStatus === status }"
-                @click="selectedCompletionStatus = status">{{ status }}</span>
-            </div>
-            <div class="filter-section">
-              <span class="filter-label">地区</span>
-              <span v-for="(region, regionIndex) in regions" :key="regionIndex"
-                :class="{ 'filter-option': true, active: selectedRegion === region }"
-                @click="selectedRegion = region">{{
-                  region }}</span>
-            </div>
-            <div class="filter-section">
-              <span class="filter-label">年份</span>
-              <span v-for="(year, yearIndex) in years" :key="yearIndex"
-                :class="{ 'filter-option': true, active: selectedYear === year }" @click="selectedYear = year">{{ year
-                }}</span>
-            </div>
-            <div class="filter-section">
-              <span class="filter-label">语言</span>
-              <span v-for="(language, languageIndex) in languages" :key="languageIndex"
-                :class="{ 'filter-option': true, active: selectedLanguage === language }"
-                @click="selectedLanguage = language">{{ language }}</span>
-            </div>
-            <div class="filter-section">
-              <span class="filter-label">字母</span>
-              <span v-for="(letter, letterIndex) in letters" :key="letterIndex"
-                :class="{ 'filter-option': true, active: selectedLetter === letter }"
-                @click="selectedLetter = letter">{{
-                  letter }}</span>
-            </div>
-            <button class="reset-button" @click="resetFilters">重新筛选</button>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="video">
       <div class="video-title">
         <div class="tab">
           <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === tab.name }"
             @click="activeTab = tab.name">{{ tab.label }}</button>
         </div>
-      <!-- 分页器 -->
-      <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
+        <!-- 分页器 -->
+        <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage"
+          @current-change="handleCurrentPageChange" />
       </div>
       <div class="video-list">
         <div v-if="animeList.length == 0">
@@ -65,24 +18,38 @@
         <div v-for="anime in animeList" :key="anime.id" class="video-card" @click="jumpToDetail(anime.id)">
           <div class="video-thumbnail">
             <!-- 如果包含完结标签，显示“完结” -->
-            <span class="finish" v-if="anime.tags.includes('完结')">完结撒花</span>
             <!-- 如果 filePath 存在且有内容，展示封面图片 -->
             <img v-if="anime.filePath?.length > 0" :src="getCoverUrl(anime.filePath[0].fileName)" :alt="anime.name">
             <!-- 如果 filePath 不存在或为空，展示默认占位符 -->
             <div v-else class="no-cover">No cover</div>
           </div>
-          <!-- 展示视频名称 -->
-          <div class="video-name">{{ anime.name }}</div>
+          <div class="video-info">
+            <!-- 展示视频名称 -->
+            <div class="video-name">{{ anime.name }}</div>
+            <div>
+              <span class="finish" v-if="anime.tags.includes('完结')">完结</span>
+              <span class="finish" v-if="!anime.tags.includes('完结')">连载中</span>
+              <span>|</span>
+              <span class="finish">评分: {{ anime.rating }}</span>
+              <p class="finish">{{ anime.description.slice(0, 120) }}...</p>
+            </div>
+            <div class="tags">
+              <span v-for="(tag, index) in filteredTags(anime)" :key="index" class="tag">
+                {{ tag }}
+              </span>
+            </div>
+          </div>
         </div>
+        <!-- 分页器 -->
+        <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage"
+          @current-change="handleCurrentPageChange" />
       </div>
-     <!-- 分页器 -->
-     <el-pagination background layout="prev, pager, next" :total="total" :current-page="currentPage" @current-change="handleCurrentPageChange"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import Navbar from '/src/components/navbar-component.vue';
 import request from '@/utils/request';
 import router from '@/router';
@@ -100,6 +67,20 @@ interface Anime {
   releaseDate: string;
   filePath: { episodes: number; fileName: string }[];
 }
+
+const tagCategories = {
+  状态: ['连载', '完结'],
+  类型: ['热血', '奇幻', '动作', '科幻', '喜剧', '治愈', '冒险', '后宫', '百合', '校园', '青春', '恋爱', '爱情', '日常', '搞笑', '推理', '悬疑', '机战', '运动', '战争', '战斗', '励志', '致郁', '经典', '史诗', '职场', '黑暗', '泡面番', '轻小说', '耽美', '其他'],
+  地区: ['日本', '大陆', '中国香港', '中国台湾', '韩国', '欧美'],
+  年份: ['2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2006', '2005', '2004']
+};
+
+// 计算 "类型" 标签
+const filteredTags = (anime) => {
+  const typeTags = tagCategories['类型']; // 获取 "类型" 标签
+  return anime.tags.filter(tag => typeTags.includes(tag)); // 仅返回属于 "类型" 的标签
+};
+
 
 // 最后更新时间
 const lastTableUpdateTimestap = ref<LTUTModel>(
@@ -303,11 +284,13 @@ onMounted(() => {
 <style scoped>
 /* 整体容器样式 */
 .filter-container {
-  padding: 20px;
-  width: 84%;
+  border-left: 1px solid #dbdbdb;
+  border-right: 1px solid #dbdbdb;
+  padding: 20px 40pcx;
+  width: 65%;
   display: flex;
   justify-content: flex-start;
-  margin: 0 auto;
+  margin: 10px auto;
 }
 
 .filter {
@@ -352,7 +335,6 @@ onMounted(() => {
   font-size: 1rem;
   color: #ff3700;
   border-bottom: 3px solid #ff5e00;
-  ;
 }
 
 .tabcontent {
@@ -364,126 +346,36 @@ onMounted(() => {
   display: block;
 }
 
-/* 新增筛选容器样式 */
-.filter-wrapper {
-  user-select: none;
-  border-radius: 5px;
-  padding: 10px;
-  margin-top: 10px;
-}
-
-/* 筛选区域样式 */
-.filter-section {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px;
-  margin-bottom: 20px;
-}
-
-.filter-label {
-  font-size: 1.1rem;
-  font-weight: 1000;
-  letter-spacing: 1px;
-  margin-right: 8px;
-}
-
-.filter-option {
-  cursor: pointer;
-  padding: 5px;
-  font-size: 0.9em;
-  font-weight: 400;
-  color: #333;
-  transition: all .3s;
-}
-
-.filter-option:hover {
-  color: #ff5a5a;
-  font-weight: 600;
-}
-
-.filter-option.active {
-  color: rgb(255, 30, 30);
-  font-weight: 800;
-}
-
-/* 重新筛选按钮样式 */
-.reset-button {
-  background: #e1e5ef;
-  color: rgb(68, 68, 68);
-  border: none;
-  border-radius: 4px;
-  padding: 8px 20px;
-  cursor: pointer;
-  margin-top: 12px;
-  letter-spacing: 2px;
-  font-weight: 600;
-  transition: all .3s;
-}
-
-.reset-button:hover {
-  color: #f2f4f8;
-  background-color: #282828;
-}
-
-.reset-button:active {
-  color: #f2f4f8;
-  background-color: #222;
-}
-
 /* Video List Part */
 .video-list {
   display: grid;
-  gap: 15px;
+  gap: 25px;
   padding: 20px;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   background-color: #f2f4f8;
   margin: 0 auto;
   user-select: none;
   transition: all .3s;
 }
 
-@media (max-width: 1000px) {
-  .filter-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .filter {
-    width: 100%;
-  }
-
-  .video {
-    flex: 1;
-    width: calc(100% - 40px);
-  }
-
-  .video-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 .video-card {
   cursor: pointer;
-  background: #ececec;
-  border-radius: 8px;
+  display: flex;
+  justify-content: left;
+  gap: 10px;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .video-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .video-thumbnail {
-  width: 100%;
-  height: 150px;
+  border-radius: 6px;
+  width: 150px;
+  height: 190px;
   position: relative;
   overflow: hidden;
 }
@@ -491,20 +383,28 @@ onMounted(() => {
 .video-thumbnail img {
   width: 100%;
   height: 100%;
-  filter: brightness(0.8);
   object-fit: cover;
+  transition: all .3s;
+  border-radius: 10px;
+  transform: scale(0.85);
   transition: all .3s;
 }
 
 .video-card:hover .video-thumbnail img {
-  transform: scale(1.2);
+  transform: scale(0.9);
+}
+
+.video-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .video-name {
   padding: 20px 5px;
-  font-size: 1em;
+  font-size: 1.1rem;
   color: #333;
-  background: #fff;
   font-weight: bold;
   text-align: center;
   white-space: nowrap;
@@ -512,19 +412,25 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
-.video-card:hover .video-name {
-  background: #dadada;
+.finish {
+  padding: 0px 5px;
+  color: #222;
+  font-weight: 800;
 }
 
-.finish {
-  top: 5px;
-  right: 5px;
-  position: absolute;
-  text-shadow: 1px 1px 1px #d2d2d249;
-  background: linear-gradient(to right, #29a3fa, #5a76ff); /*设置渐变的方向从左到右 颜色从ff0000到ffff00*/
-  -webkit-background-clip: text;/*将设置的背景颜色限制在文字中*/
-  -webkit-text-fill-color: transparent;/*给文字设置成透明*/
-  font-weight: 800;
-  z-index: 200;
+.tags {
+  margin: 15px 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.tag {
+  user-select: none;
+  border-radius: 8px;
+  background: #dcdcdc;
+  padding: 6px 12px;
+  font-weight: 600;
 }
 </style>
