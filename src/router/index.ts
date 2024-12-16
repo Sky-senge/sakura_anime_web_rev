@@ -48,6 +48,16 @@ const router = createRouter({
           name: 'homeManage',
           component: ManageHome,
         },
+        {
+          path: '/search',
+          name: 'search',
+          component: SearchPage,
+        },
+        {
+          path: '/watchhistory',
+          name: 'watchhistory',
+          component: WatchHistory,
+        }
       ]
     },
     // {
