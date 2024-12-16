@@ -7,6 +7,7 @@ import Sort from '@/views/Sort.vue'
 import VideoPlayback from '@/views/VideoPlayback.vue'
 import HomeSubView from '@/views/HomeSubView.vue'
 import VideoDetails from '@/views/VideoDetails.vue'
+import SearchPage from '@/views/SearchPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,11 @@ const router = createRouter({
           name: 'homeManage',
           component: ManageHome,
         },
+        {
+          path: '/search',
+          name: 'SearchPage',
+          component: SearchPage,
+        }
       ]
     },
     // {

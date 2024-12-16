@@ -109,15 +109,17 @@
   
   
   <style scoped>
-  .video-list {
-    display: grid;
-    gap: 15px;
-    padding: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    background-color: #f2f4f8;
-    user-select: none;
-    transition: all .3s;
-  }
+/* Video List Part */
+.video-list {
+  display: grid;
+  gap: 15px;
+  padding: 20px;
+  grid-template-columns: repeat(5, 1fr);
+  background-color: #f2f4f8;
+  margin: 0 auto;
+  user-select: none;
+  transition: all .3s;
+}
   
   @media (max-width: 768px) {
     .video-list {
