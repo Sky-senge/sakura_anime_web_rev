@@ -2,18 +2,18 @@
   <header class="navbar">
     <div class="top-nav">
       <span class="logo" v-show="displayLogo">Sakura</span>
-      <div class="search-concent" v-show="!isSearchActive">
+      <div class="search-concent" v-show="!isMobileSearchActive">
         <i class="bi bi-search"></i>
         <input type="text" placeholder="搜索" class="search-bar" />
       </div>
-      <div class="search-concent-mobile" v-show="isSearchActive" :class="{ show: isSearchActive }">
+      <div class="search-concent-mobile" v-show="isMobileSearchActive" :class="{ show: isMobileSearchActive }">
         <input type="text" placeholder="搜索" class="search-bar-m" v-model="searchText" />
-        <button class="cc-btn" v-show="isSearchActive" @click="clearOrCancelSearch">
+        <button class="cc-btn" v-show="isMobileSearchActive" @click="clearOrCancelSearch">
           {{ searchText ? '清空' : '取消' }}
         </button>
       </div>
-      <nav class="right-nav" v-show="!isSearchActive">
-        <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
+      <nav class="right-nav" v-show="!isMobileSearchActive">
+        <i class="bi bi-search btnm" v-if="!isMobileSearchActive" @click="activateSearch"></i>
         <router-link to="/WatchHistory"><button size="small" class="nav-button"><i title="历史记录"
               class="bi bi-clock-history"></i></button></router-link>
         <button size="small" class="nav-button-l" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
@@ -79,7 +79,7 @@ const playerStore = usePlayerStore();
 const loginFormRef = ref()
 
 // 搜索状态控制
-const isSearchActive = ref(false)
+const isMobileSearchActive = ref(false)
 
 // 搜索文本
 const searchText = ref('')
@@ -127,9 +127,9 @@ watch(() => route.name, (newName, oldName) => {
 
 // 单独控制logo是否显示
 const toggleLogoDisplay = () =>{
-  console.log("搜索栏状态："+isSearchActive.value);
+  console.log("搜索栏状态："+isMobileSearchActive.value);
   console.log("是否首页："+isIndexPage.value);
-  if(!isSearchActive.value && isIndexPage.value){
+  if(!isMobileSearchActive.value && isIndexPage.value){
     displayLogo.value = true;
   }else{
     displayLogo.value = false;
@@ -214,7 +214,7 @@ const loadData = () => {
 
 // 激活搜索
 const activateSearch = () => {
-  isSearchActive.value = true
+  isMobileSearchActive.value = true
 }
 
 // 清空或取消搜索
@@ -222,7 +222,7 @@ const clearOrCancelSearch = () => {
   if (searchText.value) {
     searchText.value = ''
   } else {
-    isSearchActive.value = false
+    isMobileSearchActive.value = false
   }
 }
 
@@ -230,7 +230,7 @@ const clearOrCancelSearch = () => {
 const handleResize = () => {
   // 当窗口宽度大于移动端断点时
   if (window.innerWidth >= 805) {
-    isSearchActive.value = false  // 关闭搜索状态
+    isMobileSearchActive.value = false  // 关闭搜索状态
     searchText.value = ''         // 清空搜索文本
   }
 }
