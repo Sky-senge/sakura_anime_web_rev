@@ -1,8 +1,8 @@
 <template>
   <header class="navbar">
     <div class="top-nav">
-      <span class="logo" v-show="!isSearchActive">Sakura</span>
-      <div class="search-concent" v-show="!isSearchActive">
+      <span class="logo" v-if="!isSearchActive">Sakura</span>
+      <div class="search-concent" v-if="!isSearchActive">
         <i class="bi bi-search"></i>
         <input type="text" placeholder="搜索" class="search-bar" />
       </div>
@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user';
@@ -108,6 +108,17 @@ const jumpTo = (path: string) => {
     router.replace(path)
   }
 }
+
+// 监听路由名称变化，如果不是首页，就隐藏logo和搜索框
+watch(() => route.name, (newName, oldName) => {
+      console.log('路由参数变化', newName)
+      if(newName != 'HomeSubView'){
+        isSearchActive.value = true;
+        console.log("隐藏！")
+      }else{
+        isSearchActive.value = false;
+      }
+    })
 
 const logout = () => {
   ElMessageBox.confirm(
