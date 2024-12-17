@@ -6,13 +6,13 @@
         <i class="bi bi-search"></i>
         <input type="text" placeholder="搜索" class="search-bar" />
       </div>
-      <div class="search-concent-mobile" v-show="isSearchActive" :class="{ show: isSearchActive }">
+      <div class="search-concent-mobile" v-if="isSearchActive" :class="{ show: isSearchActive }">
         <input type="text" placeholder="搜索" class="search-bar-m" v-model="searchText" />
-        <button class="cc-btn" v-show="isSearchActive" @click="clearOrCancelSearch">
+        <button class="cc-btn" v-if="isSearchActive" @click="clearOrCancelSearch">
           {{ searchText ? '清空' : '取消' }}
         </button>
       </div>
-      <nav class="right-nav" v-show="!isSearchActive">
+      <nav class="right-nav" v-if="!isSearchActive">
         <i class="bi bi-search btnm" v-if="!isSearchActive" @click="activateSearch"></i>
         <router-link to="/WatchHistory"><button size="small" class="nav-button"><i title="历史记录"
               class="bi bi-clock-history"></i></button></router-link>
@@ -114,7 +114,6 @@ watch(() => route.name, (newName, oldName) => {
       console.log('路由参数变化', newName)
       if(newName != 'HomeSubView'){
         isSearchActive.value = true;
-        console.log("隐藏！")
       }else{
         isSearchActive.value = false;
       }
