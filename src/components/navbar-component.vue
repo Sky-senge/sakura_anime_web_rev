@@ -2,6 +2,12 @@
   <header class="navbar">
     <div class="top-nav">
       <span class="logo" v-show="displayLogo">Sakura</span>
+      <nav class="left-nav" v-show="!displayLogo">
+          <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
+          <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
+          <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
+          <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
+        </nav>
       <div class="search-concent" v-show="!isMobileSearchActive">
         <i class="bi bi-search"></i>
         <input type="text" placeholder="搜索" class="search-bar" />
@@ -31,7 +37,7 @@
         </el-dropdown>
       </nav>
     </div>
-    <div class="bottom-nav">
+    <div class="bottom-nav" v-show="displayLogo">
       <nav class="left-nav">
         <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
         <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
@@ -115,15 +121,15 @@ const jumpTo = (path: string) => {
 
 // 监听路由名称变化，如果不是首页，就隐藏logo和搜索框
 watch(() => route.name, (newName, oldName) => {
-      console.log('路由参数变化', newName)
-      if(newName != 'HomeSubView'){
-        isIndexPage.value = false;
-        toggleLogoDisplay();
-      }else{
-        isIndexPage.value = true;
-        toggleLogoDisplay();
-      }
-    })
+  console.log('路由参数变化', newName)
+  if (newName != 'HomeSubView') {
+    isIndexPage.value = false;
+    toggleLogoDisplay();
+  } else {
+    isIndexPage.value = true;
+    toggleLogoDisplay();
+  }
+})
 
 // 单独控制logo是否显示
 const toggleLogoDisplay = () =>{
@@ -133,7 +139,7 @@ const toggleLogoDisplay = () =>{
     displayLogo.value = true;
   }else if(isMobileSearchActive.value){
     displayLogo.value = true;
-  }else{
+  } else {
     displayLogo.value = false;
   }
 }
@@ -233,7 +239,7 @@ const handleResize = () => {
   // 当窗口宽度大于移动端断点时
   if (window.innerWidth >= 805) {
     isMobileSearchActive.value = false  // 关闭搜索状态
-    searchText.value = ''         // 清空搜索文本
+    searchText.value = '' // 清空搜索文本     
   }
 }
 
@@ -321,7 +327,7 @@ onBeforeUnmount(() => {
   gap: 20px;
 }
 
-.left-nav{
+.left-nav {
   gap: 30px;
 }
 
@@ -329,12 +335,13 @@ onBeforeUnmount(() => {
 @media (max-width: 805px) {
   .top-nav {
     width: 100%;
-  padding: 25px 0px;
-}
+    padding: 25px 0px;
+  }
+
   .bottom-nav {
     width: 100%;
-  padding: 5px 0px;
-}
+    padding: 5px 0px;
+  }
 
   .btnm {
     color: #373737;
@@ -418,7 +425,7 @@ onBeforeUnmount(() => {
   transition: all .3s;
 }
 
-.nav-button-l{
+.nav-button-l {
   background: #ff4040;
   color: #fff;
   font-size: 0.8rem;
