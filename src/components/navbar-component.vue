@@ -101,6 +101,8 @@ const currentUserName = ref(''); //当前用户名
 const displayLogo = ref(true);
 // 是否在首页
 const isIndexPage = ref(false);
+// 是否为移动端状态
+const isMobileStatus = ref(false);
 
 // 重置表单
 // const resetForm = (done?: () => void) => {
@@ -133,11 +135,12 @@ watch(() => route.name, (newName, oldName) => {
 
 // 单独控制logo是否显示
 const toggleLogoDisplay = () =>{
-  console.log("是移动端："+isMobileSearchActive.value);
+  console.log("是移动端搜索状态："+isMobileSearchActive.value);
+  console.log("是移动端？："+isMobileStatus.value);
   console.log("是否首页："+isIndexPage.value);
   if(!isMobileSearchActive.value && isIndexPage.value){
     displayLogo.value = true;
-  }else if(isMobileSearchActive.value){
+  }else if(isMobileStatus.value){
     displayLogo.value = true;
   } else {
     displayLogo.value = false;
@@ -231,6 +234,7 @@ const clearOrCancelSearch = () => {
     searchText.value = ''
   } else {
     isMobileSearchActive.value = false
+    toggleLogoDisplay()
   }
 }
 
@@ -239,7 +243,10 @@ const handleResize = () => {
   // 当窗口宽度大于移动端断点时
   if (window.innerWidth >= 805) {
     isMobileSearchActive.value = false  // 关闭搜索状态
+    isMobileStatus.value = false; //设定为PC状态
     searchText.value = '' // 清空搜索文本     
+  }else if(window.innerWidth <= 805){
+    isMobileStatus.value = true;
   }
 }
 
