@@ -76,7 +76,7 @@ const tagCategories = {
 };
 
 // 计算 "类型" 标签
-const filteredTags = (anime) => {
+const filteredTags = (anime: { tags: any[]; }) => {
   const typeTags = tagCategories['类型']; // 获取 "类型" 标签
   return anime.tags.filter(tag => typeTags.includes(tag)); // 仅返回属于 "类型" 的标签
 };
