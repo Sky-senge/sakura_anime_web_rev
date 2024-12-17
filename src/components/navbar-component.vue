@@ -127,9 +127,11 @@ watch(() => route.name, (newName, oldName) => {
 
 // 单独控制logo是否显示
 const toggleLogoDisplay = () =>{
-  console.log("搜索栏状态："+isMobileSearchActive.value);
+  console.log("是移动端："+isMobileSearchActive.value);
   console.log("是否首页："+isIndexPage.value);
   if(!isMobileSearchActive.value && isIndexPage.value){
+    displayLogo.value = true;
+  }else if(isMobileSearchActive.value){
     displayLogo.value = true;
   }else{
     displayLogo.value = false;
