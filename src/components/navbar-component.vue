@@ -1,7 +1,7 @@
 <template>
   <header class="navbar">
     <div class="top-nav">
-      <span class="logo" v-show="!isSearchActive">Sakura</span>
+      <span class="logo" v-show="displayLogo">Sakura</span>
       <div class="search-concent" v-show="!isSearchActive">
         <i class="bi bi-search"></i>
         <input type="text" placeholder="搜索" class="search-bar" />
@@ -91,8 +91,10 @@ const isLoggedIn = ref(false); // 记录用户是否登录的状态，初始为�
 const isAdmin = ref(false); //检查是否为管理员
 
 const currentUserName = ref(''); //当前用户名
-
+// 是否显示Logo
 const displayLogo = ref(true);
+// 是否在首页
+const isIndexPage = ref(false);
 
 // 重置表单
 // const resetForm = (done?: () => void) => {
@@ -115,12 +117,24 @@ const jumpTo = (path: string) => {
 watch(() => route.name, (newName, oldName) => {
       console.log('路由参数变化', newName)
       if(newName != 'HomeSubView'){
-        isSearchActive.value = true;
-        console.log("隐藏！")
+        isIndexPage.value = false;
+        toggleLogoDisplay();
       }else{
-        isSearchActive.value = false;
+        isIndexPage.value = true;
+        toggleLogoDisplay();
       }
     })
+
+// 单独控制logo是否显示
+const toggleLogoDisplay = () =>{
+  console.log("搜索栏状态："+isSearchActive.value);
+  console.log("是否首页："+isIndexPage.value);
+  if(!isSearchActive.value && isIndexPage.value){
+    displayLogo.value = true;
+  }else{
+    displayLogo.value = false;
+  }
+}
 
 const logout = () => {
   ElMessageBox.confirm(
