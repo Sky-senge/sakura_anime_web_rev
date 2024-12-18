@@ -147,6 +147,20 @@ const toggleLogoDisplay = () =>{
   }
 }
 
+// 监听窗口大小变化
+const handleResize = () => {
+  // 当窗口宽度大于移动端断点时
+  if (window.innerWidth >= 805) {
+    isMobileSearchActive.value = false  // 关闭搜索状态
+    isMobileStatus.value = false; //设定为PC状态
+    searchText.value = '' // 清空搜索文本  
+    toggleLogoDisplay()   
+  }else if(window.innerWidth <= 805){
+    isMobileStatus.value = true;
+    toggleLogoDisplay();
+  }
+}
+
 const logout = () => {
   ElMessageBox.confirm(
     "确定要登出吗？",
@@ -238,17 +252,7 @@ const clearOrCancelSearch = () => {
   }
 }
 
-// 监听窗口大小变化
-const handleResize = () => {
-  // 当窗口宽度大于移动端断点时
-  if (window.innerWidth >= 805) {
-    isMobileSearchActive.value = false  // 关闭搜索状态
-    isMobileStatus.value = false; //设定为PC状态
-    searchText.value = '' // 清空搜索文本     
-  }else if(window.innerWidth <= 805){
-    isMobileStatus.value = true;
-  }
-}
+
 
 // 监听最大化事件（间接通过 resize）
 const handleWindowMaximized = () => {
