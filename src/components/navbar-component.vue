@@ -143,10 +143,14 @@ const toggleLogoDisplay = () =>{
   if(!isMobileSearchActive.value && isIndexPage.value){
     displayLogo.value = true;
     isDisplayLeftNav.value = false;
+  }else if(isMobileStatus.value && isMobileSearchActive.value){
+    displayLogo.value = false;
+    isDisplayLeftNav.value = false;
   }else if(isMobileStatus.value){
     displayLogo.value = true;
     isDisplayLeftNav.value = false;
-  } else {
+  } 
+  else {
     displayLogo.value = false;
     isDisplayLeftNav.value = true;
   }
