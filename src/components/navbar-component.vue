@@ -246,6 +246,7 @@ const loadData = () => {
 // 激活搜索
 const activateSearch = () => {
   isMobileSearchActive.value = true
+  displayLogo.value = false;
 }
 
 // 清空或取消搜索
