@@ -65,7 +65,7 @@
 
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, type Ref } from 'vue';
+import { ref, reactive, computed, onMounted, type Ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
@@ -182,11 +182,46 @@ const username = ref("匿名用户");
 // 保存Artplayer实例
 const artPlayerInstance = ref<any>(null);
 
+// 本次是否已经提交历史记录
+const isRecordedHistory = ref(false)
+
 // 获取 Artplayer 实例
 function getInstance(instance: any) {
   artPlayerInstance.value = instance;
   playerStore.setPlayerInstance(instance) //设置到Pinia进行跨状态管理
   console.log('Artplayer 实例:', instance);
+}
+
+const handleClick = () =>{ // 当鼠标点击后，延迟一小会(等待Player初始化)然后获取是否在播
+  let isPlaying=false;
+  setTimeout(()=>{
+    isPlaying = artPlayerInstance.value.playing;
+    console.log("获取Artplayer播放状态"+isPlaying)
+    if(isPlaying){
+      if(!isRecordedHistory.value){
+        userStore.loadUser();
+        addPlayerHistoryRecord(Number(animeId),Number(episode),userStore.userId!)
+        isRecordedHistory.value = true; //避免单个页面重复记录
+      }
+    }
+  },300)
+}
+
+// 如果是播放的状态，刷新历史记录
+const addPlayerHistoryRecord = async(animeId:number, episode:number, userId:number) =>{
+  try{
+    const payload={
+      "userId": userId,
+      "animeId": animeId,
+      "episodes": episode
+    }
+    const response = await request.post('/user/createHistory',payload);
+    if(response.data.status){
+      console.log(`新增历史记录:${animeId},${episode},${userId}`)
+    }
+  }catch(e){
+    console.error(`无法新增历史记录：${e}`)
+  }
 }
 
 // 获取动漫列表并更新视频信息
@@ -330,6 +365,7 @@ onMounted(() => {
     fetchCommentList(Number(animeId), 1); //获取评论列表,打开时默认显示第一页
     fetchTotalyCommentPageNumber(Number(animeId)) //获取评论总页数
     refreshRecommendations() //随机刷新为你推荐
+    document.addEventListener('click', handleClick) //监听鼠标点击事件
   } else {
     console.error('animeId is missing');
   }
