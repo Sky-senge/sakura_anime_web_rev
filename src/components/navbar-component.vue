@@ -3,15 +3,55 @@
     <div class="top-nav">
       <span class="logo" v-show="displayLogo">Sakura</span>
       <nav class="left-nav" v-show="isDisplayLeftNav">
-          <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
-          <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
-          <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
-          <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
-        </nav>
-      <div class="search-concent" v-show="!isMobileSearchActive">
-        <i class="bi bi-search"></i>
-        <input type="text" placeholder="搜索" class="search-bar" />
-      </div>
+        <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
+        <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
+        <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
+        <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
+      </nav>
+      <el-dropdown v-show="!isMobileSearchActive" :popper-class="'dropdown-menu'" trigger="click">
+        <div class="search-concent">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="搜索" class="search-bar" v-model="searchQuery" @input="onSearchInput"
+            @focus="onSearchFocus" @blur="onSearchBlur" />
+        </div>
+        <template #dropdown v-show="isDropdownVisible">
+          <div class="search-dropdown">
+            <!-- 番剧分类 -->
+            <div v-if="animeResults.length > 0" class="search-category">
+              <ul class="search-results">
+                <li v-for="(result, index) in animeResults" :key="'anime-' + index" class="search-result-item">
+                  <img v-if="index === 0" :src="result.image" alt="结果图片" class="result-image" />
+                  {{ result.name }}
+                </li>
+              </ul>
+            </div>
+            <hr>
+            <!-- 相关分类 -->
+            <div v-if="relatedResults.length > 0" class="search-category">
+              <ul class="search-results">
+                <li v-for="(result, index) in relatedResults" :key="'related-' + index" class="search-result-item">
+                  {{ result.name }}
+                </li>
+              </ul>
+            </div>
+            <!-- 没有结果时 -->
+            <div v-if="filteredResults.length === 0" class="no-results">
+              <ul class="search-results">
+                <li class="search-result-item">
+                  没有搜索结果
+                </li>
+              </ul>
+            </div>
+            <!-- 查看更多 -->
+            <div class="search-more" @click="viewMore">
+              <button class="view-more-button">查看更多结果</button>
+            </div>
+          </div>
+        </template>
+      </el-dropdown>
+
+
+
       <div class="search-concent-mobile" v-show="isMobileSearchActive" :class="{ show: isMobileSearchActive }">
         <input type="text" placeholder="搜索" class="search-bar-m" v-model="searchText" />
         <button class="cc-btn" v-show="isMobileSearchActive" @click="clearOrCancelSearch">
@@ -49,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user';
@@ -60,14 +100,27 @@ import {
   User
 } from '@element-plus/icons-vue'
 
-// 控制登录框的显示状态
-// const dialogVisible = ref(false)
+// 路由实例
 const router = useRouter();
 const route = useRoute();
 
-// userStore,artPlayerStore实例化
+// 状态管理
 const userStore = useUserStore();
 const playerStore = usePlayerStore();
+
+// 用户状态
+const isLoggedIn = ref(false); // 是否登录
+const isAdmin = ref(false); // 是否为管理员
+const currentUserName = ref(''); // 当前用户名
+
+// UI 状态
+const isMobileSearchActive = ref(false); // 是否激活移动端搜索
+const displayLogo = ref(true); // 是否显示 Logo
+const isIndexPage = ref(false); // 是否为首页
+const isMobileStatus = ref(false); // 是否为移动端
+const isDisplayLeftNav = ref(false); // 是否显示左侧导航栏（非移动端状态）
+const isDropdownVisible = ref(false); // 控制下拉框显示状态
+
 
 // 登录表单数据
 // const loginForm = reactive({
@@ -84,27 +137,28 @@ const playerStore = usePlayerStore();
 // 表单引用
 const loginFormRef = ref()
 
-// 搜索状态控制
-const isMobileSearchActive = ref(false)
 
 // 搜索文本
 const searchText = ref('')
+const searchQuery = ref(''); // 搜索框输入的值
+const allResults = ref([
+  // 模拟数据
+  { type: 'anime', name: '番剧1', image: 'https://via.placeholder.com/50' },
+  { type: 'anime', name: '番剧2', image: 'https://via.placeholder.com/50' },
+  { type: 'related', name: '相关1' },
+  { type: 'anime', name: '番剧3', image: 'https://via.placeholder.com/50' },
+  { type: 'related', name: '相关2' },
+  { type: 'related', name: '相关3' },
+  { type: 'anime', name: '番剧4', image: 'https://via.placeholder.com/50' },
+  { type: 'anime', name: '番剧5', image: 'https://via.placeholder.com/50' },
+  { type: 'related', name: '相关4' },
+  { type: 'anime', name: '番剧6', image: 'https://via.placeholder.com/50' },
+  { type: 'anime', name: '番剧7', image: 'https://via.placeholder.com/50' },
+  { type: 'related', name: '相关5' },
+  { type: 'related', name: '相关6' }, // 超过12个的结果会被忽略
+]);
 
-// 是否已登录
-const isLoggedIn = ref(false); // 记录用户是否登录的状态，初始为未登录
 
-//是否为管理员
-const isAdmin = ref(false); //检查是否为管理员
-
-const currentUserName = ref(''); //当前用户名
-// 是否显示Logo
-const displayLogo = ref(true);
-// 是否在首页
-const isIndexPage = ref(false);
-// 是否为移动端状态
-const isMobileStatus = ref(false);
-// 是否显示左边导航栏(非移动端状态)
-const isDisplayLeftNav = ref(false);
 
 // 重置表单
 // const resetForm = (done?: () => void) => {
@@ -123,6 +177,7 @@ const jumpTo = (path: string) => {
   }
 }
 
+
 // 监听路由名称变化，如果不是首页，就隐藏logo和搜索框
 watch(() => route.name, (newName, oldName) => {
   console.log('路由参数变化', newName)
@@ -136,20 +191,20 @@ watch(() => route.name, (newName, oldName) => {
 })
 
 // 单独控制logo是否显示
-const toggleLogoDisplay = () =>{
-  console.log("是移动端搜索状态："+isMobileSearchActive.value);
-  console.log("是移动端？："+isMobileStatus.value);
-  console.log("是否首页："+isIndexPage.value);
-  if(!isMobileSearchActive.value && isIndexPage.value){
+const toggleLogoDisplay = () => {
+  console.log("是移动端搜索状态：" + isMobileSearchActive.value);
+  console.log("是移动端？：" + isMobileStatus.value);
+  console.log("是否首页：" + isIndexPage.value);
+  if (!isMobileSearchActive.value && isIndexPage.value) {
     displayLogo.value = true;
     isDisplayLeftNav.value = false;
-  }else if(isMobileStatus.value && isMobileSearchActive.value){
+  } else if (isMobileStatus.value && isMobileSearchActive.value) {
     displayLogo.value = false;
     isDisplayLeftNav.value = false;
-  }else if(isMobileStatus.value){
+  } else if (isMobileStatus.value) {
     displayLogo.value = true;
     isDisplayLeftNav.value = false;
-  } 
+  }
   else {
     displayLogo.value = false;
     isDisplayLeftNav.value = true;
@@ -163,15 +218,15 @@ const handleResize = () => {
     isMobileSearchActive.value = false;  // 关闭搜索状态
     isMobileStatus.value = false; //设定为PC状态
     searchText.value = '' // 清空搜索文本  
-    toggleLogoDisplay()   
-  }else if(window.innerWidth <= 805){
+    toggleLogoDisplay()
+  } else if (window.innerWidth <= 805) {
     isMobileStatus.value = true;
     toggleLogoDisplay();
   }
 }
 
-const checkIsIndex = () =>{
-  if(route.name == 'HomeSubView'){
+const checkIsIndex = () => {
+  if (route.name == 'HomeSubView') {
     isIndexPage.value = true;
   }
 }
@@ -268,7 +323,39 @@ const clearOrCancelSearch = () => {
   }
 }
 
+// 搜索结果过滤
+const filteredResults = computed(() =>
+  allResults.value.filter((result) => result.name.includes(searchQuery.value)).slice(0, 6)
+);
 
+const animeResults = computed(() =>
+  filteredResults.value.filter((result) => result.type === 'anime')
+);
+
+const relatedResults = computed(() =>
+  filteredResults.value.filter((result) => result.type === 'related')
+);
+
+// 输入事件：动态更新下拉框显示状态
+const onSearchInput = () => {
+  // 只有当 searchText 和 searchQuery 都有值时才更改状态
+  isDropdownVisible.value = searchText.value.trim() !== '' && searchQuery.value.trim() !== '';
+};
+
+// 聚焦事件：显示下拉框
+const onSearchFocus = () => {
+  isDropdownVisible.value = searchQuery.value.trim() !== '';
+};
+
+// 失焦事件：隐藏下拉框
+const onSearchBlur = () => {
+  setTimeout(() => (isDropdownVisible.value = false), 200); // 延时关闭，避免用户操作中断
+};
+
+// 查看更多结果
+const viewMore = () => {
+  console.log('查看更多结果');
+};
 
 // 监听最大化事件（间接通过 resize）
 const handleWindowMaximized = () => {
@@ -290,6 +377,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
   window.removeEventListener('resize', handleWindowMaximized)
 })
+
 </script>
 
 <style scoped>
@@ -311,6 +399,71 @@ onBeforeUnmount(() => {
   color: #ff4040;
   font-weight: 800;
 }
+
+.search-drop {
+  max-height: 360px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+
+.search-results {
+  width: 500px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-result-item {
+  padding: 5px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
+}
+
+.result-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+
+.search-category {
+  margin-bottom: 15px;
+}
+
+.category-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.search-more {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.view-more-button {
+  border: none;
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.view-more-button:hover {
+  background-color: #0056b3;
+}
+
 
 .btnm {
   display: none;
