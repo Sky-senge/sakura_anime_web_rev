@@ -2,7 +2,7 @@
   <header class="navbar">
     <div class="top-nav">
       <span class="logo" v-show="displayLogo">Sakura</span>
-      <nav class="left-nav" v-show="!displayLogo">
+      <nav class="left-nav" v-show="isDisplayLeftNav">
           <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
           <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
           <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
@@ -103,6 +103,8 @@ const displayLogo = ref(true);
 const isIndexPage = ref(false);
 // 是否为移动端状态
 const isMobileStatus = ref(false);
+// 是否显示左边导航栏(非移动端状态)
+const isDisplayLeftNav = ref(false);
 
 // 重置表单
 // const resetForm = (done?: () => void) => {
@@ -140,10 +142,13 @@ const toggleLogoDisplay = () =>{
   console.log("是否首页："+isIndexPage.value);
   if(!isMobileSearchActive.value && isIndexPage.value){
     displayLogo.value = true;
+    isDisplayLeftNav.value = false;
   }else if(isMobileStatus.value){
     displayLogo.value = true;
+    isDisplayLeftNav.value = false;
   } else {
     displayLogo.value = false;
+    isDisplayLeftNav.value = true;
   }
 }
 
@@ -151,7 +156,7 @@ const toggleLogoDisplay = () =>{
 const handleResize = () => {
   // 当窗口宽度大于移动端断点时
   if (window.innerWidth >= 805) {
-    isMobileSearchActive.value = false  // 关闭搜索状态
+    isMobileSearchActive.value = false;  // 关闭搜索状态
     isMobileStatus.value = false; //设定为PC状态
     searchText.value = '' // 清空搜索文本  
     toggleLogoDisplay()   
