@@ -161,6 +161,12 @@ const handleResize = () => {
   }
 }
 
+const checkIsIndex = () =>{
+  if(route.name == 'HomeSubView'){
+    isIndexPage.value = true;
+  }
+}
+
 const logout = () => {
   ElMessageBox.confirm(
     "确定要登出吗？",
@@ -261,6 +267,7 @@ const handleWindowMaximized = () => {
 
 // 在组件挂载时添加监听器
 onMounted(() => {
+  checkIsIndex() // 不要改动这个顺序，checkIsIndex必须在前面
   window.addEventListener('resize', handleResize)
   window.addEventListener('resize', handleWindowMaximized)
   // 在初始化时检查一次窗口大小
