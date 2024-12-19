@@ -8,24 +8,28 @@
         <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
         <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
       </nav>
-      <el-dropdown v-show="!isMobileSearchActive" :popper-class="'dropdown-menu'" trigger="click">
+
+      <div v-show="!isMobileSearchActive" class="dropdown-menu">
         <div class="search-concent">
           <i class="bi bi-search"></i>
           <input type="text" placeholder="搜索" class="search-bar" v-model="searchQuery" @input="onSearchInput"
-            @focus="onSearchFocus" @blur="onSearchBlur" />
+            @focus="onSearchFocus" @blur="onSearchBlur"/>
+          <!--@input="onSearchInput" @click="onSearchFocus" @blur="onSearchBlur" -->
+          <!-- @keydown="onInputKeydown" 用于阻止ElementPlus捕获空格导致输入失败问题 -->
         </div>
-        <template #dropdown v-show="isDropdownVisible">
+        <Dropdown Dropdown :is-dropdown-visible="isDropdownVisible" >
+          <!-- 动态内容 -->
           <div class="search-dropdown">
             <!-- 番剧分类 -->
             <div v-if="animeResults.length > 0" class="search-category">
               <ul class="search-results">
-                <li v-for="(result, index) in animeResults" :key="'anime-' + index" class="search-result-item">
+                <li v-for="(result, index) in animeResults" :key="'anime-' + index" class="search-result-item" @click="jumpToAnime(result.url)">
                   <img v-if="index === 0" :src="result.image" alt="结果图片" class="result-image" />
                   {{ result.name }}
                 </li>
               </ul>
             </div>
-            <hr>
+            <hr />
             <!-- 相关分类 -->
             <div v-if="relatedResults.length > 0" class="search-category">
               <ul class="search-results">
@@ -37,18 +41,16 @@
             <!-- 没有结果时 -->
             <div v-if="filteredResults.length === 0" class="no-results">
               <ul class="search-results">
-                <li class="search-result-item">
-                  没有搜索结果
-                </li>
+                <li class="search-result-item">没有搜索结果</li>
               </ul>
             </div>
             <!-- 查看更多 -->
-            <div class="search-more" @click="viewMore">
+            <div class="search-more" @click="jumpTo(`/search?kw=${searchQuery}`)">
               <button class="view-more-button">查看更多结果</button>
             </div>
           </div>
-        </template>
-      </el-dropdown>
+        </Dropdown>
+      </div>
 
 
 
@@ -61,7 +63,7 @@
       <nav class="right-nav" v-show="!isMobileSearchActive">
         <i class="bi bi-search btnm" v-if="!isMobileSearchActive" @click="activateSearch"></i>
         <button size="small" class="nav-button" @click="jumpTo('/WatchHistory')"><i title="历史记录"
-              class="bi bi-clock-history"></i></button>
+            class="bi bi-clock-history"></i></button>
         <button size="small" class="nav-button-l" v-if="!isLoggedIn" @click="jumpTo('/login')">登录</button>
         <el-dropdown v-if="isLoggedIn">
           <span class="nav-button">
@@ -99,6 +101,7 @@ import {
   SwitchButton,
   User
 } from '@element-plus/icons-vue'
+import Dropdown from '@/components/Dropdown.vue';
 
 // 路由实例
 const router = useRouter();
@@ -120,6 +123,7 @@ const isIndexPage = ref(false); // 是否为首页
 const isMobileStatus = ref(false); // 是否为移动端
 const isDisplayLeftNav = ref(false); // 是否显示左侧导航栏（非移动端状态）
 const isDropdownVisible = ref(false); // 控制下拉框显示状态
+const isMouseClick = ref(false); // 鼠标是否已经点击
 
 
 // 登录表单数据
@@ -141,23 +145,31 @@ const loginFormRef = ref()
 // 搜索文本
 const searchText = ref('')
 const searchQuery = ref(''); // 搜索框输入的值
-const allResults = ref([
-  // 模拟数据
-  { type: 'anime', name: '番剧1', image: 'https://via.placeholder.com/50' },
-  { type: 'anime', name: '番剧2', image: 'https://via.placeholder.com/50' },
-  { type: 'related', name: '相关1' },
-  { type: 'anime', name: '番剧3', image: 'https://via.placeholder.com/50' },
-  { type: 'related', name: '相关2' },
-  { type: 'related', name: '相关3' },
-  { type: 'anime', name: '番剧4', image: 'https://via.placeholder.com/50' },
-  { type: 'anime', name: '番剧5', image: 'https://via.placeholder.com/50' },
-  { type: 'related', name: '相关4' },
-  { type: 'anime', name: '番剧6', image: 'https://via.placeholder.com/50' },
-  { type: 'anime', name: '番剧7', image: 'https://via.placeholder.com/50' },
-  { type: 'related', name: '相关5' },
-  { type: 'related', name: '相关6' }, // 超过12个的结果会被忽略
-]);
+// const allResults = ref([
+//   // 模拟数据
+//   { type: 'anime', name: '番剧1', image: 'https://via.placeholder.com/50' },
+//   { type: 'anime', name: '番剧2', image: 'https://via.placeholder.com/50' },
+//   { type: 'related', name: '相关1' },
+//   { type: 'anime', name: '番剧3', image: 'https://via.placeholder.com/50' },
+//   { type: 'related', name: '相关2' },
+//   { type: 'related', name: '相关3' },
+//   { type: 'anime', name: '番剧4', image: 'https://via.placeholder.com/50' },
+//   { type: 'anime', name: '番剧5', image: 'https://via.placeholder.com/50' },
+//   { type: 'related', name: '相关4' },
+//   { type: 'anime', name: '番剧6', image: 'https://via.placeholder.com/50' },
+//   { type: 'anime', name: '番剧7', image: 'https://via.placeholder.com/50' },
+//   { type: 'related', name: '相关5' },
+//   { type: 'related', name: '相关6' }, // 超过12个的结果会被忽略
+// ]);
 
+const allResults = ref<SearchResultItem[]>([]); //搜索结果集
+
+interface SearchResultItem { //对应接口
+  type: 'anime' | 'related';
+  name: string;
+  image?: string;
+  url: string | null;
+}
 
 
 // 重置表单
@@ -189,6 +201,11 @@ watch(() => route.name, (newName, oldName) => {
     toggleLogoDisplay();
   }
 })
+
+// 监听搜索框visibility
+// watch(() => isDropdownVisible.value, (newName, oldName) => {
+//   console.log('搜索框变化', newName)
+// })
 
 // 单独控制logo是否显示
 const toggleLogoDisplay = () => {
@@ -282,31 +299,6 @@ const loadData = () => {
   }
 }
 
-// 提交登录
-// const submitLogin = async () => {
-//   loginFormRef.value?.validate(async (valid: boolean) => {
-//     if (valid) {
-//       try {
-//         const response = await request.post('/user/login', loginForm)
-//         if (response.data.status) {
-//           const { token, userId } = response.data.data
-//           const userStore = useUserStore()
-//           userStore.setUser({ token, userId })
-//           dialogVisible.value = false
-//           resetForm()
-//           console.log('登录成功', response.data.message)
-//         } else {
-//           console.error('登录失败:', response.data.message)
-//         }
-//       } catch (error) {
-//         console.error('网络错误:', error)
-//       }
-//     } else {
-//       console.log('表单验证失败')
-//     }
-//   })
-// }
-
 // 激活搜索
 const activateSearch = () => {
   isMobileSearchActive.value = true
@@ -325,11 +317,12 @@ const clearOrCancelSearch = () => {
 
 // 搜索结果过滤
 const filteredResults = computed(() =>
-  allResults.value.filter((result) => result.name.includes(searchQuery.value)).slice(0, 6)
+  // allResults.value.filter((result) => result.name.includes(searchQuery.value)).slice(0, 6) //暂时不太明白你这里想过滤什么，总之这个把模糊搜索搞炸了
+  allResults.value.filter((result) => allResults.value)
 );
 
 const animeResults = computed(() =>
-  filteredResults.value.filter((result) => result.type === 'anime')
+  filteredResults.value.filter((result:any) => result.type === 'anime')
 );
 
 const relatedResults = computed(() =>
@@ -337,25 +330,83 @@ const relatedResults = computed(() =>
 );
 
 // 输入事件：动态更新下拉框显示状态
-const onSearchInput = () => {
-  // 只有当 searchText 和 searchQuery 都有值时才更改状态
-  isDropdownVisible.value = searchText.value.trim() !== '' && searchQuery.value.trim() !== '';
+const onSearchInput = (event: any) => {
+  // 只有当searchText和searchQuery不为空才触发
+  // 不要启用，启用会导致搜索框自己没掉
+  // isDropdownVisible.value = searchText.value.trim() !== '' && searchQuery.value.trim() !== '';
+  setTimeout(() => {
+    searchPreviewResultGetter();
+  }, 30);
 };
 
 // 聚焦事件：显示下拉框
 const onSearchFocus = () => {
-  isDropdownVisible.value = searchQuery.value.trim() !== '';
+  // isMouseClick.value = false;
+  // isDropdownVisible.value = searchQuery.value.trim() !== '';
+  isDropdownVisible.value = true;
 };
 
 // 失焦事件：隐藏下拉框
 const onSearchBlur = () => {
-  setTimeout(() => (isDropdownVisible.value = false), 200); // 延时关闭，避免用户操作中断
+  console.log("搜索框失焦")
+  setTimeout(() => {
+    isDropdownVisible.value = false;
+    searchQuery.value = '';
+    searchText.value = ''; //同时清空内容
+    allResults.value = [];
+  }, 200); // 延时关闭，避免用户操作中断
+};
+
+const handleClick = () => {
+  isMouseClick.value = true;
+}
+
+const setDropdownVisibility = (visible: boolean) => {
+  isDropdownVisible.value = visible;
+};
+
+// 阻止冒泡事件，导致无法输入空格或者意外切换Dropdown，用于El-Drop-Menu，已废弃
+const onInputKeydown = (event: any) => {
+  const blockedKeys = ['Enter', ' ', 'ArrowDown', 'NumpadEnter'];
+  if (blockedKeys.includes(event.key)) {
+    // console.log("尝试阻止: "+event.key)
+    event.stopPropagation(); // 阻止事件冒泡到 el-dropdown
+    event.preventDefault();
+  }
 };
 
 // 查看更多结果
 const viewMore = () => {
   console.log('查看更多结果');
 };
+
+// 请求并返回搜索动漫结果
+const searchPreviewResultGetter = async () => {
+  const response = await request.get(`/anime/searchByName?keyWord=${searchQuery.value}&size=12`);
+  if (response.data.status) {
+    allResults.value = response.data.data.map((item: {
+      id: number; name: string; filePath: {
+        episodes: number; fileName: string; 
+}[]; 
+}) => ({
+      type: 'anime',
+      name: item.name,
+      image: item.filePath.length > 0 ? `http://localhost:8080/files/getCover/${item.filePath[0].fileName}` : 'http://localhost:8080/files/getCover/default',
+      url: item.filePath.length > 0 ? `/Videoplayback/${item.id}/${item.filePath[0].episodes}` : null
+    }));
+  }
+  console.log(`搜索结果：`)
+  console.log(allResults.value)
+};
+
+// 处理跳转动漫
+const jumpToAnime = (url:string | null) =>{
+  if(url===null){
+    return;
+  }else{
+    jumpTo(url);
+  }
+}
 
 // 监听最大化事件（间接通过 resize）
 const handleWindowMaximized = () => {
@@ -367,6 +418,7 @@ onMounted(() => {
   checkIsIndex() // 不要改动这个顺序，checkIsIndex必须在前面
   window.addEventListener('resize', handleResize)
   window.addEventListener('resize', handleWindowMaximized)
+  document.addEventListener('click', handleClick)
   // 在初始化时检查一次窗口大小
   handleResize()
   loadData()
