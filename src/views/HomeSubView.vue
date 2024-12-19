@@ -28,20 +28,24 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import VideoList from '/src/components/video-list-component.vue';
 import RandomRecommendationPicturesCom from '@/components/RandomRecommendationPicturesCom.vue';
 import Carousel from '/src/components/carousel-component.vue';
 // 引入样式
 import '../assets/home.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+// 引入相关路由/store
 import { useRouter } from 'vue-router';
+import { usePlayerStore } from '@/stores/playerStore';
 
 //实例化路由
 const router = useRouter();
 // 定义刷新状态
 const refreshKey = ref(0);
 const animationClass = ref('');
+
+const playerStore = usePlayerStore();
 
 // 触发动画的函数
 const refreshRecommendations = () => {
@@ -62,6 +66,21 @@ const handleAnimationEnd = () => {
 const jumpTo = (path) => {
   router.push(path)
 }
+
+const refererToPlay =()=>{
+  const jumpTarget = playerStore.theWayTo;
+  if(jumpTarget === null){
+    return;
+  }else{
+    jumpTo(jumpTarget);
+  }
+}
+
+onMounted(()=>{
+  setTimeout(() => {
+    refererToPlay();
+  }, 300); // 延迟 确保playerStore已经加载
+})
 </script>
 
 <style>

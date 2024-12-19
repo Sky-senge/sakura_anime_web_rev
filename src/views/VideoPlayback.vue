@@ -358,10 +358,15 @@ const handleAnimationEnd = () => {
   }
 };
 
+const resetTheWay = ()=>{
+  playerStore.theWayTo = null; //确保跳转成功后就擦除
+}
+
 // 在组件挂载时获取视频详情
 onMounted(() => {
   if (animeId) {
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
+    resetTheWay(); //清空跳转方法
     fetchCommentList(Number(animeId), 1); //获取评论列表,打开时默认显示第一页
     fetchTotalyCommentPageNumber(Number(animeId)) //获取评论总页数
     refreshRecommendations() //随机刷新为你推荐

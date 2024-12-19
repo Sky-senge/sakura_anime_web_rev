@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 export const usePlayerStore = defineStore('player', {
   state: () => ({
     artPlayerInstance: null as Artplayer | null,
+    theWayTo: null as string | null //用于指导接下来该跳哪儿
   }),
   actions: {
     setPlayerInstance(instance: Artplayer | null) {

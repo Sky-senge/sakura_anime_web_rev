@@ -147,19 +147,10 @@ const searchText = ref('')
 const searchQuery = ref(''); // 搜索框输入的值
 // const allResults = ref([
 //   // 模拟数据
-//   { type: 'anime', name: '番剧1', image: 'https://via.placeholder.com/50' },
-//   { type: 'anime', name: '番剧2', image: 'https://via.placeholder.com/50' },
-//   { type: 'related', name: '相关1' },
-//   { type: 'anime', name: '番剧3', image: 'https://via.placeholder.com/50' },
-//   { type: 'related', name: '相关2' },
-//   { type: 'related', name: '相关3' },
-//   { type: 'anime', name: '番剧4', image: 'https://via.placeholder.com/50' },
-//   { type: 'anime', name: '番剧5', image: 'https://via.placeholder.com/50' },
-//   { type: 'related', name: '相关4' },
-//   { type: 'anime', name: '番剧6', image: 'https://via.placeholder.com/50' },
-//   { type: 'anime', name: '番剧7', image: 'https://via.placeholder.com/50' },
-//   { type: 'related', name: '相关5' },
-//   { type: 'related', name: '相关6' }, // 超过12个的结果会被忽略
+//   { type: 'anime', name: '番剧1', image: 'https://via.placeholder.com/50', url:'/videoPlayback/1/3' },
+//   { type: 'anime', name: '番剧2', image: 'https://via.placeholder.com/50', url: null },
+//   { type: 'related', name: '相关1', url: null },
+//   ...
 // ]);
 
 const allResults = ref<SearchResultItem[]>([]); //搜索结果集
@@ -404,7 +395,12 @@ const jumpToAnime = (url:string | null) =>{
   if(url===null){
     return;
   }else{
-    jumpTo(url);
+    if(route.name === 'Videoplayback'){
+      playerStore.theWayTo=url; // 邪恶的同路径跳转黑科技(bushi
+      jumpTo('/');
+    }else{
+      jumpTo(url);
+    }
   }
 }
 
