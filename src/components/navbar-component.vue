@@ -13,23 +13,25 @@
         <div class="search-concent">
           <i class="bi bi-search"></i>
           <input type="text" placeholder="搜索" class="search-bar" v-model="searchQuery" @input="onSearchInput"
-            @focus="onSearchFocus" @blur="onSearchBlur"/>
+            @focus="onSearchFocus" @blur="onSearchBlur" />
+          <i v-if="searchQuery" class="bi bi-x-circle-fill" @click="cancelSearch" title="清空">
+          </i>
           <!--@input="onSearchInput" @click="onSearchFocus" @blur="onSearchBlur" -->
           <!-- @keydown="onInputKeydown" 用于阻止ElementPlus捕获空格导致输入失败问题 -->
         </div>
-        <Dropdown Dropdown :is-dropdown-visible="isDropdownVisible" >
+        <Dropdown Dropdown :is-dropdown-visible="isDropdownVisible">
           <!-- 动态内容 -->
           <div class="search-dropdown">
             <!-- 番剧分类 -->
             <div v-if="animeResults.length > 0" class="search-category">
               <ul class="search-results">
-                <li v-for="(result, index) in animeResults" :key="'anime-' + index" class="search-result-item" @click="jumpToAnime(result.url)">
+                <li v-for="(result, index) in animeResults" :key="'anime-' + index" class="search-result-item"
+                  @click="jumpToAnime(result.url)">
                   <img v-if="index === 0" :src="result.image" alt="结果图片" class="result-image" />
                   {{ result.name }}
                 </li>
               </ul>
             </div>
-            <hr />
             <!-- 相关分类 -->
             <div v-if="relatedResults.length > 0" class="search-category">
               <ul class="search-results">
@@ -40,12 +42,10 @@
             </div>
             <!-- 没有结果时 -->
             <div v-if="filteredResults.length === 0" class="no-results">
-              <ul class="search-results">
-                <li class="search-result-item">没有搜索结果</li>
-              </ul>
+              <p class="search-result-item-n">没有搜索结果</p>
             </div>
             <!-- 查看更多 -->
-            <div class="search-more" @click="jumpTo(`/search?kw=${searchQuery}`)">
+            <div class="search-more" @click="jumpTo(`/search?kw=${searchQuery}`)" v-if="filteredResults.length > 0">
               <button class="view-more-button">查看更多结果</button>
             </div>
           </div>
@@ -53,12 +53,45 @@
       </div>
 
 
-
-      <div class="search-concent-mobile" v-show="isMobileSearchActive" :class="{ show: isMobileSearchActive }">
-        <input type="text" placeholder="搜索" class="search-bar-m" v-model="searchText" />
-        <button class="cc-btn" v-show="isMobileSearchActive" @click="clearOrCancelSearch">
-          {{ searchText ? '清空' : '取消' }}
-        </button>
+      <div class="dropdown-menu-m" v-show="isMobileSearchActive">
+        <div class="search-concent-mobile" :class="{ show: isMobileSearchActive }">
+          <input type="text" placeholder="搜索" class="search-bar-m" v-model="searchQuery" @input="onSearchInput"
+          @focus="onSearchFocus" @blur="onSearchBlur"/>
+          <button class="cc-btn" @click="clearOrCancelSearch">
+            {{ searchQuery ? '清空' : '取消' }}
+          </button>
+        </div>
+        <Dropdown Dropdown :is-dropdown-visible="isDropdownVisible">
+          <!-- 动态内容 -->
+          <div class="search-dropdown-m">
+            <!-- 番剧分类 -->
+            <div v-if="animeResults.length > 0" class="search-category">
+              <ul class="search-results">
+                <li v-for="(result, index) in animeResults" :key="'anime-' + index" class="search-result-item"
+                  @click="jumpToAnime(result.url)">
+                  <img v-if="index === 0" :src="result.image" alt="结果图片" class="result-image" />
+                  {{ result.name }}
+                </li>
+              </ul>
+            </div>
+            <!-- 相关分类 -->
+            <div v-if="relatedResults.length > 0" class="search-category">
+              <ul class="search-results">
+                <li v-for="(result, index) in relatedResults" :key="'related-' + index" class="search-result-item">
+                  {{ result.name }}
+                </li>
+              </ul>
+            </div>
+            <!-- 没有结果时 -->
+            <div v-if="filteredResults.length === 0" class="no-results">
+              <p class="search-result-item-n">没有搜索结果</p>
+            </div>
+            <!-- 查看更多 -->
+            <div class="search-more" @click="jumpTo(`/search?kw=${searchQuery}`)" v-if="filteredResults.length > 0">
+              <button class="view-more-button">查看更多结果</button>
+            </div>
+          </div>
+        </Dropdown>
       </div>
       <nav class="right-nav" v-show="!isMobileSearchActive">
         <i class="bi bi-search btnm" v-if="!isMobileSearchActive" @click="activateSearch"></i>
@@ -298,12 +331,17 @@ const activateSearch = () => {
 
 // 清空或取消搜索
 const clearOrCancelSearch = () => {
-  if (searchText.value) {
-    searchText.value = ''
+  if (searchQuery.value) {
+    searchQuery.value = ''
   } else {
     isMobileSearchActive.value = false
     toggleLogoDisplay()
   }
+}
+
+// 清空搜索
+const cancelSearch = () => {
+  searchText.value = ''
 }
 
 // 搜索结果过滤
@@ -313,7 +351,7 @@ const filteredResults = computed(() =>
 );
 
 const animeResults = computed(() =>
-  filteredResults.value.filter((result:any) => result.type === 'anime')
+  filteredResults.value.filter((result: any) => result.type === 'anime')
 );
 
 const relatedResults = computed(() =>
@@ -377,9 +415,9 @@ const searchPreviewResultGetter = async () => {
   if (response.data.status) {
     allResults.value = response.data.data.map((item: {
       id: number; name: string; filePath: {
-        episodes: number; fileName: string; 
-}[]; 
-}) => ({
+        episodes: number; fileName: string;
+      }[];
+    }) => ({
       type: 'anime',
       name: item.name,
       image: item.filePath.length > 0 ? `http://localhost:8080/files/getCover/${item.filePath[0].fileName}` : 'http://localhost:8080/files/getCover/default',
@@ -391,14 +429,14 @@ const searchPreviewResultGetter = async () => {
 };
 
 // 处理跳转动漫
-const jumpToAnime = (url:string | null) =>{
-  if(url===null){
+const jumpToAnime = (url: string | null) => {
+  if (url === null) {
     return;
-  }else{
-    if(route.name === 'Videoplayback'){
-      playerStore.theWayTo=url; // 邪恶的同路径跳转黑科技(bushi
+  } else {
+    if (route.name === 'Videoplayback') {
+      playerStore.theWayTo = url; // 邪恶的同路径跳转黑科技(bushi
       jumpTo('/');
-    }else{
+    } else {
       jumpTo(url);
     }
   }
@@ -448,38 +486,41 @@ onBeforeUnmount(() => {
   font-weight: 800;
 }
 
-.search-drop {
-  max-height: 360px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
+.search-dropdown {
+  border: none;
 }
 
-
 .search-results {
-  width: 500px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .search-result-item {
-  padding: 5px 10px;
+  padding: 15px 10px;
   cursor: pointer;
   display: flex;
+  font-weight: 600;
+  width: 100%;
+  gap: 12px;
   align-items: center;
 }
 
+.search-result-item-n {
+  font-weight: 600;
+}
+
+.no-results {
+  text-align: center;
+}
+
 .search-result-item:hover {
-  background-color: #f0f0f0;
+  background-color: #e0e0e0;
 }
 
 .result-image {
   width: 40px;
   height: 40px;
-  margin-right: 10px;
   border-radius: 5px;
 }
 
@@ -496,22 +537,22 @@ onBeforeUnmount(() => {
 
 .search-more {
   text-align: center;
-  margin-top: 10px;
 }
 
 .view-more-button {
   border: none;
-  background-color: #007bff;
-  color: white;
-  padding: 5px 10px;
+  background: none;
+  border-top: 1px solid #ccc;
+  width: 100%;
+  color: rgb(79, 79, 79);
+  font-weight: 600;
+  padding: 20px 0;
   cursor: pointer;
-  border-radius: 5px;
 }
 
 .view-more-button:hover {
-  background-color: #0056b3;
+  color: rgb(66, 66, 66);
 }
-
 
 .btnm {
   display: none;
@@ -524,20 +565,22 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0px;
+  padding: 8px 0px;
   transition: all .3s;
 }
 
 .bottom-nav {
-  padding: 15px 0px;
+  padding: 12px 0px;
 }
 
 .search-bar-m,
 .search-concent {
   width: 500px;
-  background-color: #e5e5e5;
-  padding: 12px 15px;
-  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  background-color: #e2e4e6;
+  padding: 9px 12px;
+  border-radius: 8px;
   transition: all 0.3s ease;
 }
 
@@ -581,24 +624,25 @@ onBeforeUnmount(() => {
     display: none;
   }
 
+
+  .dropdown-menu-m{
+    max-width: 100%;
+    width: 100%;
+  }
+
   .search-concent-mobile {
     display: flex;
-    width: 20px;
-    max-width: 0;
     background: none;
     justify-content: flex-start;
     align-items: center;
-    gap: 10px;
     transition: all .3s;
   }
 
   .search-concent-mobile.show {
     color: #373737;
     background: #e2e4e7;
-    max-width: 100%;
     width: 100%;
     border-radius: 6px;
-    padding: 0 10px;
   }
 
   .search-bar-m {
@@ -618,6 +662,7 @@ onBeforeUnmount(() => {
     font-size: 0.8rem;
     letter-spacing: 2px;
     color: #ff4d00;
+    margin-right: 10px;
   }
 
   .bi {
@@ -683,7 +728,7 @@ onBeforeUnmount(() => {
 
 .search-concent i {
   font-size: 0.7rem;
-  padding: 8px 4px;
+  padding: 8px;
   cursor: pointer;
 }
 </style>

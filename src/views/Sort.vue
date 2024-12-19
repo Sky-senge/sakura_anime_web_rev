@@ -423,13 +423,13 @@ onMounted(() => {
 }
 
 .reset-button:hover {
-  color: #f2f4f8;
-  background-color: #282828;
+  color: rgb(68, 68, 68);
+  background: #d7dbe5;
 }
 
 .reset-button:active {
-  color: #f2f4f8;
-  background-color: #222;
+  color: rgb(68, 68, 68);
+  background: #e7eaf0;
 }
 
 /* Video List Part */
