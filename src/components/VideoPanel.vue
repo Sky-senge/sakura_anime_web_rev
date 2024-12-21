@@ -34,7 +34,7 @@
     <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentPageChange" />
 
     <!-- 编辑/新建 视频对话框 -->
-    <el-dialog v-model="isEditDialogVisible" title="修改视频信息"  :before-close="handleDialogClose">
+    <el-dialog v-model="isEditDialogVisible" :title="editForm.id ? '修改视频信息' : '创建视频资源'"  :before-close="handleDialogClose">
       <div v-loading="loadingDetail">
         <el-form :model="editForm" label-width="100px">
           <!-- Tab栏 -->
