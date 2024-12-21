@@ -238,6 +238,7 @@ const fetchAnimeList = async () => {
 
       console.log(animeList.value);
     } else {
+      animeList.value = [];
       console.error('Failed to fetch anime list:', response.data.message);
     }
   } catch (error) {
