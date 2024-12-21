@@ -20,7 +20,9 @@
             </div>
             <ul>
               <li v-for="(comment, commentIndex) in comments" :key="commentIndex">
-                <p><strong>{{ comment.username }}</strong>：{{ comment.content }}</p>
+                <p><strong>{{ comment.username }}</strong>：{{ comment.content }}
+                  <el-button v-if="isAdmin" type="danger" text="danger" @click="deleteComment(comment.id)">删除评论</el-button>
+                </p>
               </li>
             </ul>
             <!-- 分页器 -->
@@ -88,6 +90,9 @@ const episode = route.params.episode as string;
 const videoPlayerRef = ref<InstanceType<typeof Artplayer> | null>(null);
 //userStore实例化
 const userStore = useUserStore();
+
+// 是否为管理员状态
+const isAdmin = ref(false);
 
 const tagCategories = {
   状态: ['连载', '完结'],
@@ -340,6 +345,16 @@ async function addComment() {
   }
 }
 
+const deleteComment = async(commentId: number) =>{
+  const response = await request.get(`/comment/deleteComment/${commentId}`)
+  if(response.data.status){
+    ElMessage.success("删除评论成功！")
+    fetchCommentList(videoDetail.id, currentPage.value);
+  }else{
+    ElMessage.error("删除评论失败！")
+  }
+}
+
 const refreshKey = ref(0);
 const animationClass = ref('');
 
@@ -365,8 +380,12 @@ const resetTheWay = ()=>{
 // 在组件挂载时获取视频详情
 onMounted(() => {
   if (animeId) {
+    userStore.loadUser()
     fetchEpisodeList(animeId); // 调用获取视频列表的方法
     resetTheWay(); //清空跳转方法
+    if(userStore.isAdmin === true){
+      isAdmin.value = true; //是管理员则设置状态
+    }
     fetchCommentList(Number(animeId), 1); //获取评论列表,打开时默认显示第一页
     fetchTotalyCommentPageNumber(Number(animeId)) //获取评论总页数
     refreshRecommendations() //随机刷新为你推荐
