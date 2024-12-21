@@ -213,14 +213,17 @@ const isTagSelected = (tag) => {
 };
 
 const toggleTag = (tag) => {
-  const existingTags = editForm.tags.split(',').map(t => t.trim()).filter(t => t);
+  let existingTags = [];
+  if (editForm.tags && typeof editForm.tags === 'string') {
+    existingTags = editForm.tags.split(',').map(t => t.trim()).filter(t => t);
+  }
 
   if (existingTags.includes(tag)) {
-    // 如果标签已经存在，从标签列表中移除
+    // 如果标签已经存在,从标签列表中移除
     const updatedTags = existingTags.filter((existingTag) => existingTag !== tag);
     editForm.tags = updatedTags.join(', ');
   } else {
-    // 否则，添加标签
+    // 否则,添加标签
     const updatedTags = [...existingTags, tag];
     editForm.tags = updatedTags.join(', ');
   }
