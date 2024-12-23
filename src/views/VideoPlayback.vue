@@ -67,7 +67,7 @@
 
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, type Ref, watch } from 'vue';
+import { ref, reactive, computed, onMounted, type Ref, watch, inject } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
@@ -78,6 +78,9 @@ import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitle
 import artplayerPluginLibass from 'artplayer-plugin-libass';
 import { request } from '@/utils/request';
 import { ElMessage } from 'element-plus';
+
+// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
+const serverUrl = inject<string>('serverUrl');
 
 // 获取路由参数
 const router = useRouter();
@@ -242,8 +245,8 @@ async function fetchEpisodeList(animeId: string) {
       episodes.value = filePathList.map((file: any) => {
         return {
           episode: `${file.episodes}`,
-          videoUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.m3u8`,
-          subtitleUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.ass`
+          videoUrl: `${serverUrl}/files/getVideo/${file.fileName}/playlist.m3u8`,
+          subtitleUrl: `${serverUrl}/files/getVideo/${file.fileName}/playlist.ass`
         };
       });
       // 如果 episodes 存在，默认设置为第一个视频

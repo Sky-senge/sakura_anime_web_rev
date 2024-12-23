@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user';
@@ -157,6 +157,9 @@ const isMobileStatus = ref(false); // 是否为移动端
 const isDisplayLeftNav = ref(false); // 是否显示左侧导航栏（非移动端状态）
 const isDropdownVisible = ref(false); // 控制下拉框显示状态
 const isMouseClick = ref(false); // 鼠标是否已经点击
+
+// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
+const serverUrl = inject<string>('serverUrl');
 
 
 // 登录表单数据
@@ -420,7 +423,7 @@ const searchPreviewResultGetter = async () => {
     }) => ({
       type: 'anime',
       name: item.name,
-      image: item.filePath.length > 0 ? `http://localhost:8080/files/getCover/${item.filePath[0].fileName}` : 'http://localhost:8080/files/getCover/default',
+      image: item.filePath.length > 0 ? `${serverUrl}/files/getCover/${item.filePath[0].fileName}` : `${serverUrl}/files/getCover/default`,
       url: item.filePath.length > 0 ? `/Videoplayback/${item.id}/${item.filePath[0].episodes}` : null
     }));
   }

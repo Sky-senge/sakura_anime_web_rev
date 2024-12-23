@@ -15,9 +15,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, inject } from 'vue';
 import '@arco-design/web-vue/dist/arco.css';
 import { fileRequest } from '@/utils/request';
+
+// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
+const serverUrl = inject<string>('serverUrl');
 
 export default defineComponent({
   name: 'Carousel',
@@ -38,7 +41,7 @@ export default defineComponent({
         const response = await fileRequest.get<CarouselResponse>('/getCarouselList');
         if (response.data.status) {
           images.value = response.data.data.map(
-            (fileName) => `http://localhost:8080/files/getCarouse/${fileName}`
+            (fileName) => `${serverUrl}/files/getCarouse/${fileName}`
           );
           console.log('轮播图加载成功:', images.value);
         } else {

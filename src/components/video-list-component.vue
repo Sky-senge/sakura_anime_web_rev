@@ -16,9 +16,12 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, inject } from 'vue';
 import request from '@/utils/request'; // 引入封装好的 request 模块
 import router from '@/router';
+
+// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
+const serverUrl = inject<string>('serverUrl');
 
 // 定义 Anime 接口类型
 interface Anime {
@@ -80,7 +83,7 @@ export default defineComponent({
      * @returns 完整的封面 URL
      */
     const getCoverUrl = (fileName: string) => {
-      return `http://localhost:8080/files/getCover/${fileName}`;
+      return `${serverUrl}/files/getCover/${fileName}`;
     };
 
     /**

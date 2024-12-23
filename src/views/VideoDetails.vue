@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, type Ref } from 'vue';
+import { onMounted, ref, reactive, type Ref, inject } from 'vue';
 import { ElButton, ElMessageBox } from 'element-plus';
 import { ElMessage } from 'element-plus';
 import { useRoute,useRouter } from 'vue-router';
@@ -76,6 +76,9 @@ const route=useRoute();
 const router=useRouter();
 //获取路由参数
 const animeId = route.params.animeId as string;
+
+// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
+const serverUrl = inject<string>('serverUrl');
 
 const episodes: Ref<Episode[]> = ref([]);
 const videoDetail = reactive<Video>({
@@ -160,8 +163,8 @@ async function fetchEpisodeList(animeId: string) {
       episodes.value = filePathList.map((file: any) => {
         return {
           episode: `${file.episodes}`,
-          videoUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.m3u8`,
-          subtitleUrl: `http://localhost:8080/files/getVideo/${file.fileName}/playlist.ass`
+          videoUrl: `${serverUrl}/files/getVideo/${file.fileName}/playlist.m3u8`,
+          subtitleUrl: `${serverUrl}/files/getVideo/${file.fileName}/playlist.ass`
         };
       });
     } else {
@@ -179,7 +182,7 @@ async function fetchEpisodeList(animeId: string) {
 const getCoverUrl = () => {
 const fileObj = videoDetail.filePath.find(item => item.episodes === 1);
 const fileName = fileObj?.fileName || 'default';
-return `http://localhost:8080/files/getCover/${fileName}`;
+return `${serverUrl}/files/getCover/${fileName}`;
 };
 
 onMounted(()=>{

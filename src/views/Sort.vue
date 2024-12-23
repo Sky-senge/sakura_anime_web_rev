@@ -82,11 +82,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { inject, onMounted, ref, watch } from 'vue';
 import Navbar from '/src/components/navbar-component.vue';
 import request from '@/utils/request';
 import router from '@/router';
 import { ElMessage } from 'element-plus';
+
+// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
+const serverUrl = inject<string>('serverUrl');
 
 
 const animeList = ref<Anime[]>([]);
@@ -252,7 +255,7 @@ const fetchAnimeList = async () => {
  * @returns 完整的封面 URL
  */
 const getCoverUrl = (fileName: string) => {
-  return `http://localhost:8080/files/getCover/${fileName}`;
+  return `${serverUrl}/files/getCover/${fileName}`;
 };
 
 /**
