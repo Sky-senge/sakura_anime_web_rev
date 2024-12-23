@@ -6,6 +6,7 @@
         <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
         <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
         <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
+        <button size="small" class="nav-button" @click="jumpTo('/imagelibrary')">精选图库</button>
         <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
       </nav>
 
@@ -117,6 +118,7 @@
         <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
         <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
         <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
+        <button size="small" class="nav-button" @click="jumpTo('/imagelibrary')">精选图库</button>
         <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
       </nav>
     </div>

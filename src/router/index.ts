@@ -9,6 +9,7 @@ import HomeSubView from '@/views/HomeSubView.vue'
 import VideoDetails from '@/views/VideoDetails.vue'
 import SearchPage from '@/views/SearchPage.vue'
 import WatchHistory from '@/views/WatchHistory.vue'
+import ImageLibrary from '@/views/ImageLibrary.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,11 @@ const router = createRouter({
           path: '/watchhistory',
           name: 'watchhistory',
           component: WatchHistory,
+        },
+        {
+          path: '/imagelibrary',
+          name: 'imagelibrary',
+          component: ImageLibrary,
         }
       ]
     },
