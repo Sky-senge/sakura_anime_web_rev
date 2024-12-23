@@ -14,8 +14,6 @@ import 'element-plus/dist/index.css'
 import '@arco-design/web-vue/dist/arco.css';
 import './assets/global.css' 
 
-// API服务器全局地址
-const serverUrl = 'http://localhost:8080';
 
 
 
@@ -26,7 +24,6 @@ app.use(pinia)
 app.use(router)
 app.use(ElementPlus)
 app.use(ArcoVue)
-app.provide('serverUrl', serverUrl);
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component) //导入ElementPlus Icon图标库

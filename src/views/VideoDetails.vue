@@ -66,19 +66,21 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, type Ref, inject } from 'vue';
+import { onMounted, ref, reactive, type Ref } from 'vue';
 import { ElButton, ElMessageBox } from 'element-plus';
 import { ElMessage } from 'element-plus';
 import { useRoute,useRouter } from 'vue-router';
 import request from '@/utils/request';
+import { useGlobalStore } from '@/stores/globalSettings';
 
 const route=useRoute();
 const router=useRouter();
 //获取路由参数
 const animeId = route.params.animeId as string;
 
-// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
-const serverUrl = inject<string>('serverUrl');
+// 获取来自GlobalSettings提供的 serverUrl
+const globalStore = useGlobalStore();
+const serverUrl = globalStore.serverUrl;
 
 const episodes: Ref<Episode[]> = ref([]);
 const videoDetail = reactive<Video>({

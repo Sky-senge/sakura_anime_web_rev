@@ -16,12 +16,12 @@
   
   
   <script lang="ts">
-  import { defineComponent, ref, onMounted, inject } from 'vue';
+  import { defineComponent, ref, onMounted } from 'vue';
   import request from '@/utils/request'; // 引入封装好的 request 模块
   import router from '@/router';
+import { useGlobalStore } from '@/stores/globalSettings';
 
-  // 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
-const serverUrl = inject<string>('serverUrl');
+
   
   // 定义 Anime 接口类型
   interface Anime {
@@ -42,6 +42,9 @@ const serverUrl = inject<string>('serverUrl');
       required: true
     }},
     setup() {
+      // 获取来自GlobalSettings提供的 serverUrl
+      const globalStore = useGlobalStore();
+      const serverUrl = globalStore.serverUrl;
       // 定义响应式变量 animeList
       const animeList = ref<Anime[]>([]);
       //是否启用随机推荐模式

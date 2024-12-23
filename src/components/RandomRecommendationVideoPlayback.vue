@@ -14,12 +14,12 @@
   
   
   <script lang="ts">
-  import { defineComponent, ref, onMounted, inject } from 'vue';
+  import { defineComponent, ref, onMounted } from 'vue';
   import request from '@/utils/request'; // 引入封装好的 request 模块
   import router from '@/router';
+import { useGlobalStore } from '@/stores/globalSettings';
 
-  // 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
-const serverUrl = inject<string>('serverUrl');
+
   
   interface Anime {
     id: number;
@@ -34,6 +34,9 @@ const serverUrl = inject<string>('serverUrl');
   export default defineComponent({
     name: 'VideoList',
     setup() {
+      // 获取来自GlobalSettings提供的 serverUrl
+      const globalStore = useGlobalStore();
+      const serverUrl = globalStore.serverUrl;
       const animeList = ref<Anime[]>([]);
       const randomAnimeList = ref<Anime[]>([]);
       const randomCount = ref(6);  // 默认选择4个动漫

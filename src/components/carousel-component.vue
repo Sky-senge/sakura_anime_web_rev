@@ -15,16 +15,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, inject } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import '@arco-design/web-vue/dist/arco.css';
 import { fileRequest } from '@/utils/request';
+import { useGlobalStore } from '@/stores/globalSettings';
 
-// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
-const serverUrl = inject<string>('serverUrl');
+
 
 export default defineComponent({
   name: 'Carousel',
   setup() {
+    // 获取来自GlobalSettings提供的 serverUrl
+    const globalStore = useGlobalStore();
+    const serverUrl = globalStore.serverUrl;
     // 定义轮播图数据
     const images = ref<string[]>([]);
 

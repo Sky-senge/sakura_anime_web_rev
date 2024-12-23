@@ -67,7 +67,7 @@
 
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, type Ref, watch, inject } from 'vue';
+import { ref, reactive, computed, onMounted, type Ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { usePlayerStore } from '@/stores/playerStore';
@@ -78,9 +78,11 @@ import artplayerPluginMultipleSubtitles from 'artplayer-plugin-multiple-subtitle
 import artplayerPluginLibass from 'artplayer-plugin-libass';
 import { request } from '@/utils/request';
 import { ElMessage } from 'element-plus';
+import { useGlobalStore } from '@/stores/globalSettings';
 
-// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
-const serverUrl = inject<string>('serverUrl');
+// 获取来自GlobalSettings提供的 serverUrl
+const globalStore = useGlobalStore();
+const serverUrl = globalStore.serverUrl;
 
 // 获取路由参数
 const router = useRouter();

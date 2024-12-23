@@ -49,14 +49,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, watch, inject } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import Navbar from '/src/components/navbar-component.vue';
 import request from '@/utils/request';
 import router from '@/router';
 import { ElMessage } from 'element-plus';
+import { useGlobalStore } from '@/stores/globalSettings';
 
-// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
-const serverUrl = inject<string>('serverUrl');
+// 获取来自GlobalSettings提供的 serverUrl
+const globalStore = useGlobalStore();
+const serverUrl = globalStore.serverUrl;
 
 
 const animeList = ref<Anime[]>([]);

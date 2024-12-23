@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onBeforeUnmount, watch, inject } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user';
@@ -135,6 +135,7 @@ import {
   User
 } from '@element-plus/icons-vue'
 import Dropdown from '@/components/Dropdown.vue';
+import { useGlobalStore } from '@/stores/globalSettings';
 
 // 路由实例
 const router = useRouter();
@@ -158,8 +159,9 @@ const isDisplayLeftNav = ref(false); // 是否显示左侧导航栏（非移动�
 const isDropdownVisible = ref(false); // 控制下拉框显示状态
 const isMouseClick = ref(false); // 鼠标是否已经点击
 
-// 使用 inject 获取从App.vue提供的 serverUrl，并声明类型
-const serverUrl = inject<string>('serverUrl');
+// 获取来自GlobalSettings提供的 serverUrl
+const globalStore = useGlobalStore();
+const serverUrl = globalStore.serverUrl;
 
 
 // 登录表单数据
