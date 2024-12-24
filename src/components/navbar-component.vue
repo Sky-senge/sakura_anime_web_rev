@@ -162,7 +162,7 @@ const isDropdownVisible = ref(false); // 控制下拉框显示状态
 const isMouseClick = ref(false); // 鼠标是否已经点击
 
 // UI附加功能
-const isEnableImagelibrary = ref(false);
+const isEnableImagelibrary = ref(true);
 const isEnablePersonalCenter = ref(false);
 
 // 获取来自GlobalSettings提供的 serverUrl
