@@ -18,6 +18,8 @@
   import request from '@/utils/request'; // 引入封装好的 request 模块
   import router from '@/router';
 import { useGlobalStore } from '@/stores/globalSettings';
+import { usePlayerStore } from '@/stores/playerStore';
+import { useRoute } from 'vue-router';
 
 
   
@@ -36,6 +38,8 @@ import { useGlobalStore } from '@/stores/globalSettings';
     setup() {
       // 获取来自GlobalSettings提供的 serverUrl
       const globalStore = useGlobalStore();
+      const playerStore = usePlayerStore()
+      const route = useRoute();
       const serverUrl = globalStore.serverUrl;
       const animeList = ref<Anime[]>([]);
       const randomAnimeList = ref<Anime[]>([]);
@@ -83,10 +87,22 @@ import { useGlobalStore } from '@/stores/globalSettings';
       const getCoverUrl = (fileName: string) => {
         return `${serverUrl}/files/getCover/${fileName}`;
       };
-  
+
+      // 导航跳转方法
+      const jumpTo = (path: string) => {
+        router.push(path)
+        // 防止被播放器卡住
+        if (route.name === 'Videoplayback') {
+          playerStore.destroyPlayerInstance(); //跳转前销毁播放器实例
+          router.replace(path)
+        }
+      }
+      
       // 跳转到详情页面
       const jumpToDetail = (animeId: number) => {
-        router.push(`/Videoplayback/${animeId}/1`);
+        const path = `/Videoplayback/${animeId}/1`;
+        playerStore.theWayTo = path;
+        jumpTo(`/`);
       };
   
       onMounted(fetchAnimeList);
