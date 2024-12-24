@@ -17,9 +17,9 @@
   import { defineComponent, ref, onMounted } from 'vue';
   import request from '@/utils/request'; // 引入封装好的 request 模块
   import router from '@/router';
-import { useGlobalStore } from '@/stores/globalSettings';
-import { usePlayerStore } from '@/stores/playerStore';
-import { useRoute } from 'vue-router';
+  import { useGlobalStore } from '@/stores/globalSettings';
+  import { usePlayerStore } from '@/stores/playerStore';
+  import { useRoute } from 'vue-router';
 
 
   
