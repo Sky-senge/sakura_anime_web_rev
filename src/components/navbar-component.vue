@@ -6,7 +6,7 @@
         <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
         <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
         <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
-        <button size="small" class="nav-button" @click="jumpTo('/imagelibrary')">精选图库</button>
+        <button size="small" class="nav-button" @click="jumpTo('/imagelibrary')" v-if="isEnableImagelibrary">精选图库</button>
         <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
       </nav>
 
@@ -106,7 +106,7 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item :icon="User">用户详情</el-dropdown-item>
+              <el-dropdown-item :icon="User" v-if="isEnablePersonalCenter">用户详情</el-dropdown-item>
               <el-dropdown-item :icon="SwitchButton" @click="logout">登出</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -118,7 +118,7 @@
         <button size="small" class="nav-button" @click="jumpTo('/')">首页</button>
         <button size="small" class="nav-button" @click="jumpTo('/sort')">全部</button>
         <button size="small" class="nav-button" @click="jumpTo('/ranking')">排行榜</button>
-        <button size="small" class="nav-button" @click="jumpTo('/imagelibrary')">精选图库</button>
+        <button size="small" class="nav-button" @click="jumpTo('/imagelibrary')" v-if="isEnableImagelibrary">精选图库</button>
         <button size="small" class="nav-button" @click="jumpTo('/manage')" v-if="isAdmin">管理后台</button>
       </nav>
     </div>
@@ -160,6 +160,10 @@ const isMobileStatus = ref(false); // 是否为移动端
 const isDisplayLeftNav = ref(false); // 是否显示左侧导航栏（非移动端状态）
 const isDropdownVisible = ref(false); // 控制下拉框显示状态
 const isMouseClick = ref(false); // 鼠标是否已经点击
+
+// UI附加功能
+const isEnableImagelibrary = ref(false);
+const isEnablePersonalCenter = ref(false);
 
 // 获取来自GlobalSettings提供的 serverUrl
 const globalStore = useGlobalStore();
