@@ -12,6 +12,55 @@ TypeScript 默认无法处理 `.vue` 文件的类型信息，因此我们用 `vu
 
 请参阅 [Vite 配置参考](https://vite.dev/config/)。
 
+关于后端API的地址配置需要改动`./stores/globalSettings`
+
+```ts
+import { defineStore } from 'pinia';
+
+export const useGlobalStore = defineStore('global', {
+  state: () => ({
+    serverUrl: 'http://localhost:8080', // 在这里定义后端的URL
+    resUrl:'' // CDN资源的链接，目前没用，留个接口
+  }),
+});
+
+```
+
+另外需要配置`vite.config.ts`文件，配置后端ProxyURL以解决跨域问题
+
+```ts
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+// https://vite.dev/config/
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080', // 后端Proxy URL
+        changeOrigin: true,
+      },
+      '/files': {
+        target: 'http://localhost:8080',// 后端Proxy URL
+        changeOrigin: true,
+      }
+    }
+  },
+  plugins: [
+    vue(),
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    },
+  },
+})
+
+
+```
+
 ## 项目设置
 
 ```sh
