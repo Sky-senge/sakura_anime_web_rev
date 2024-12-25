@@ -1,32 +1,30 @@
-# sakura_anime_web
+# sakura_anime_web 运行说明
 
-This template should help get you started developing with Vue 3 in Vite.
+## 推荐的 IDE 设置
 
-## Recommended IDE Setup
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)（并禁用 Vetur，如有）。
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## `.vue` 文件在 TS 中的类型支持
 
-## Type Support for `.vue` Imports in TS
+TypeScript 默认无法处理 `.vue` 文件的类型信息，因此我们用 `vue-tsc` 替代 `tsc` CLI 来进行类型检查。在编辑器中，我们需要 [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) 使 TypeScript 语言服务能够识别 `.vue` 文件的类型，并建议安装`Vite`插件。
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## 自定义配置
 
-## Customize configuration
+请参阅 [Vite 配置参考](https://vite.dev/config/)。
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## 项目设置
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### 运行和热重载模式
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### 类型检查、编译和压缩为生产模式代码
 
 ```sh
 npm run build
