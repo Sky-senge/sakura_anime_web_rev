@@ -1,5 +1,13 @@
 # sakura_anime_web 运行说明
 
+**If you are Looking for English ver. [Click here](./README_EN.md)**
+
+## 运行环境需求：
+
+NodeJS v18 (LTS版本)
+
+npm v9.8 (建议，不强制)
+
 ## 推荐的 IDE 设置
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)（并禁用 Vetur，如有）。
@@ -23,7 +31,6 @@ export const useGlobalStore = defineStore('global', {
     resUrl:'' // CDN资源的链接，目前没用，留个接口
   }),
 });
-
 ```
 
 另外需要配置`vite.config.ts`文件，配置后端ProxyURL以解决跨域问题
@@ -57,8 +64,6 @@ export default defineConfig({
     },
   },
 })
-
-
 ```
 
 ## 项目设置
