@@ -79,6 +79,7 @@ try{
   
 };
 const handleClose = () => {
+  dialogVisible.value = false;
   return null;
 }
 </script>
