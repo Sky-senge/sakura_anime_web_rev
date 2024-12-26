@@ -4,9 +4,9 @@
 
 ## 运行环境需求：
 
-NodeJS v18 (LTS版本)
+* NodeJS v18 (LTS版本)
 
-npm v9.8 (建议，不强制)
+* npm v9.8 (建议，不强制)
 
 ## 推荐的 IDE 设置
 
