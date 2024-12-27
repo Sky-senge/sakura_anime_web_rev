@@ -76,7 +76,24 @@ const refererToPlay =()=>{
   }
 }
 
+// 展示logo
+const logoStyle = `font-size: 75px; font-weight: bold;
+background: #FFB6C1 ; color: #d9526d;
+text-shadow: 3px -3px #FFFFFF , -3px 3px 6px black;
+padding: 8px 25px;`;
+
+const showConsoleLogo = () =>{
+  console.log(
+    "%cSakura Anime🌸%c\n"
+    ,logoStyle
+  );
+  console.log("Project Sorce: https://github.com/Radium-bit/sakura_anime_web\n"+
+  "项目源码: https://github.com/Radium-bit/sakura_anime_web\n"+
+  "Sakura_Anime_Web Copyright(C)2024 Radium-bit,MilkteaCat,Lunk,Sky_Sen.")
+}
+
 onMounted(()=>{
+  showConsoleLogo()
   setTimeout(() => {
     refererToPlay();
   }, 300); // 延迟 确保playerStore已经加载
