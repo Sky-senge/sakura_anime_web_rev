@@ -58,6 +58,7 @@
 import { ref,onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user'; 
+import { useTokenStatus } from '@/stores/token';
 import { ElMessageBox } from 'element-plus';
 import request from '@/utils/request';
 
@@ -71,6 +72,8 @@ import DanmuPanel from '@/components/DanmuPanel.vue';
 const router = useRouter();
 // userStore实例化
 const userStore = useUserStore();
+// TokenStatus实例化
+const tokenStatus = useTokenStatus();
 
 // 响应式变量
 const currentPanel = ref('UserPanel'); // 默认显示用户管理模块
@@ -123,6 +126,9 @@ const checkUserPermissionLv = async () => { // 检查用户权限是否满足
         router.push('/');  // 如果权限不为0，跳转到首页
       }
     } else {
+      if(response.data.error.includes("JWT expired")){ //如果Token过期那么给予提示
+        tokenStatus.setTokenStatus('1');
+      }
       router.push('/');  // 如果状态为false或者data不存在，跳转到首页
     }
   } catch (error) {

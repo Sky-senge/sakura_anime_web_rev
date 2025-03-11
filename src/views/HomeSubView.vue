@@ -38,6 +38,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 // 引入相关路由/store
 import { useRouter } from 'vue-router';
 import { usePlayerStore } from '@/stores/playerStore';
+import { useTokenStatus } from '@/stores/token';
+import { useUserStore } from '@/stores/user';
 
 //实例化路由
 const router = useRouter();
@@ -46,6 +48,8 @@ const refreshKey = ref(0);
 const animationClass = ref('');
 
 const playerStore = usePlayerStore();
+const tokenStatus = useTokenStatus();
+const userStore = useUserStore();
 
 // 触发动画的函数
 const refreshRecommendations = () => {
@@ -69,6 +73,13 @@ const jumpTo = (path) => {
 
 const refererToPlay =()=>{
   const jumpTarget = playerStore.theWayTo;
+  const isExpiredToken = tokenStatus.isTokenExpired;
+  if(isExpiredToken === '1'){
+    alert("登录已过期，请重新登陆")
+    tokenStatus.clearTokenStatus();
+    userStore.clearUser();
+    location.reload()
+  }
   if(jumpTarget === null){
     return;
   }else{
