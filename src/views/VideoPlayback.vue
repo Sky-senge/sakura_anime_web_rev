@@ -116,6 +116,11 @@ const filteredTags = computed(() => {
 const option = reactive({
   url: ``,
   fullscreen: true,
+  setting: true,
+  flip: true,
+  playbackRate: true,
+  aspectRatio: true,
+  subtitleOffset: true,
   type: 'm3u8',
   plugins: [
     artplayerPluginLibass({
